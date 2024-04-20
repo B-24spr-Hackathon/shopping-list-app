@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      # ビルドコンテキストを指定
+      context: ./backend_project
+      # dockerfileの指定
+      dockerfile: docker/python/Dockerfile
+    volumes:
+      # ホストディレクトリ：コンテナディレクトリにマウント
+      - ./backend_project/backend:/backend
+    # コンテナ起動時に実行するコマンド
+    command: python3 /backend/manage.py runserver 0.0.0.0:8000
+    # ポートを指定、ホスト：コンテナ
+    ports:
+      - "8000:8000"
+    # コンテナがフォアグラウンドで実行される
+    tty: true
+    depends_on:
+      - db
+
+  frontend:
+    build: 
+      # ビルドコンテキストを指定
+      context: ./frontend_project
+      # dockerfileの指定
+      dockerfile: docker/node/Dockerfile
+    
+    volumes:
+      # ホストディレクトリ：コンテナディレクトリにマウント
+      - ./frontend_project/frontend:/frontend
+      # 
+      - /frontend/node_modules
+    ports:
+      - "5173:5173"
+    tty: true
+    command: /bin/sh -c "cd /frontend/react && npm run dev"
+
+  db:
+    image: mysql:8.0
+    platform: linux/amd64
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_DATABASE: django-db
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
