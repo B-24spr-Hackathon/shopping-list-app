@@ -5,7 +5,6 @@ import {
   Route,
   Link
 } from "react-router-dom";
-import MainMenu from "./components/MainMenu";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import List from "./pages/List";
@@ -18,11 +17,11 @@ function App() {
     <Router>
       <div>
         <Routes>
+          <Route exact path="/" element={<Login />} />
           <Route path="/stock" element={<Stock />} />
           <Route path="/list" element={<List />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </Router>
