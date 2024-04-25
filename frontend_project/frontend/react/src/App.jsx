@@ -8,7 +8,7 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import List from "./pages/List";
-import Stock from "./pages/Stock";
+import Items from "./pages/Items";
 import Setting from "./pages/Setting";
 
 
@@ -18,7 +18,7 @@ function App() {
       <div>
         <Routes>
           <Route exact path="/" element={<Login />} />
-          <Route path="/stock" element={<Stock />} />
+          <Route path="/items" element={<Items />} />
           <Route path="/list" element={<List />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/home" element={<Home />} />
