@@ -66,7 +66,7 @@ class User(AbstractUser):
         db_table = 'users'
 
     def __str__(self):
-        return self.user_name
+        return self.user_id
 
    
 class List(models.Model):
