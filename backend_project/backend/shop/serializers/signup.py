@@ -3,7 +3,7 @@ from shop.models import User
 
 
 """
-UserRegisterSerializer
+SignupSerializer
 ユーザー登録処理に使用するSerializer
 """
 class SignupSerializer(serializers.Serializer):
