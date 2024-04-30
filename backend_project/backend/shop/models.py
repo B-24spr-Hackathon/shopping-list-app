@@ -96,7 +96,7 @@ class Member(models.Model):
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
-    list_id = models.ForeignKey(List, on_delete=models.CASCADE)
+    list = models.ForeignKey(List, on_delete=models.CASCADE)
     color = models.IntegerField(choices=COLOR_CHOICES, blank=True, null=True)
     consume_cycle = models.IntegerField(default=30)
     last_purchase_at = models.DateField(blank=True, null=True)
