@@ -84,7 +84,7 @@ class List(models.Model):
     
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
-    shared_list = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members')
+    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members')
     invitee_id = models.ForeignKey(User, on_delete=models.CASCADE)
     authority = models.BooleanField(default=False)
 
