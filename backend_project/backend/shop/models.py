@@ -9,9 +9,9 @@ DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'),
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
 
-#createsuperuerのために、UserManagerのオーバーライドが必要。#（username=>user_id）
+# createsuperuerのために、UserManagerのオーバーライドが必要。#（username=>user_id）
 class UserManager(BaseUserManager):
-    #ユーザーとスーパーユーザーの作成共通部分
+    # ユーザーとスーパーユーザーの作成共通部分
     def _create_user(self, user_id, email, password=None, **extra_fields):
 
         if not user_id:
@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(user_id, email, password, **extra_fields)
-    #スーパーユーザー作成部分
+    # スーパーユーザー作成部分
     def create_superuser(self, user_id, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -42,8 +42,8 @@ class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=50)
     user_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
-    #password = models.CharField(max_length=128)
-    #AbstractUserがもともと持っているusernameフィールドは使わない(除外せず、空白可としておく)
+    # password = models.CharField(max_length=128)
+    # AbstractUserがもともと持っているusernameフィールドは使わない(除外せず、空白可としておく)
     username = models.CharField(max_length=50, blank=True, null=True)
 
     line_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
@@ -56,7 +56,7 @@ class User(AbstractUser):
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
 
-    #ユーザーを一意に識別するフィールド
+    # ユーザーを一意に識別するフィールド
     USERNAME_FIELD = 'user_id'    
     REQUIRED_FIELDS = ['email']
 
@@ -91,7 +91,7 @@ class Member(models.Model):
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee.user_name
+        return self.invitee_id.user_name
     
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)

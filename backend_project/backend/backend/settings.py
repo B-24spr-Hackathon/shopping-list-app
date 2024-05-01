@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'shop',
 ]
 
-#AbstractUserを使うため追記
+# AbstractUserを使うため追記
 AUTH_USER_MODEL = 'shop.User'
 
 
