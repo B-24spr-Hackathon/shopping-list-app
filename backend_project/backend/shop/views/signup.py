@@ -12,6 +12,7 @@ SignupView
 """
 class SignupView(APIView):
     authentication_classes = []
+    
     # POSTリクエストの処理
     def post(self, request):
         serializer = SignupSerializer(data=request.data)

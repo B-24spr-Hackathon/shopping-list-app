@@ -12,17 +12,17 @@ class SignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
-    # ユーザー登録の処理
+    # DBへユーザーを保存
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
-    # user_idの確認
+    # user_idがDBに存在するか確認
     def validate_user_id(self, value):
         if User.objects.filter(user_id=value).exists():
             raise serializers.ValidationError("登録済みのIDです")
         return value
 
-    # emailの確認
+    # emailがDBに存在するか確認
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("登録済みのメールアドレスです")
