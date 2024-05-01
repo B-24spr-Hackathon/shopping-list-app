@@ -71,7 +71,7 @@ class User(AbstractUser):
    
 class List(models.Model):
     list_id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, db_column='owner_id')
+    owner_id = models.ForeignKey(User, on_delete=models.CASCADE)
     list_name = models.CharField(max_length=50)
     shopping_cycle = models.IntegerField(choices=SHOPPING_CYCLE_CHOICES,  default=0)
     shopping_day = models.IntegerField(choices=SHOPPING_DAY, blank=True, null=True)
@@ -85,7 +85,7 @@ class List(models.Model):
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     shared_list = models.ForeignKey(List, on_delete=models.CASCADE)
-    invitee = models.ForeignKey(User, on_delete=models.CASCADE)
+    invitee_id = models.ForeignKey(User, on_delete=models.CASCADE)
     authority = models.BooleanField(default=False)
 
     class Meta:
@@ -96,7 +96,6 @@ class Member(models.Model):
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
-    # list_idが正しいfield名です
     list_id = models.ForeignKey(List, on_delete=models.CASCADE)
     color = models.IntegerField(choices=COLOR_CHOICES, blank=True, null=True)
     consume_cycle = models.IntegerField(default=30)
