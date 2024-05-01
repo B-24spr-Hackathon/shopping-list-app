@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from backend_project.backend.shop.serializers.signup import SignupSerializer
+from shop.serializers.signup import SignupSerializer
 
 
 """
