@@ -3,7 +3,8 @@ from shop.views import items_views
 
 urlpatterns = [
     path('api/items/<user_id>/<list_id>/', items_views.ItemList.as_view()),
-
+    #path('api/items/<user_id>/<list_id>/', items_views.ItemCreateView.as_view()),
+    #path('api/items/<int:pk>/', items_views.ItemRetrieveView.as_view())
 
 ]
 
