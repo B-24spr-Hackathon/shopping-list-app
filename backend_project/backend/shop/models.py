@@ -71,7 +71,7 @@ class User(AbstractUser):
    
 class List(models.Model):
     list_id = models.AutoField(primary_key=True)
-    owner_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='owner_id')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, db_column='owner_id')
     list_name = models.CharField(max_length=50)
     shopping_cycle = models.IntegerField(choices=SHOPPING_CYCLE_CHOICES,  default=0)
     shopping_day = models.IntegerField(choices=SHOPPING_DAY, blank=True, null=True)
