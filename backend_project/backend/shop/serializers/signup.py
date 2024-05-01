@@ -7,27 +7,27 @@ SignupSerializer
 ユーザー登録処理に使用するSerializer
 """
 class SignupSerializer(serializers.Serializer):
-    authentication_classes = []
-    
-    user_id = serializers.CharField(write_only=True, required=True)
+    user_id = serializers.CharField(required=True)
     user_name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True)
-    
+    password = serializers.CharField(required=True, write_only=True)
+
+    # ユーザー登録の処理
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
     # user_idの確認
     def validate_user_id(self, value):
-        user = User(user_id=value)
-        if user:
+        if User.objects.filter(user_id=value).exists():
             raise serializers.ValidationError("登録済みのIDです")
         return value
-    
+
     # emailの確認
     def validate_email(self, value):
-        user = User(email=value)
-        if user:
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("登録済みのメールアドレスです")
         return value
-    
+
 
 """
 user_authentication_rule
