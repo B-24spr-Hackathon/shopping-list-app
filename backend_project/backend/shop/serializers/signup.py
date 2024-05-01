@@ -7,6 +7,8 @@ SignupSerializer
 ユーザー登録処理に使用するSerializer
 """
 class SignupSerializer(serializers.Serializer):
+    authentication_classes = []
+    
     user_id = serializers.CharField(write_only=True, required=True)
     user_name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
