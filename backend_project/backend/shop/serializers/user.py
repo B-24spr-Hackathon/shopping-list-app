@@ -27,12 +27,3 @@ class SignupSerializer(serializers.Serializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("登録済みのメールアドレスです")
         return value
-
-
-"""
-user_authentication_rule
-JWTでユーザーを認証する際に使用するルール
-DBにユーザーが存在すれば認証
-"""
-def user_authentication_rule(user):
-    return user is not None

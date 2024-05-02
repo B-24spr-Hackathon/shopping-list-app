@@ -141,7 +141,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # デフォルトでViewに適用する認証クラス
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
+        'shop.authentication.CustomJWTAuthentication'
+    ),
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated'
     )
 }
 
@@ -154,5 +157,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'user_id',
     'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'backend.shop.serializers.user_authentication_rule',
+    'USER_AUTHENTICATION_RULE': 'shop.authentication.user_authentication_rule',
+    'COOKIE_NAME': 'jwt_token'
 }
