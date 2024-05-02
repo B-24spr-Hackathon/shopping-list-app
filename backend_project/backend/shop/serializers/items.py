@@ -21,7 +21,7 @@ class ItemCreateSerializer(serializers.ModelSerializer):
         fields = ('item_name', 'color', 'consume_cycle', 'last_purchase_at', 'last_open_at', 'link', 'remind_by_item', )
 
 # アイテムリスト作成レスポンス用、アイテム更新レスポンス用
-class ItemRetrieveSerializer(serializers.ModelSerializer):
+class ItemResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from ..models import Item, List
-from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemRetrieveSerializer, ItemUpdateSerializer
+from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, ItemUpdateSerializer
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -43,7 +43,7 @@ class ItemList(generics.ListCreateAPIView):
         self.perform_create(serializer)
 
         # レスポンス表示に利用するserializer設定
-        retrieve_serializer = ItemRetrieveSerializer(serializer.instance)
+        retrieve_serializer = ItemResponseSerializer(serializer.instance)
         headers = self.get_success_headers(serializer.data)
         return Response(retrieve_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -55,7 +55,7 @@ class ItemUpdate(generics.RetrieveUpdateAPIView):
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
             return ItemUpdateSerializer
-        return ItemRetrieveSerializer
+        return ItemResponseSerializer
 
     # (owner または invitee) かつ item_id=item_id の条件でフィルタリング
     def get_queryset(self):
@@ -71,7 +71,7 @@ class ItemUpdate(generics.RetrieveUpdateAPIView):
         
         if serializer.is_valid():
             serializer.save()
-            updated_item_serializer = ItemRetrieveSerializer(item)
+            updated_item_serializer = ItemResponseSerializer(item)
             return Response(updated_item_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
