@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from ..models import Item, List
-from ..serializers.items_serializers import ItemSerializer, ItemCreateSerializer, ItemRetrieveSerializer, ItemUpdateSerializer
+from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemRetrieveSerializer, ItemUpdateSerializer
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -74,7 +74,7 @@ class ItemUpdate(generics.RetrieveUpdateAPIView):
             updated_item_serializer = ItemRetrieveSerializer(item)
             return Response(updated_item_serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
     '''
