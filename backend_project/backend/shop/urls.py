@@ -1,7 +1,7 @@
 from django.urls import path
 from shop.views import items_views
 from rest_framework.urlpatterns import format_suffix_patterns
-from shop.views import items, signup
+from shop.views import items, signup, user, login
 
 urlpatterns = [
      # アイテムリスト表示、アイテム作成
@@ -11,6 +11,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('api/user/', signup.SignupView.as_view(), name='signup')
+    path('api/user/', user.UserView.as_view(), name='user'),
+    path('api/login/', login.LoginView.as_view(), name='login')
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import User
+from shop.models import User, List
 
 
 """
@@ -12,17 +12,17 @@ class SignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
-    # ユーザー登録の処理
+    # DBへユーザーを保存（save()メソッドが呼出された時に実行される）
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
-    # user_idの確認
+    # user_idがDBに存在するか確認
     def validate_user_id(self, value):
         if User.objects.filter(user_id=value).exists():
             raise serializers.ValidationError("登録済みのIDです")
         return value
 
-    # emailの確認
+    # emailがDBに存在するか確認
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("登録済みのメールアドレスです")
@@ -30,9 +30,12 @@ class SignupSerializer(serializers.Serializer):
 
 
 """
-user_authentication_rule
-JWTでユーザーを認証する際に使用するルール
-DBにユーザーが存在すれば認証
+GetUserSerializer
+ユーザー情報表示に使用するSerializer
 """
-def user_authentication_rule(user):
-    return user is not None
+class GetUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["user_id", "user_name", "email", "line_id", "user_icon",
+                  "invitation", "request", "have_list", "default_list",
+                  "remind", "remind_timing", "remind_time"]

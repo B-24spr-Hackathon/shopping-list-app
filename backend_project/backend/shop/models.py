@@ -52,7 +52,7 @@ class User(AbstractUser):
     request = models.BooleanField(default=False)
     have_list = models.BooleanField(default=False)
     default_list = models.BooleanField(default=True)
-    remind = models.BooleanField(default=True)
+    remind = models.BooleanField(default=False)
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
 
@@ -68,7 +68,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.user_id
 
-   
+
 class List(models.Model):
     list_id = models.AutoField(primary_key=True)
     owner_id = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -81,7 +81,7 @@ class List(models.Model):
         db_table = 'lists'
     def __str__(self):
         return self.list_name
-    
+
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members')
@@ -91,8 +91,8 @@ class Member(models.Model):
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee_id.user_name
-    
+        return self.invitee.user_name
+
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
@@ -110,4 +110,3 @@ class Item(models.Model):
         db_table = 'items'           
     def __str__(self):
         return self.item_name
-

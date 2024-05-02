@@ -35,15 +35,14 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
-    'rest_framework',
-    'shop',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.messages",
+    # 'django.contrib.sessions',
+    # 'django.contrib.staticfiles',
+    "rest_framework",
+    "shop",
 ]
 
 # AbstractUserを使うため追記
@@ -141,7 +140,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # デフォルトでViewに適用する認証クラス
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
+        'shop.authentication.CustomJWTAuthentication'
+    ),
+    'DEFAULT_PERMISSIONS_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated'
     )
 }
 
@@ -154,5 +156,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'user_id',
     'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'backend.shop.serializers.user_authentication_rule',
+    'USER_AUTHENTICATION_RULE': 'shop.authentication.user_authentication_rule',
+    'COOKIE_NAME': 'jwt_token'
 }
