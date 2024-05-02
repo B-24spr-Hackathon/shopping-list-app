@@ -9,7 +9,7 @@ DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'),
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
 
-#createsuperuerのために、UserManagerのオーバーライドが必要。#（username=>user_id）
+# createsuperuerのために、UserManagerのオーバーライドが必要。#（username=>user_id）
 class UserManager(BaseUserManager):
     #ユーザーとスーパーユーザーの作成共通部分
     def _create_user(self, user_id, email, password=None, **extra_fields):
@@ -42,8 +42,8 @@ class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=50)
     user_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
-    #password = models.CharField(max_length=128)
-    #AbstractUserがもともと持っているusernameフィールドは使わない(除外せず、空白可としておく)
+    # password = models.CharField(max_length=128)
+    # AbstractUserがもともと持っているusernameフィールドは使わない(除外せず、空白可としておく)
     username = models.CharField(max_length=50, blank=True, null=True)
 
     line_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
@@ -56,9 +56,9 @@ class User(AbstractUser):
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
 
-    #ユーザーを一意に識別するフィールド
-    USERNAME_FIELD = 'user_id'    
-    REQUIRED_FIELDS = ['email']
+    # ユーザーを一意に識別するフィールド
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
@@ -68,7 +68,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.user_id
 
-   
+
 class List(models.Model):
     list_id = models.AutoField(primary_key=True)
     owner_id = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -81,7 +81,7 @@ class List(models.Model):
         db_table = 'lists'
     def __str__(self):
         return self.list_name
-    
+
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     shared_list = models.ForeignKey(List, on_delete=models.CASCADE)
@@ -92,7 +92,7 @@ class Member(models.Model):
         db_table = 'members'
     def __str__(self):
         return self.invitee.user_name
-    
+
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
@@ -110,4 +110,3 @@ class Item(models.Model):
         db_table = 'items'           
     def __str__(self):
         return self.item_name
-
