@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import User
+from shop.models import User, List
 
 
 """
@@ -30,9 +30,12 @@ class SignupSerializer(serializers.Serializer):
 
 
 """
-user_authentication_rule
-JWTでユーザーを認証する際に使用するルール
-DBにユーザーが存在すれば認証
+GetUserSerializer
+ユーザー情報表示に使用するSerializer
 """
-def user_authentication_rule(user):
-    return user is not None
+class GetUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["user_id", "user_name", "email", "line_id", "user_icon",
+                  "invitation", "request", "have_list", "default_list",
+                  "remind", "remind_timing", "remind_time"]

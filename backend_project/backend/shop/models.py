@@ -52,7 +52,7 @@ class User(AbstractUser):
     request = models.BooleanField(default=False)
     have_list = models.BooleanField(default=False)
     default_list = models.BooleanField(default=True)
-    remind = models.BooleanField(default=True)
+    remind = models.BooleanField(default=False)
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
 

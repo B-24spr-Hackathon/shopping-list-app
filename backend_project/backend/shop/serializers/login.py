@@ -27,9 +27,9 @@ class LoginSerializer(serializers.Serializer):
             if user:
                 return {"user": user}
             else:
-                raise serializers.ValidationError("パスワードが違います")
+                raise serializers.ValidationError("ユーザーは存在しません")
         else:
-            raise serializers.ValidationError("エラー")
+            raise serializers.ValidationError("メールアドレスとパスワードを入力してください")
 
 
 """
