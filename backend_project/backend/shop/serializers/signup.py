@@ -12,7 +12,7 @@ class SignupSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True, write_only=True)
 
-    # DBへユーザーを保存
+    # DBへユーザーを保存（save()メソッドが呼出された時に実行される）
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
