@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import User
+from shop.models import User, List
 
 
 """
@@ -27,3 +27,15 @@ class SignupSerializer(serializers.Serializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("登録済みのメールアドレスです")
         return value
+
+
+"""
+GetUserSerializer
+ユーザー情報表示に使用するSerializer
+"""
+class GetUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["user_id", "user_name", "email", "line_id", "user_icon",
+                  "invitation", "request", "have_list", "default_list",
+                  "remind", "remind_timing", "remind_time"]
