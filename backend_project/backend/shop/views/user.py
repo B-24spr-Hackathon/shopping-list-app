@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from shop.models import List
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.user import SignupSerializer, GetUserSerializer
+from shop.serializers.user import SignupSerializer, GetUpdateUserSerializer
 
 
 """
@@ -32,17 +32,13 @@ class UserView(APIView):
     # GETリクエストの処理（表示）
     def get(self, request):
         user = request.user
-        response_serializer = GetUserSerializer(user)
+        response_serializer = GetUpdateUserSerializer(user)
         lists = List.objects.filter(owner_id=user.user_id).values("list_id", "list_name")
         response_lists = [{"list_id": i["list_id"], "list_name": i["list_name"]} for i in lists]
-        test_response = [
-            {"list_id": 123, "list_name": "hoge"},
-            {"list_id": 124, "list_name": "fuga"},
-        ]
         return Response({
             "user": response_serializer.data,
-            "lists": test_response
-        })
+            "lists": response_lists
+        }, status=status.HTTP_200_OK)
 
 
     # POSTリクエストの処理（登録）
@@ -57,6 +53,20 @@ class UserView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    # PATCHリクエストの処理（更新）
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        serializer = GetUpdateUserSerializer(user, data=request.data,
+                                       context={"request": request},
+                                       partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "user": serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 
     # DELETEリクエストの処理（退会）
     def delete(self, request):
