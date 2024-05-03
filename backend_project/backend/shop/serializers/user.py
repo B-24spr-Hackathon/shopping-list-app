@@ -40,7 +40,7 @@ class GetUpdateUserSerializer(serializers.ModelSerializer):
                   "user_icon", "invitation", "request", "have_list",
                   "default_list", "remind", "remind_timing", "remind_time"]
         extra_kwargs = {"password": {"write_only": True}}
-        read_only_fields = ["line_id"]
+        read_only_fields = ["user_id", "line_id"]
 
     # レスポンスに含めるデータを制御
     def to_representation(self, instance):
