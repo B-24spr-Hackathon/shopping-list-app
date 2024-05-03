@@ -25,17 +25,11 @@ class ItemView(APIView):
         else:
             return  [IsAuthenticated]
 
-    # owner または invitee, かつ list_idでアイテムをフィルタリング
-    def filter_items(self, user_id, list_id=None, item_id=None):
-        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(list_id=list_id)
-        if list_id is not None:
-            filters &= Q(list_id=list_id)
-        if item_id is not None:
-            filters &= Q(id=item_id)
-        return Item.objects.filter(filters)
-
-    #fアイテムリスト表示
+    # アイテムリスト表示
     def get(self, request, user_id, list_id):
+        # owner または invitee, かつ list_idでアイテムをフィルタリング
+        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(list_id=list_id)
+        items = Item.objects.filter(filters)
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
     
