@@ -24,7 +24,19 @@ class ItemView(APIView):
             return [AllowAny]
         else:
             return  [IsAuthenticated]
- 
+
+    # owner または invitee, かつ list_idでアイテムをフィルタリング
+    def filter_items(self, user_id, list_id=None, item_id=None):
+        filters =      
+            (Q(list_id__owner_id=user_id) | 
+            Q(list_id__members__invitee_id=user_id)) & 
+            Q(list_id=list_id)
+        if list_id is not None:
+            filters &= Q(list_id=list_id)
+        if item_id is not None:
+            filters &= Q(id=item_id)
+        return Item.objects.filter(filters)
+
     #fアイテムリスト表示
     def get(self, request, user_id, list_id):
         serializer = ItemSerializer(items, many=True)
@@ -41,5 +53,19 @@ class ItemView(APIView):
         # 作成、保存されたアイテムをシリアライズして返す
             response_serializer = ItemResponseSerializer(serializer.instance)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # アイテム更新            
+    def patch(self, request, *args, **kwargs):
+        # アイテムを取得
+        item = get_object_or_404(Item, id=item_id, list_id__owner_id=user_id)
+
+        serializer = ItemUpdateSerializer(item, data=request.data, context={"request": request}, partial=True)
+    
+        if serializer.is_valid():
+            saved_item = serializer.save()
+            update_serializer = ItemResponseSerializer(saved_item)
+            return Response(update_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
