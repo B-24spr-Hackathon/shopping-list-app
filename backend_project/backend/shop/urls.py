@@ -8,6 +8,8 @@ urlpatterns = [
     path('api/items/<user_id>/<list_id>/', items.ItemList.as_view()),
      # アイテム更新
     path('api/items/<user_id>/<item_id>/', items.ItemUpdate.as_view()),
+    # アイテム削除
+    path('/api/items/<user_id>/<item_id/', items.ItemDelete.as_view())
 ]
 
 urlpatterns += [
