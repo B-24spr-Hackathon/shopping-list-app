@@ -27,10 +27,7 @@ class ItemView(APIView):
 
     # owner または invitee, かつ list_idでアイテムをフィルタリング
     def filter_items(self, user_id, list_id=None, item_id=None):
-        filters =      
-            (Q(list_id__owner_id=user_id) | 
-            Q(list_id__members__invitee_id=user_id)) & 
-            Q(list_id=list_id)
+        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(list_id=list_id)
         if list_id is not None:
             filters &= Q(list_id=list_id)
         if item_id is not None:
@@ -69,3 +66,15 @@ class ItemView(APIView):
             return Response(update_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    # アイテム削除
+    def delete(self, request, user_id, item_id):
+        # 削除するアイテムのインスタンスを取得
+        item = get_object_or_404(Item, id=item_id, list_id__owner_id=user_id)
+
+        response_serializer = ItemResponseSerializer(item)
+        serialized_data = response_serializer.data
+
+        item.delete()
+
+        return Response(serialized_data, status=status.HTTP_200_OK)
