@@ -1,7 +1,7 @@
 from django.urls import path
-from shop.views import items_views
+from shop.views import items
 from rest_framework.urlpatterns import format_suffix_patterns
-from shop.views import items, signup, user, login
+from shop.views import items, user, login
 
 urlpatterns = [
      # アイテムリスト表示GET、アイテム作成POST
