@@ -1,25 +1,37 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import, status
 from ..models import Item, List
 from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, ItemUpdateSerializer
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.views import APIView
 
 
 # アイテムリスト表示および新規作成
-class ItemList(generics.ListCreateAPIView):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
+class ItemView(APIView):
+
+    def get(self, request, user_id, list_id):
+        # owner または invitee, かつ list_idでフィルタリング
+        items = Item.objects.filter(
+            (Q(list_id__owner_id=user_id) | 
+            Q(list_id__members__invitee_id=user_id)) & 
+            Q(list_id=list_id)
+        ) 
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+    
+
+
+    #authentication_classes = (SessionAuthentication, BasicAuthentication)
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
-   # 同じビューを利用して新規作成(POST)
+   # リクエストメソッドにより、シリアライザー設定
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return ItemCreateSerializer
-        return ItemSerializer
+        return ItemSerializer    
     
-    # 同じビューを利用して表示(GET)
     def get_queryset(self):
         user_id = self.kwargs.get('user_id')
         list_id = self.kwargs.get('list_id')
@@ -76,7 +88,23 @@ class ItemUpdate(generics.RetrieveUpdateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# アイテムの削除
+class ItemDelete(generics.RetrieveUpdateAPIView):
 
+    # DELETEリクエストの処理（退会）
+    def delete(self, request):
+        user = request.user
+        response_user = {
+            "user_id": user.user_id,
+            "user_name": user.user_name,
+            "email": user.email,
+            "user_icon": user.user_icon
+        }
+        user.delete()
+        return Response(response_user, status=status.HTTP_200_OK)
+
+
+    
     '''
     このメソッドを追加して、どのHTTPメソッドも受け入れるようにします（デバッグ用）
     def options(self, request, *args, **kwargs):

@@ -4,12 +4,10 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from shop.views import items, signup, user, login
 
 urlpatterns = [
-     # アイテムリスト表示、アイテム作成
-    path('api/items/<user_id>/<list_id>/', items.ItemList.as_view()),
-     # アイテム更新
-    path('api/items/<user_id>/<item_id>/', items.ItemUpdate.as_view()),
-    # アイテム削除
-    path('/api/items/<user_id>/<item_id/', items.ItemDelete.as_view())
+     # アイテムリスト表示GET、アイテム作成POST
+    path('api/items/<user_id>/<list_id>/', items.ItemView.as_view()),
+     # アイテム更新PATCH、削除DELETE
+    path('api/items/<user_id>/<item_id>/', items.ItemView.as_view()),
 ]
 
 urlpatterns += [
