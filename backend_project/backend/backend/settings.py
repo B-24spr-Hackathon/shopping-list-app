@@ -159,3 +159,9 @@ SIMPLE_JWT = {
     'USER_AUTHENTICATION_RULE': 'shop.authentication.user_authentication_rule',
     'COOKIE_NAME': 'jwt_token'
 }
+
+# LINEの設定
+LINE_CHANNEL_ID = "2004751038"
+LINE_CHANNEL_SECRET = "b2b453579e5786b991a979e0c555f1a0"
+REDIRECT_URL = "http%3A%2F%2F0.0.0.0%3A8000%2Fapi%2Fcallback%2F"
+STATE = "shopping-list12345"
