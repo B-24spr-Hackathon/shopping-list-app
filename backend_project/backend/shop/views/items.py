@@ -11,20 +11,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 # アイテムリスト表示および新規作成
 class ItemView(APIView):
 
-        # リクエストメソッドごとに認証クラスを設定
-    def get_authenticators(self):
-        if self.request.method == "POST":
-            return []
-        else:
-            return [CustomJWTAuthentication]
-
-    # リクエストメソッドごとにパーミッションクラスを設定
-    def get_permissions(self):
-        if self.request.method == "POST":
-            return [AllowAny]
-        else:
-            return  [IsAuthenticated]
-
     # アイテムリスト表示
     def get(self, request, user_id, list_id):
         # owner または invitee, かつ list_idでアイテムをフィルタリング
@@ -49,8 +35,12 @@ class ItemView(APIView):
 
     # アイテム更新            
     def patch(self, request, *args, **kwargs):
+        user_id = request.user.id
+        item_id = kwargs.get('item_id')        
+        # owner または inviteeか、アイテムが存在するかフィルタリング
+        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(id=item_id)
         # アイテムを取得
-        item = get_object_or_404(Item, id=item_id, list_id__owner_id=user_id)
+        item = get_object_or_404(Item.objects.filter(filters))
 
         serializer = ItemUpdateSerializer(item, data=request.data, context={"request": request}, partial=True)
     
@@ -61,14 +51,15 @@ class ItemView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    # アイテム削除
+     # アイテム削除
     def delete(self, request, user_id, item_id):
+        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(id=item_id)
         # 削除するアイテムのインスタンスを取得
-        item = get_object_or_404(Item, id=item_id, list_id__owner_id=user_id)
-
+        item = get_object_or_404(Item.objects.filter(filters))
+        # 削除する前にシリアライズしたデータを保存
         response_serializer = ItemResponseSerializer(item)
         serialized_data = response_serializer.data
 
         item.delete()
-
-        return Response(serialized_data, status=status.HTTP_200_OK)
+        # 削除したアイテムのデータを表示する
+        return Response(serialized_data, status=status.HTTP_200_OK)   

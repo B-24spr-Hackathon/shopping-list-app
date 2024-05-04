@@ -91,7 +91,7 @@ class Member(models.Model):
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee.user_name
+        return self.invitee_id.user_name
 
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
