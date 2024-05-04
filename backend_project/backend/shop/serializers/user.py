@@ -30,12 +30,24 @@ class SignupSerializer(serializers.Serializer):
 
 
 """
-GetUserSerializer
+GetUpdateUserSerializer
 ユーザー情報表示に使用するSerializer
 """
-class GetUserSerializer(serializers.ModelSerializer):
+class GetUpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["user_id", "user_name", "email", "line_id", "user_icon",
-                  "invitation", "request", "have_list", "default_list",
-                  "remind", "remind_timing", "remind_time"]
+        fields = ["user_id", "user_name", "email", "password", "line_id",
+                  "user_icon", "invitation", "request", "have_list",
+                  "default_list", "remind", "remind_timing", "remind_time"]
+        extra_kwargs = {"password": {"write_only": True}}
+        read_only_fields = ["user_id", "line_id"]
+
+    # レスポンスに含めるデータを制御
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get("request")
+        if request and request.method == "PATCH":
+            fields = request.data.keys()
+            ret = {field: value for field, value in ret.items() if field in fields
+            }
+        return ret
