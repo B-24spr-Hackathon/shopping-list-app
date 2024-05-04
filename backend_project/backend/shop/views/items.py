@@ -8,7 +8,6 @@ from rest_framework.views import APIView
 from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-# アイテムリスト表示および新規作成
 class ItemView(APIView):
 
     # アイテムリスト表示
