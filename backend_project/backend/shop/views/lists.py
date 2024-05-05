@@ -32,8 +32,9 @@ class ListView(APIView):
         serializer = ListCreateSerializer(data=request.data)
 
         if serializer.is_valid():
-            list_instance = serializer.save(owner=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save(owner_id=request.user)
+            response_serializer = ListResponseSerializer(serializer.instance)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
