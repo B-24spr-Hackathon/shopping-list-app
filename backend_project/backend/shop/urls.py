@@ -8,7 +8,7 @@ urlpatterns = [
     # アイテム更新PATCH、削除DELETE
     path('api/items/<user_id>/<item_id>/', items.ItemView.as_view()),
     # 買い物リスト表示GET
-    path('api/shopping-list/<list_id>/', lists.ListView)
+    path('api/shopping-list/<list_id>/', lists.ListView.as_view())
 ]
 
 urlpatterns += [
