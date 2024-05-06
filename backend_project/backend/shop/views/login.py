@@ -3,23 +3,25 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from shop.serializers.signup import SignupSerializer
+from shop.serializers.login import LoginSerializer, LoginResponseSerializer
 
 
 """
-SignupView
-ユーザー登録処理のView
+LoginView
+ログイン処理のView
 """
-class SignupView(APIView):
+class LoginView(APIView):
     authentication_classes = []
+    
     # POSTリクエストの処理
     def post(self, request):
-        serializer = SignupSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            user = serializer.validated_data["user"]
             token = AccessToken.for_user(user)
+            response_serializer = LoginResponseSerializer(user)
             return Response({
-                "user": serializer.data,
+                "user": response_serializer.data,
                 "access": str(token)
-            }, status=status.HTTP_201_CREATED)
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
