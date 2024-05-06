@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import List from "./pages/List";
 import Items from "./pages/Items";
 import Setting from "./pages/Setting";
+import Signup from "./pages/Signup";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Login />} />
           <Route path="/items" element={<Items />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/list" element={<List />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="/home" element={<Home />} />
