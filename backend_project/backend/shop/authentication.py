@@ -14,7 +14,7 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
         # CookieからJWTを取得
         token = request.COOKIES.get(settings.SIMPLE_JWT["COOKIE_NAME"])
         if not token:
-            return None
+            raise exceptions.AuthenticationFailed("トークンが存在しません")
 
         # JWTを検証
         try:
