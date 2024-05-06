@@ -1,0 +1,3 @@
+# DBのテーブルやカラムが確定するまでmigrationファイルを管理対象外とする
+!backend_project/backend/shop/migrations/__init__.py
+backend_project/backend/shop/migrations/*
