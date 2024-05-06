@@ -10,7 +10,7 @@ class LineSignupSerializer(serializers.Serializer):
     user_id = serializers.CharField()
     user_name = serializers.CharField()
     line_id = serializers.CharField()
-    email = serializers.EmailField()
+    email = serializers.EmailField(required=False)
 
     def create(self, validated_data):
         user_id = validated_data["user_id"]
@@ -21,7 +21,13 @@ class LineSignupSerializer(serializers.Serializer):
     # user_idがDBに存在するか確認
     def validate_user_id(self, value):
         if User.objects.filter(user_id=value).exists():
-            raise serializers.ValidationError("登録済みのIDです")
+            raise serializers.ValidationError("登録済みのuser_idです")
+        return value
+
+    # line_idがDBに存在するか確認
+    def validate_line_id(self, value):
+        if User.objects.filter(line_id=value).exists():
+            raise serializers.ValidationError("登録済みのline_idです")
         return value
 
 

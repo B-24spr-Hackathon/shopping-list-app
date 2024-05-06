@@ -86,7 +86,7 @@ LINEログインからユーザーを登録するためのView
 """
 class LineSignupView(APIView):
     authentication_classes = []
-    
+
     # POSTリクエストの処理（登録）
     def post(self, request):
         serializer = LineSignupSerializer(data=request.data)
@@ -96,7 +96,8 @@ class LineSignupView(APIView):
             return Response({
                 "user": serializer.data,
                 "access": str(token)
-            })
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 """
