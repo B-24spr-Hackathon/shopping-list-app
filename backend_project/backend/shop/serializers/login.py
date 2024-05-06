@@ -8,8 +8,8 @@ LoginSerializer
 ログイン処理の認証に使用するSerializer
 """
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True)
+    email = serializers.EmailField()
+    password = serializers.CharField()
 
     # emailがDBに登録されているか確認
     def validate_email(self, value):

@@ -7,10 +7,10 @@ SignupSerializer
 ユーザー登録処理に使用するSerializer
 """
 class SignupSerializer(serializers.Serializer):
-    user_id = serializers.CharField(required=True)
-    user_name = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    user_id = serializers.CharField()
+    user_name = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
     # DBへユーザーを保存（save()メソッドが呼出された時に実行される）
     def create(self, validated_data):
