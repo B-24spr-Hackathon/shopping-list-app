@@ -36,3 +36,9 @@ class ListResponseSerializer(serializers.ModelSerializer):
         model = List
         fields = ('list_id', 'list_name', 'shopping_cycle', 'shopping_day', 'day_of_week',)
       
+# リスト更新リクエスト、レスポンス用      
+class ListUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = List
+        fields = ('list_name', 'shopping_cycle', 'shopping_day', 'day_of_week',)
