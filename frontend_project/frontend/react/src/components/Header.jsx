@@ -1,11 +1,12 @@
 import React from 'react';
-import "../styles/Header.css"
 
 function Header() {
     return (
-        <header className='header'>
-            <img src="/HeaderBar.png" alt="img" className="w-full h-auto lg:h-[125px]"/>
-        </header>
+        <>
+            <div className='top-0 left-0 w-full h-[125px]'>
+                <img src="/HeaderBar.png" alt="img" className="w-full h-full"/>
+            </div>
+        </>
     );
 }
 

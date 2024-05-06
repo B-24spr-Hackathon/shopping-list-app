@@ -2,7 +2,7 @@ import React from "react";
 
 function TextInput({ type = "text", placeholder = "text", value, onChange }) {
     return (
-        <div>
+        <div className="mt-8">
             <input 
                 type={type} 
                 placeholder={placeholder} 

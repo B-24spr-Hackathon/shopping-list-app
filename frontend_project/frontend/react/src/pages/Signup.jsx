@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import TextInput from "../components/TextInput";
-import { CertifyBtn } from "../components/Buttons";
+import { CertifyBtn, LineBtn } from "../components/Buttons";
+import Title from "../components/Title";
+import Footer from "../components/Footer";
 
 function Signup() {
     //状態管理
@@ -30,19 +32,21 @@ function Signup() {
     };
     return (
         <>
-            <Header />
-            <div className="">メールアドレスで登録</div>
-            <div className="">
+            <div className="main flex justify-center items-center flex-col">
+                <Header />
+                <Title children="IDを登録" />
+                <LineBtn onClick={""} children="LINEで新規登録"/>
                 <TextInput  placeholder="user_id" value={user_id} onChange={e => setUser_id(e.target.value)} />
                 <TextInput  placeholder="user_name" value={user_name} onChange={e => setUser_name(e.target.value)} />
                 <TextInput  placeholder="mail" value={email} onChange={e => setEmail(e.target.value)} />
                 <TextInput  type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)} />
+                <CertifyBtn onClick={handleSignup} children="登録する"/>
+                {error && <p>{error}</p>} { }
+                <Footer />
             </div>
-            <div>
-                <CertifyBtn onClick={handleSignup} children="新規登録する"/>
-            </div>
-            {error && <p>{error}</p>} { }
         </>
+
+        
 
     );
 }
