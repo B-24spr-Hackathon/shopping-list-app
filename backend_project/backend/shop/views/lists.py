@@ -28,7 +28,8 @@ class ShoppingListView(APIView):
 
 class ListView(APIView):
     # JWT認証を要求する
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
+
     # リスト設定（登録）POST
     def post(self, request):
         serializer = ListCreateSerializer(data=request.data)
@@ -42,21 +43,16 @@ class ListView(APIView):
         
     # リスト設定（表示）GET
     def get(self, request, list_id):
-        filters = (Q(owner_id=request.user) | Q(members__invitee_id=request.user)) & Q(list_id=list_id)
-        # 対象のリストを取得
-        lists = List.objects.filter(filters)
-        # リストが見つからない場合エラーを返す
-        if not lists.exists():
-            return Response({"message": "リストが見つからないか、アクセス権限がありません。"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = ListResponseSerializer(lists, many=True)
-        return Response(serializer.data)
+        # オーナーのみフィルタリング
+        list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
+
+        serializer = ListResponseSerializer(list_instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     # リスト設定（更新）PATCH
     def patch(self, request, list_id):
-        #リストのownerとinviteeだけをフィルタリング        
-        filters = (Q(owner_id=request.user) | Q(members__invitee_id=request.user)) & Q(pk=list_id)
-        # 対象のリストを取得
-        list_instance = get_object_or_404(List, filters)
+        # オーナーのみフィルタリング
+        list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
 
         serializer = ListUpdateSerializer(list_instance, data=request.data, context={"request":request}, partial=True)
 
@@ -69,9 +65,8 @@ class ListView(APIView):
                    
     # リスト設定（削除）DELETE
     def delete(self, request, list_id):
-        # 削除するリストのインスタンスを取得
+        # オーナーのみフィルタリング
         list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
-
         # 削除する前にシリアライズしたデータを保存
         response_serializer = ListResponseSerializer(list_instance)
         serialized_data = response_serializer.data
