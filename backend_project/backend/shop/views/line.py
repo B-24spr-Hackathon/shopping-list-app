@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 import requests, jwt
-from shop.serializers.line import LineSerializer
+from shop.serializers.line import LineSignupSerializer, LineLoginSerializer
+from shop.models import User
+from shop.serializers.login import LoginResponseSerializer
 
 
 # LINEログインで使用するパラメーターを定義
@@ -14,50 +16,33 @@ client_secret = settings.LINE_CHANNEL_SECRET
 redirect_uri = settings.REDIRECT_URL
 state = settings.STATE
 
+# フロントエンドへのリダイレクト先
+redirect_ok = settings.FRONT_REDIRECT_URL
+redirect_ng = settings.FRONT_ERROR_URL
+
 """
+LineCallbackView
+LINE認証サーバーからのコールバックに対応するView
 """
-class LineLoginView(APIView):
+class LineCallbackView(APIView):
     authentication_classes = []
 
-    # POSTリクエストの処理
-    def post(self, request):
-        # 受取ったuser_idをDBへ保存
-        serializer = LineSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            token = AccessToken.for_user(user)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        # 上記以外のLINEログイン用パラメータを設定
-        scope = "profile%20openid"
-
-        # LINE認証サーバーのURL生成
-        line_url = f"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&state={state}&scope={scope}"
-
-        # LINE認証サーバーへのリクエストURLの返信
-        return Response({
-            "url": line_url,
-            "access": str(token)
-            }, status=status.HTTP_200_OK)
-
-
-class LineCallbackView(APIView):
     def get(self, request):
-        user = request.user
-        if not user.is_authenticated:
-            return redirect("http://127.0.0.1:5173/?error=no_jwt")
         # クエリパラメータから認可コードを取得
         code = request.GET.get("code")
-        get_state = request.GET.get("state")
-        if get_state != state:
-            return redirect("http://127.0.0.1:5173/?error=bad_request")
+        state = request.GET.get("state")
         error = request.GET.get("error")
-        if error:
-            return redirect(f"http://127.0.0.1:5173/?error={error}")
+        error_description = request.GET.get("error_description")
 
-        # アクセストークンを受取るリクエストのための情報定義
+        # errorが発生しているか確認
+        if error:
+            return redirect(f"{redirect_ng}?error={error}&error_description={error_description}")
+
+        # stateの値の確認（csrf防止のため）
+        if state != settings.STATE:
+            return redirect(f"{redirect_ng}?error=bad_request")
+
+        # アクセストークンを受取るための情報定義
         token_url = "https://api.line.me/oauth2/v2.1/token"
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {
@@ -70,31 +55,66 @@ class LineCallbackView(APIView):
 
         # POSTリクエストを送信しアクセストークンを取得
         response = requests.post(token_url, headers=headers, data=data)
-        if response.status_code == 200:
-            # 取得した情報を辞書型に変換
-            tokens = response.json()
-            if "error" in tokens:
-                return redirect("http://127.0.0.1:5173/?error=fail_to_get_token")
-        else:
-            return redirect("http://127.0.0.1:5173/?error=fail_to_get_token")
+        tokens = response.json()
+        if response.status_code != 200:
+            return redirect(f"{redirect_ng}?error={response.status_code}&error_msg={response.text}")
 
-        # JWTであるid_tokenを取得
+        # id_token(JWT)からユーザー情報を取得
         id_token = tokens["id_token"]
-        decoded_token = jwt.decode(id_token, client_secret, audience=client_id,
-                                   issuer="https://access.line.me",
-                                   algorithms=["HS256"])
+        payload = jwt.decode(id_token, client_secret, audience=client_id,
+                             issuer="https://access.line.me",
+                             algorithms=["HS256"])
 
         # id_tokenからユーザー情報を取得
-        user_name = decoded_token["name"]
-        line_id = decoded_token["sub"]
+        user_name = payload["name"]
+        line_id = payload["sub"]
 
-        # パスパラメーターからuser_idを取得
-        serializer = LineSerializer(user,
-                                    data={"user_name": user_name,
-                                          "line_id": line_id},
-                                    partial=True)
+        # ユーザーがDBに存在する場合
+        if User.objects.filter(line_id=line_id).exists():
+            return redirect(
+                f"{redirect_ok}?line_id={line_id}")
+        
+        # ユーザーがDBに存在しない場合
+        return redirect(
+            f"{redirect_ok}?line_id={line_id}&user_name={user_name}"
+        )
+
+
+"""
+LineSignupView
+LINEログインからユーザーを登録するためのView
+"""
+class LineSignupView(APIView):
+    authentication_classes = []
+    
+    # POSTリクエストの処理（登録）
+    def post(self, request):
+        serializer = LineSignupSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return redirect("http://127.0.0.1:5173/")
+            user = serializer.save()
+            token = AccessToken.for_user(user)
+            return Response({
+                "user": serializer.data,
+                "access": str(token)
+            })
 
-        return redirect("http://127.0.0.1:5173/?error=no_user_id")
+
+"""
+LineLoginView
+LINEログインからログインするためのView
+"""
+class LineLoginView(APIView):
+    authentication_classes = []
+
+    # POSTリクエストの処理
+    def post(self, request):
+        serializer = LineLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            token = AccessToken.for_user(user)
+            response_serializer = LoginResponseSerializer(user)
+            return Response({
+                "user": response_serializer.data,
+                "access": str(token)
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

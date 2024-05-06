@@ -2,11 +2,15 @@ from rest_framework import serializers
 from shop.models import User
 
 
-class LineSerializer(serializers.Serializer):
+"""
+LineSignupSerializer
+LINEログインでユーザー登録に使用するSerializer
+"""
+class LineSignupSerializer(serializers.Serializer):
     user_id = serializers.CharField()
-    user_name = serializers.CharField(required=False)
-    line_id = serializers.CharField(required=False)
-    email = serializers.EmailField(required=False)
+    user_name = serializers.CharField()
+    line_id = serializers.CharField()
+    email = serializers.EmailField()
 
     def create(self, validated_data):
         user_id = validated_data["user_id"]
@@ -14,15 +18,25 @@ class LineSerializer(serializers.Serializer):
         validated_data["email"] = validated_data.get("email", email)
         return User.objects.create_user(**validated_data)
 
-    def update(self, instance, validated_data):
-        instance.user_name = validated_data.get("user_name",
-                                                instance.user_name)
-        instance.line_id = validated_data.get("line_id", instance.line_id)
-        instance.save()
-        return instance
-
     # user_idがDBに存在するか確認
     def validate_user_id(self, value):
         if User.objects.filter(user_id=value).exists():
             raise serializers.ValidationError("登録済みのIDです")
         return value
+
+
+"""
+LineLoginSerializer
+LINEログインでログインに使用するSerializer
+"""
+class LineLoginSerializer(serializers.Serializer):
+    line_id = serializers.CharField()
+    
+    # 受取ったline_idでユーザー認証
+    def validate(self, data):
+        line_id = data.get("line_id")
+        if User.objects.filter(line_id=line_id).exists():
+            user = User.objects.get(line_id=line_id)
+            return {"user": user}
+        else:
+            raise serializers.ValidationError("ユーザーは存在しません")
