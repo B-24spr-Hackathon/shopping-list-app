@@ -10,6 +10,7 @@ export default {
       },
       colors: {
         'line-green': '#06C755',
+        'base-orange': '#FFA800',
       },
       fontFamily:{
         'hel': 'Helvetica',

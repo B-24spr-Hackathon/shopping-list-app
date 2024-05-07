@@ -1,3 +1,31 @@
 .title-center {
   margin-top: 200px;
 }
+
+
+
+.header-border {
+  position: relative;
+  display: inline-block;
+  padding: 0 55px;
+}
+
+.header-border:before,
+.header-border:after {
+  content:"";
+  position: absolute;
+  top: 50%;
+  display: inline-block;
+  width: 50px;
+  height:1px;
+
+  background-color: #666;
+}
+
+.header-border:before {
+  left: 0;
+}
+
+.header-border:after {
+  right: 0;
+}

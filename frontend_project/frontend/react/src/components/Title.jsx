@@ -2,10 +2,18 @@ import React from "react";
 
 function Title( {children} ) {
     return (
-        <div className="flex justify-center font-bold text-2xl mt-8">
+        <div className="flex justify-center font-bold text-2xl my-8">
             {children}
         </div>
     );
 }
 
-export default Title;
+function Bar( {children} ){
+    return (
+        <div className="header-border my-3">
+            {children}
+        </div>
+    );
+}
+
+export { Title, Bar };
