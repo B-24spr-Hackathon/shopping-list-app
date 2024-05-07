@@ -14,7 +14,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    //ユーザー登録関数
+    //ログイン関数
     const navigate = useNavigate();
 
     const handleLogin = async() => {

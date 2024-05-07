@@ -15,6 +15,8 @@ function Signup() {
     const [error, setError] = useState("");
 
     //ユーザー登録関数
+    const navigate = useNavigate();
+
     const handleSignup = async() => {
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/user/', {
