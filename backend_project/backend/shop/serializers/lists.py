@@ -29,7 +29,7 @@ class ListCreateSerializer(serializers.ModelSerializer):
         model = List
         fields = ('list_name', 'shopping_cycle', 'shopping_day', 'day_of_week',)
 
-# リスト設定（表示）（登録）レスポンス用
+# リスト設定（表示）（登録）（更新）(削除)レスポンス用
 class ListResponseSerializer(serializers.ModelSerializer):
 
     class Meta:

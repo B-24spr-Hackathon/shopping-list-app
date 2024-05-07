@@ -57,9 +57,12 @@ class ListView(APIView):
         serializer = ListUpdateSerializer(list_instance, data=request.data, context={"request":request}, partial=True)
 
         if serializer.is_valid():
+            # データベースのデータを更新して保存
             saved_list = serializer.save()
-            update_serializer = ListUpdateSerializer(saved_list)
-            return Response(update_serializer.data, status=status.HTTP_200_OK)
+            # 更新されたフィールドのみを辞書として取得
+            update_fields = {field: request.data[field] for field in request.data}
+            # 更新されたフィールドのみをレスポンスとして返す
+            return Response(update_fields, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                    
