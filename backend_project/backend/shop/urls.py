@@ -23,5 +23,6 @@ urlpatterns += [
          name="line-callback"),
     path("api/line/", line.LineSignupView.as_view(), name="line-signup"),
     path("api/line-login/", line.LineLoginView.as_view(), name="line-login"),
+    path("api/line-link/", line.LineLinkView.as_view(), name='line-link')
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

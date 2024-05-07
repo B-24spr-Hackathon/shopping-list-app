@@ -168,7 +168,7 @@ SIMPLE_JWT = {
     'COOKIE_NAME': 'jwt_token'
 }
 
-# LINEの設定
+# LINEログインの設定
 LINE_CHANNEL_ID = "2004751038"
 LINE_CHANNEL_SECRET = "b2b453579e5786b991a979e0c555f1a0"
 REDIRECT_URL = "http://127.0.0.1:8000/api/callback/"
@@ -177,3 +177,6 @@ STATE = "shopping-list12345"
 # LINEログインでのフロントエンドリダイレクトURL
 FRONT_REDIRECT_URL = "http://127.0.0.1:5173/"
 FRONT_ERROR_URL = "http://127.0.0.1:5173/"
+
+# LINE公式チャンネルの設定
+CHANNEL_URL = "https://lin.ee/Ekblccd"
