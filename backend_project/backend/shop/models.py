@@ -1,6 +1,25 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser,BaseUserManager
 
+class UserManager(BaseUserManager):
+    def create_user(self, user_id, email, password=None, **extra_fields):
+        if not user_id:
+            raise ValueError('The given user_id must be set')
+        if not email:
+            raise ValueError('The given email must be set')
+        
+        email = self.normalize_email(email)
+        user = self.model(user_id=user_id, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, user_id, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(user_id, email, password, **extra_fields)
+    
 # Create your models here.
 REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
 SHOPPING_CYCLE_CHOICES = [(0,'毎月'), (1,'隔週'), (2,'毎週'),]
@@ -8,35 +27,6 @@ SHOPPING_DAY = [(i, i) for i in range(1, 31)]
 DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'), (6,'日'),]
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
-
-# createsuperuerのために、UserManagerのオーバーライドが必要。#（username=>user_id）
-class UserManager(BaseUserManager):
-    #ユーザーとスーパーユーザーの作成共通部分
-    def _create_user(self, user_id, email, password=None, **extra_fields):
-
-        if not user_id:
-            raise ValueError('The given user_id must be set')
-        email = self.normalize_email(email)
-        user = self.model(user_id=user_id, email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_user(self, user_id, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
-        return self._create_user(user_id, email, password, **extra_fields)
-    #スーパーユーザー作成部分
-    def create_superuser(self, user_id, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True')
-
-        return self._create_user(user_id, email, password, **extra_fields)
 
 class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=50)
@@ -56,11 +46,11 @@ class User(AbstractUser):
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
 
-    # ユーザーを一意に識別するフィールド
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-
     objects = UserManager()
+
+    # ユーザーを一意に識別するフィールド
+    USERNAME_FIELD = 'user_id'    
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         db_table = 'users'
@@ -84,24 +74,24 @@ class List(models.Model):
 
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
-    shared_list = models.ForeignKey(List, on_delete=models.CASCADE)
+    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members')
     invitee_id = models.ForeignKey(User, on_delete=models.CASCADE)
     authority = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee.user_name
+        return self.invitee_id.user_name
 
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
-    list_id = models.ForeignKey(List, on_delete=models.CASCADE)
+    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='items')
     color = models.IntegerField(choices=COLOR_CHOICES, blank=True, null=True)
     consume_cycle = models.IntegerField(default=30)
     last_purchase_at = models.DateField(blank=True, null=True)
     last_open_at = models.DateField(blank=True, null=True)
-    link = models.CharField(max_length=255, blank=True, null=True)
+    item_url = models.CharField(max_length=255, blank=True, null=True)
     to_list = models.BooleanField(default=False,blank=True, null=True)
     remind_by_item = models.BooleanField(default=True)
     manage_target = models.BooleanField(default=True)

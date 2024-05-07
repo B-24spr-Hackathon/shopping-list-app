@@ -145,14 +145,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # デフォルトでViewに適用する認証クラス
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'shop.authentication.CustomJWTAuthentication'
+        'shop.authentication.CustomJWTAuthentication',
     ),
-    'DEFAULT_PERMISSIONS_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated'
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 
