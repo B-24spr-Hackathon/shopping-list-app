@@ -63,15 +63,21 @@ class ItemView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-     # アイテム削除
-    def delete(self, request, user_id, item_id):
-        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(id=item_id)
-        # 削除するアイテムのインスタンスを取得
-        item = get_object_or_404(Item.objects.filter(filters))
+    # アイテム削除
+    def delete(self, request, item_id):
+        # item_idを使って、アイテムのインスタンスを取得
+        # リストのオーナーまたはauthority=Trueのinviteeだけの条件でフィルタリング
+        item_instance = get_object_or_404(
+            Item.objects.filter(
+                Q(pk=item_id) &
+                (Q(list__owner=request.user) | 
+                 Q(list__members__invitee=request.user, list__members__authority=True))
+            )
+        )
         # 削除する前にシリアライズしたデータを保存
-        response_serializer = ItemResponseSerializer(item)
+        response_serializer = ItemResponseSerializer(item_instance)
         serialized_data = response_serializer.data
 
-        item.delete()
+        item_instance.delete()
         # 削除したアイテムのデータを表示する
         return Response(serialized_data, status=status.HTTP_200_OK)   
