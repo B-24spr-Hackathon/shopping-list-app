@@ -23,4 +23,4 @@ function RegisterOrLogin( {children, onClick} ) {
         </div>
     );
 }
-export { Title, Bar, RegisterOrLogin};
+export { Title, Bar, RegisterOrLogin };
