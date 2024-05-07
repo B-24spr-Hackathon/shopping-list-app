@@ -14,9 +14,15 @@ class ItemView(APIView):
 
     # アイテムリスト表示
     def get(self, request, list_id):
-        # owner または invitee, かつ list_idでアイテムをフィルタリング
-        filters = (Q(list_id__owner_id=request.user) | Q(list_id__members__invitee_id=request.user)) & Q(list_id=list_id)
-        items = Item.objects.filter(filters)
+        # リストのオーナーまたはauthority=Trueのinviteeだけの条件でリストを取得
+        list_instance = get_object_or_404(
+            List.objects.filter(
+                Q(pk=list_id),
+                Q(owner_id=request.user) | Q(members__invitee_id=request.user, members__authority=True)
+            )
+        )
+        # 取得したリストに紐づくアイテムを取得
+        items = Item.objects.filter(list_id=list_instance)
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
     
