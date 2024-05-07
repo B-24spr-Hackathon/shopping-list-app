@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework import status
@@ -26,13 +27,15 @@ LINE認証サーバーからのコールバックに対応するView
 """
 class LineCallbackView(APIView):
     authentication_classes = []
+    permission_classes = []
 
     def get(self, request):
-        # クエリパラメータから認可コードを取得
+        # クエリパラメータから認可コードなどを取得
         code = request.GET.get("code")
         state = request.GET.get("state")
         error = request.GET.get("error")
         error_description = request.GET.get("error_description")
+        status = request.GET.get("friendship_status_changed")
 
         # errorが発生しているか確認
         if error:
@@ -71,12 +74,11 @@ class LineCallbackView(APIView):
 
         # ユーザーがDBに存在する場合
         if User.objects.filter(line_id=line_id).exists():
-            return redirect(
-                f"{redirect_ok}?line_id={line_id}")
-        
+            return redirect(f"{redirect_ok}?line_id={line_id}&status={status}")
+
         # ユーザーがDBに存在しない場合
         return redirect(
-            f"{redirect_ok}?line_id={line_id}&user_name={user_name}"
+            f"{redirect_ok}?line_id={line_id}&user_name={user_name}&status={status}"
         )
 
 
@@ -86,6 +88,7 @@ LINEログインからユーザーを登録するためのView
 """
 class LineSignupView(APIView):
     authentication_classes = []
+    permission_classes = []
 
     # POSTリクエストの処理（登録）
     def post(self, request):
@@ -106,6 +109,7 @@ LINEログインからログインするためのView
 """
 class LineLoginView(APIView):
     authentication_classes = []
+    permission_classes = []
 
     # POSTリクエストの処理
     def post(self, request):
