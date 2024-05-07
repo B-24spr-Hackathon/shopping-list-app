@@ -4,7 +4,7 @@ import axios from "axios";
 import Header from "../components/Header";
 import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
-import { Title, Bar } from "../components/Title";
+import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import Footer from "../components/Footer";
 
 
@@ -50,6 +50,7 @@ function Signup() {
                     <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                     <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
                     <CertifyBtn onClick={handleSignup} children="登録する"/>
+                    <RegisterOrLogin children="すでにお持ちのアカウントでログインする" onClick={ () => navigate('/')} />
                     {error && <p>{error}</p>} { }
                 </div>
                 <Footer />
