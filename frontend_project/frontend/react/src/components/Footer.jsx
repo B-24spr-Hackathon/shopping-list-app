@@ -1,11 +1,10 @@
 import React from 'react';
-import "../styles/Footer.css";
 
 function Footer() {
     return (
-        <footer className='fixed bottom-0 w-full'>
-            <img src="/HeaderBar.png" alt="img" className="block w-full h-auto lg:h-[125px] transform rotate-180"/>
-        </footer>
+        <div className='bottom-0 left-0 w-full h-[125px]'>
+            <img src="/HeaderBar.png" alt="img" className="block w-full h-full transform rotate-180"/>
+        </div>
     );
 }
 

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import Header from "../components/Header";
 import TextInput from "../components/TextInput";
-import { CertifyBtn } from "../components/Buttons";
+import { CertifyBtn, LineBtn } from "../components/Buttons";
+import { Title, Bar } from "../components/Title";
+import Footer from "../components/Footer";
+
 
 function Signup() {
     //状態管理
@@ -13,6 +17,8 @@ function Signup() {
     const [error, setError] = useState("");
 
     //ユーザー登録関数
+    const navigate = useNavigate();
+
     const handleSignup = async() => {
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/user/', {
@@ -22,6 +28,8 @@ function Signup() {
                 password: password,
             });
             console.log(response.data);
+            //リダイレクト
+            navigate('/home');
 
         } catch (err) {
             setError("失敗");
@@ -30,19 +38,25 @@ function Signup() {
     };
     return (
         <>
-            <Header />
-            <div className="">メールアドレスで登録</div>
-            <div className="">
-                <TextInput  placeholder="user_id" value={user_id} onChange={e => setUser_id(e.target.value)} />
-                <TextInput  placeholder="user_name" value={user_name} onChange={e => setUser_name(e.target.value)} />
-                <TextInput  placeholder="mail" value={email} onChange={e => setEmail(e.target.value)} />
-                <TextInput  type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)} />
+            <div className="flex flex-col min-h-screen">
+                <Header />
+                {/* <div className="main flex overflow-auto justify-center items-center flex-col"> */}
+                <div className="flex flex-col justify-center items-center flex-grow overflow-auto mb-1">
+                    <Title children="IDを登録" />
+                    <LineBtn onClick={""} children="LINEでログイン"/>
+                    <Bar children="またはメールアドレスで登録"/>
+                    <TextInput  placeholder="ユーザーID" value={user_id} onChange={e => setUser_id(e.target.value)} />
+                    <TextInput  placeholder="名前" value={user_name} onChange={e => setUser_name(e.target.value)} />
+                    <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
+                    <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
+                    <CertifyBtn onClick={handleSignup} children="登録する"/>
+                    {error && <p>{error}</p>} { }
+                </div>
+                <Footer />
             </div>
-            <div>
-                <CertifyBtn onClick={handleSignup} children="新規登録する"/>
-            </div>
-            {error && <p>{error}</p>} { }
         </>
+
+        
 
     );
 }
