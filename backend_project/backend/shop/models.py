@@ -3,9 +3,11 @@ from django.contrib.auth.models import AbstractUser,BaseUserManager
 
 class UserManager(BaseUserManager):
     def create_user(self, user_id, email, password=None, **extra_fields):
-        # user_id をユーザーを一意に識別するフィールドとして使用
         if not user_id:
             raise ValueError('The given user_id must be set')
+        if not email:
+            raise ValueError('The given email must be set')
+        
         email = self.normalize_email(email)
         user = self.model(user_id=user_id, email=email, **extra_fields)
         user.set_password(password)
@@ -13,7 +15,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, user_id, email, password=None, **extra_fields):
-        # 同様に、create_superuser メソッドも修正する
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -44,6 +45,8 @@ class User(AbstractUser):
     remind = models.BooleanField(default=False)
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
     remind_time = models.TimeField( blank=True, null=True)
+
+    objects = UserManager()
 
     # ユーザーを一意に識別するフィールド
     USERNAME_FIELD = 'user_id'    
