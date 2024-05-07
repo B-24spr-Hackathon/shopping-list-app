@@ -4,3 +4,8 @@ __pycache__/
 # DBのテーブルやカラムが確定するまでmigrationファイルを管理対象外とする
 !backend_project/backend/shop/migrations/__init__.py
 backend_project/backend/shop/migrations/*
+backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
+backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
+backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
+backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
+backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
