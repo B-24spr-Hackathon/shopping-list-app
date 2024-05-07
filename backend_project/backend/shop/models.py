@@ -49,8 +49,8 @@ class User(AbstractUser):
     objects = UserManager()
 
     # ユーザーを一意に識別するフィールド
-    USERNAME_FIELD = 'user_id'    
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     class Meta:
         db_table = 'users'
