@@ -16,4 +16,11 @@ function Bar( {children} ){
     );
 }
 
-export { Title, Bar };
+function RegisterOrLogin( {children, onClick} ) {
+    return (
+        <div className="cursor-pointer text-base-orange flex justify-center text-sm my-3" onClick={onClick}>
+            {children}
+        </div>
+    );
+}
+export { Title, Bar, RegisterOrLogin };

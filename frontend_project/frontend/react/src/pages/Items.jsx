@@ -1,7 +1,6 @@
 import React from "react";
 import MainMenu from "../components/MainMenu";
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { Header, Footer } from "../components/HeaderImg";
 import StockItems from "../components/StockItems";
 
 function Items() {

@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import Header from "../components/Header";
+import { Header, Footer } from "../components/HeaderImg";
 import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
-import { Title, Bar } from "../components/Title";
-import Footer from "../components/Footer";
-
+import { Title, Bar, RegisterOrLogin } from "../components/Title";
 
 function Signup() {
     //状態管理
@@ -40,7 +38,6 @@ function Signup() {
         <>
             <div className="flex flex-col min-h-screen">
                 <Header />
-                {/* <div className="main flex overflow-auto justify-center items-center flex-col"> */}
                 <div className="flex flex-col justify-center items-center flex-grow overflow-auto mb-1">
                     <Title children="IDを登録" />
                     <LineBtn onClick={""} children="LINEでログイン"/>
@@ -49,7 +46,9 @@ function Signup() {
                     <TextInput  placeholder="名前" value={user_name} onChange={e => setUser_name(e.target.value)} />
                     <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                     <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
+                    <TextInput  type="password" placeholder="パスワード(確認)：未実装" />
                     <CertifyBtn onClick={handleSignup} children="登録する"/>
+                    <RegisterOrLogin children="すでにお持ちのアカウントでログインする" onClick={ () => navigate('/')} />
                     {error && <p>{error}</p>} { }
                 </div>
                 <Footer />
