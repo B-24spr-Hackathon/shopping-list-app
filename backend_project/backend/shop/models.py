@@ -101,7 +101,7 @@ class Item(models.Model):
     consume_cycle = models.IntegerField(default=30)
     last_purchase_at = models.DateField(blank=True, null=True)
     last_open_at = models.DateField(blank=True, null=True)
-    link = models.CharField(max_length=255, blank=True, null=True)
+    item_url = models.CharField(max_length=255, blank=True, null=True)
     to_list = models.BooleanField(default=False,blank=True, null=True)
     remind_by_item = models.BooleanField(default=True)
     manage_target = models.BooleanField(default=True)
