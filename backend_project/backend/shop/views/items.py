@@ -9,22 +9,29 @@ from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class ItemView(APIView):
+    # JWT認証を要求する
+    permission_classes = [IsAuthenticated]
 
     # アイテムリスト表示
-    def get(self, request, user_id, list_id):
+    def get(self, request, list_id):
         # owner または invitee, かつ list_idでアイテムをフィルタリング
-        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(list_id=list_id)
+        filters = (Q(list_id__owner_id=request.user) | Q(list_id__members__invitee_id=request.user)) & Q(list_id=list_id)
         items = Item.objects.filter(filters)
         serializer = ItemSerializer(items, many=True)
         return Response(serializer.data)
     
     # アイテム新規作成
-    def post(self, request, user_id, list_id):
-        # リクエストデータとlist_idを使って新しいアイテムを作成
+    def post(self, request, list_id):
+        # リストのオーナーまたはauthority=Trueのinviteeだけの条件でリストを取得
+        list_instance = get_object_or_404(
+            List.objects.filter(
+                Q(pk=list_id),
+                Q(owner_id=request.user) | Q(members__invitee_id=request.user, members__authority=True)
+            )
+        )
         serializer = ItemCreateSerializer(data=request.data)
         # list_idを使ってListインスタンスを取得し、アイテムを保存
         if serializer.is_valid():
-            list_instance = List.objects.get(pk=list_id) 
             serializer.save(list_id=list_instance)
         # 作成、保存されたアイテムをシリアライズして返す
             response_serializer = ItemResponseSerializer(serializer.instance)
