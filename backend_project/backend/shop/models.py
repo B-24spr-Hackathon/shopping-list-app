@@ -1,6 +1,24 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,BaseUserManager
 
+class UserManager(BaseUserManager):
+    def create_user(self, user_id, email, password=None, **extra_fields):
+        # user_id をユーザーを一意に識別するフィールドとして使用
+        if not user_id:
+            raise ValueError('The given user_id must be set')
+        email = self.normalize_email(email)
+        user = self.model(user_id=user_id, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, user_id, email, password=None, **extra_fields):
+        # 同様に、create_superuser メソッドも修正する
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        return self.create_user(user_id, email, password, **extra_fields)
+    
 # Create your models here.
 REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
 SHOPPING_CYCLE_CHOICES = [(0,'毎月'), (1,'隔週'), (2,'毎週'),]
