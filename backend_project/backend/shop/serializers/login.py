@@ -40,6 +40,6 @@ LoginResponseSerializer
 class LoginResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["user_id", "user_name", "email", "line_id", "user_icon",
-                "invitation", "request", "have_list", "default_list", "remind",
-                "remind_timing", "remind_time"]
+        fields = ["user_id", "user_name", "email", "line_id", "line_status",
+                  "user_icon", "invitation", "request", "have_list",
+                  "default_list", "remind", "remind_timing", "remind_time"]

@@ -10,6 +10,7 @@ class LineSignupSerializer(serializers.Serializer):
     user_id = serializers.CharField()
     user_name = serializers.CharField()
     line_id = serializers.CharField()
+    line_status = serializers.BooleanField()
     email = serializers.EmailField(required=False)
 
     def create(self, validated_data):
