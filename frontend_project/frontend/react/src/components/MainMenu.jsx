@@ -5,7 +5,6 @@ import {
   Route,
   Link
 } from "react-router-dom";
-import "../styles/MainMenu.css";
 
 function MainMenu() {
     return (

@@ -12,6 +12,7 @@ LoginView
 """
 class LoginView(APIView):
     authentication_classes = []
+    permission_classes = []
     
     # POSTリクエストの処理
     def post(self, request):
