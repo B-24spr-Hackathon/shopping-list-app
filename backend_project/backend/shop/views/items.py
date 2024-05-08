@@ -13,7 +13,7 @@ class ItemCreateView(APIView):
     #permission_classes = [IsAuthenticated]
 
     # アイテムリスト表示
-    def get(self, request, list_id):
+    def get(self, request, list_id):      
         # リストのオーナーまたはauthority=Trueのinviteeだけの条件でリストを取得
         list_instance = get_object_or_404(
             List.objects.filter(
@@ -22,9 +22,16 @@ class ItemCreateView(APIView):
             )
         )
         # 取得したリストに紐づくアイテムを取得
-        items = Item.objects.filter(list_id=list_instance)
+        items = Item.objects.filter(list_id=list_id)
         serializer = ItemSerializer(items, many=True)
-        return Response(serializer.data)
+        # レスポンスをカスタマイズ
+        response_data = {
+            'list_id': list_id,
+            'list_name': list_instance.list_name,
+            'items': serializer.data
+        }
+        return Response(response_data)
+
     
     # アイテム新規作成
     def post(self, request, list_id):

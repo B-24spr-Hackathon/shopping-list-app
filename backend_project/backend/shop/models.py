@@ -94,7 +94,7 @@ class Item(models.Model):
     last_open_at = models.DateField(blank=True, null=True)
     item_url = models.CharField(max_length=255, blank=True, null=True)
     to_list = models.BooleanField(default=False,blank=True, null=True)
-    remind_by_item = models.BooleanField(default=True)
+    remind_by_item = models.BooleanField(default=False)
     manage_target = models.BooleanField(default=True)
 
     class Meta:
