@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class ItemCreateView(APIView):
     # JWT認証を要求する
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     # アイテムリスト表示
     def get(self, request, list_id):
@@ -49,12 +49,34 @@ class ItemDetailView(APIView):
     # JWT認証を要求する
     #permission_classes = [IsAuthenticated]
 
+        # アイテム更新            
+    def patch(self, request, list_id, item_id):
+        # アイテムのインスタンスを取得
+        item_instance = get_object_or_404(Item, pk=item_id)
+        # リストのオーナーまたは権限を持つ招待者かどうかをチェック
+        list_instance = get_object_or_404(
+            List.objects.filter(
+                Q(pk=list_id),
+                Q(owner_id=request.user) | Q(members__invitee_id=request.user, members__authority=True)
+            )
+        )
+
+        serializer = ItemUpdateSerializer(item_instance, data=request.data, context={"request": request}, partial=True)
+    
+        if serializer.is_valid():
+            # データを更新して保存
+            serializer.save()
+            # 更新されたフィールドのみ辞書として取得
+            update_fields = {field: request.data[field] for field in request.data}
+            # 更新されたフィールドのみをレスポンスとして返す
+            return Response(update_fields, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     # アイテム削除
     def delete(self, request, list_id, item_id):
         # アイテムのインスタンスを取得
         item_instance = get_object_or_404(Item, pk=item_id)
-        # アイテムが属するリストのlist_idを取得
-        #list_id = item_instance.list.id
         # リストのオーナーまたは権限を持つ招待者かどうかをチェック
         list_instance = get_object_or_404(
             List.objects.filter(
@@ -73,23 +95,5 @@ class ItemDetailView(APIView):
         
         return Response({"detail": "削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
 
-'''
-    # アイテム更新            
-    def patch(self, request, *args, **kwargs):
-        user_id = request.user.id
-        item_id = kwargs.get('item_id')        
-        # owner または inviteeか、アイテムが存在するかフィルタリング
-        filters = (Q(list_id__owner_id=user_id) | Q(list_id__members__invitee_id=user_id)) & Q(id=item_id)
-        # アイテムを取得
-        item = get_object_or_404(Item.objects.filter(filters))
 
-        serializer = ItemUpdateSerializer(item, data=request.data, context={"request": request}, partial=True)
-    
-        if serializer.is_valid():
-            saved_item = serializer.save()
-            update_serializer = ItemResponseSerializer(saved_item)
-            return Response(update_serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            '''
-        
+
