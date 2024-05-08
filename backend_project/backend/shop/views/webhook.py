@@ -136,5 +136,5 @@ def verify_jwt(text):
         payload = jwt.decode(text, secret, algorithms=["HS256"])
         user_id = payload["user_id"]
         return user_id
-    except jwt.InvalidTokenError:
+    except Exception:
         return None
