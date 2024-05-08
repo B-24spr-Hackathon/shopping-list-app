@@ -178,5 +178,13 @@ STATE = "shopping-list12345"
 FRONT_REDIRECT_URL = "http://127.0.0.1:5173/"
 FRONT_ERROR_URL = "http://127.0.0.1:5173/"
 
+# LINE連携後のフロントエンドリダイレクトURL
+LINK_REDIRECT_URL = "http://127.0.0.1:5173/"
+
 # LINE公式チャンネルの設定
 CHANNEL_URL = "https://lin.ee/Ekblccd"
+REPLY_URL = "https://api.line.me/v2/bot/message/reply"
+PUSH_URL = "https://api.line.me/v2/bot/message/push"
+
+# チャンネルアクセストークン
+CHANNEL_ACCESS_TOKEN = "3XxTjzUjmAoJC2uybNTaRAis+pRQtbfsr/Lf48T7VHPxvrchvxqkwCHL8W2WOaw8AZRPwzFFStB25Hi50j/0Rn2lg/i9q2+uxRxF+iOoNwgUMpGdF2YEElhVrPXnD6g1Gj/6y2gYwlZT5lQ+wu2Y4AdB04t89/1O/w1cDnyilFU="
