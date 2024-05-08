@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from shop.views import items, user, login, line, lists
+from shop.views import items, user, login, line, lists, healthcheck, webhook
 
 urlpatterns = [
     # アイテムリスト表示GET、アイテム作成POST
@@ -17,11 +17,15 @@ urlpatterns = [
 ]
 
 urlpatterns += [
+    path("api/", healthcheck.HealthcheckView.as_view(), name="healthcheck"),
     path("api/user/", user.UserView.as_view(), name="user"),
     path("api/login/", login.LoginView.as_view(), name="login"),
     path("api/callback/", line.LineCallbackView.as_view(),
          name="line-callback"),
     path("api/line/", line.LineSignupView.as_view(), name="line-signup"),
     path("api/line-login/", line.LineLoginView.as_view(), name="line-login"),
+    path("api/line-link/", line.LineLinkView.as_view(), name='line-link'),
+    path("api/line-webhook/", webhook.LineWebhookView.as_view(),
+         name="line-webhook")
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
