@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-class ItemView(APIView):
+class ItemCreateView(APIView):
     # JWT認証を要求する
     permission_classes = [IsAuthenticated]
 
@@ -45,6 +45,35 @@ class ItemView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ItemDetailView(APIView):
+    # JWT認証を要求する
+    #permission_classes = [IsAuthenticated]
+
+    # アイテム削除
+    def delete(self, request, list_id, item_id):
+        # アイテムのインスタンスを取得
+        item_instance = get_object_or_404(Item, pk=item_id)
+        # アイテムが属するリストのlist_idを取得
+        #list_id = item_instance.list.id
+        # リストのオーナーまたは権限を持つ招待者かどうかをチェック
+        list_instance = get_object_or_404(
+            List.objects.filter(
+                Q(pk=list_id),
+                Q(owner_id=request.user) | Q(members__invitee_id=request.user, members__authority=True)
+            )
+        )
+        # 権限が確認できた後にアイテムを削除
+        if list_instance:
+            # 削除する前にシリアライズしたデータを保存
+            response_serializer = ItemResponseSerializer(item_instance)
+            serialized_data = response_serializer.data
+            item_instance.delete()
+            # 削除したアイテムのデータを表示する
+            return Response(serialized_data, status=status.HTTP_200_OK)
+        
+        return Response({"detail": "削除する権限がありません"}, status=status.HTTP_403_FORBIDDEN)
+
+'''
     # アイテム更新            
     def patch(self, request, *args, **kwargs):
         user_id = request.user.id
@@ -62,22 +91,5 @@ class ItemView(APIView):
             return Response(update_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            '''
         
-    # アイテム削除
-    def delete(self, request, item_id):
-        # item_idを使って、アイテムのインスタンスを取得
-        # リストのオーナーまたはauthority=Trueのinviteeだけの条件でフィルタリング
-        item_instance = get_object_or_404(
-            Item.objects.filter(
-                Q(pk=item_id) &
-                (Q(list__owner=request.user) | 
-                 Q(list__members__invitee=request.user, list__members__authority=True))
-            )
-        )
-        # 削除する前にシリアライズしたデータを保存
-        response_serializer = ItemResponseSerializer(item_instance)
-        serialized_data = response_serializer.data
-
-        item_instance.delete()
-        # 削除したアイテムのデータを表示する
-        return Response(serialized_data, status=status.HTTP_200_OK)   

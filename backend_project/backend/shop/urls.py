@@ -4,15 +4,15 @@ from shop.views import items, user, login, line, lists
 
 urlpatterns = [
     # アイテムリスト表示GET、アイテム作成POST
-    path('api/items/<list_id>/', items.ItemView.as_view()),
+    path('api/items/<list_id>/', items.ItemCreateView.as_view(),name="item-post-get"),
     # アイテム更新PATCH、削除DELETE
-    path('api/items/<item_id>/', items.ItemView.as_view()),
+    path('api/items/<list_id>/<item_id>/', items.ItemDetailView.as_view(), name="item-patch-delete"),
     # 買い物リスト表示GET
-    path('api/shopping-list/<list_id>/', lists.ListView.as_view()),
+    path('api/shopping-list/<list_id>/', lists.ListView.as_view(), name="shoppinglist"),
     # リスト設定（登録）POST
-    path('api/list/', lists.ListView.as_view()),
+    path('api/list/', lists.ListView.as_view(), name="list-post"),
     # リスト設定（表示）GET,（更新）PATCH, (削除）DELETE
-    path('api/list/<list_id>/', lists.ListView.as_view()),
+    path('api/list/<list_id>/', lists.ListView.as_view(), name="list-get-patch-delete"),
 
 ]
 
