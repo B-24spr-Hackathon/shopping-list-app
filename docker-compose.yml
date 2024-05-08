@@ -25,6 +25,7 @@ services:
     tty: true
     depends_on:
       - db
+      - redis
 
   frontend:
     build: 
