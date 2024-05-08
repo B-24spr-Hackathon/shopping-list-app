@@ -1,32 +1,63 @@
 import React, { useState } from "react";
-import { Tab, Tabs,TabList, TabPanel } from "react-tabs";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import '../styles/Tabs.css';
 
-
-function TabItems({children}) {
+//デフォルト状態のタブ構成
+function TabItems({ children }) {
     const [tabs, setTabs] = useState([
-        {id: 1, title: "デフォルト", content: "Tab1 content"},
-        {id: 2, title: "+", content: "Tab2 content"}
+        { id: 1, title: "デフォルト", content: "", isEditing: false },
+        { id: 0, title: "+", content: "", isEditing: false },
     ]);
-
-    const [tabCount, setTabCount] = useState(3);
-
+    //現在のtabの数を取得する
+    const findTabMaxId = () => {
+        const maxId = tabs.reduce((max, tab) => tab.id !== 0 ? Math.max(max, tab.id) : max, 0);
+        return maxId;
+    };
+    //タブの追加
     const addTab = () => {
+        //タブの数を取得して+1したものが新しいタブのIDとなる
+        const newTabId = findTabMaxId() + 1;
         const newTab = {
-            id: tabCount,
-            title: `Tab ${tabCount}`,
-            content: `Tab ${tabCount} content`
+            id: newTabId,
+            title: "",
+            content: "",
+            isEditing: true
         };
-        setTabs([...tabs, newTab]);
+        //IDが0ではないタブを取り出して、[それら、新しいタブ、ID=0のタブ]の順にstateに入れる
+        setTabs(tabs => {
+            const filteredTabs = tabs.filter(tab => tab.id !== 0);
+            return [...filteredTabs, newTab, tabs.find(tab => tab.id === 0)];
+        })
         setTabCount(tabCount + 1);
     };
 
     const onTabSelect = (index) => {
-        if(index === 1) {
+        // '+'タブが選択された場合にのみ新しいタブを追加
+        if (tabs[index].title === "+") {
             addTab();
         }
     };
-    
+
+    const handleDoubleClick = (id) => {
+        // タブのタイトルをダブルクリックすると編集可能に
+        setTabs(tabs.map(tab => {
+            if (tab.id === id) return { ...tab, isEditing: true };
+            return tab;
+        }));
+    };
+
+    const handleTitleChange = (id, title) => {
+        setTabs(tabs.map(tab => {
+            if (tab.id === id) return { ...tab, title, isEditing: false };
+            return tab;
+        }));
+    };
+    const handleKeyPress = (e, id) => {
+        if (e.key === 'Enter') {
+            handleTitleChange(id, e.target.value);
+        }
+    };
+
     const itemsHeader = (
         <thead>
             <tr className="text-center">
@@ -43,15 +74,26 @@ function TabItems({children}) {
 
     const itemsData = [
         { 管理: "管理内容1", 商品名: "商品1", 消費サイクル: "1ヶ月", 開封日: "2021-09-01", リンク: "http://example.com", 購入日: "2021-08-01", 通知: "はい" },
-    ]
+    ];
 
     return (
         <>
             <Tabs onSelect={onTabSelect} className="items-tabs-container">
                 <TabList className="items-tabs__tab-list">
-                    {tabs.map(tab => (
-                        <Tab key={tab.id} selectedClassName="items-tabs__tab--selected" className="items-tabs__tab">
-                            {tab.title}
+                    {tabs.map((tab) => (
+                        <Tab key={tab.id} className="items-tabs__tab" selectedClassName="items-tabs__tab--selected">
+                            {tab.isEditing ? (
+                                <input
+                                    type="text"
+                                    value={tab.title}
+                                    onBlur={() => handleTitleChange(tab.id, tab.title, true)}
+                                    onChange={(e) => handleTitleChange(tab.id, e.target.value)}
+                                    onKeyDown={(e) => handleKeyPress(e,tab.id)}
+                                    autoFocus
+                                />
+                            ) : (
+                                <div onDoubleClick={() => handleDoubleClick(tab.id)}>{tab.title}</div>
+                            )}
                         </Tab>
                     ))}
                 </TabList>
@@ -76,9 +118,10 @@ function TabItems({children}) {
                         </table>
                         <div>{children}</div>
                     </TabPanel>
-            ))}
+                ))}
             </Tabs>
         </>
+    );
+}
 
-)};
 export default TabItems;

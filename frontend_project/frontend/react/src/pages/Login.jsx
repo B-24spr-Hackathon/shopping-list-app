@@ -34,9 +34,9 @@ function Login() {
     };
     return (
         <>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col">
                 <Header />
-                <div className="flex flex-col justify-center items-center flex-grow overflow-auto mb-1">
+                <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ログイン" />
                     <LineBtn onClick={"#"} children="LINEでログイン"/>
                     <Bar children="またはメールアドレスでログイン"/>
