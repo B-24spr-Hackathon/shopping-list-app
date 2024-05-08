@@ -8,5 +8,8 @@ function LineBtn({ onClick, children }) {
     return <button className="bg-line-green text-white px-8 py-2.5 rounded-full text-xl my-2 font-hel font-semibold" onClick={onClick}>{children}</button>
 }
 
+function testBtn({ onClick, children }) {
+    return <button className="bg-line-green text-white px-8 py-2.5 rounded-full text-xl my-2 font-hel font-semibold" onClick={onClick}>{children}</button>
+}
 
-export { CertifyBtn, LineBtn }
+export { CertifyBtn, LineBtn, testBtn }

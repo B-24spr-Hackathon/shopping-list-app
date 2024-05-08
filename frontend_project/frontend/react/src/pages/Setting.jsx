@@ -1,21 +1,32 @@
-import React from 'react';
-
+import React from "react";
+import { Header, Footer } from "../components/HeaderImg";
+import StockItems from "../components/StockItems";
+import TabMainMenu from "../components/TabMainMenu";
 
 function Setting() {
     return (
         <>
-            <img src="/Vector.png" alt="img" className="header-img"/>
-            <div className="border border-gray-400 rounded-2xl p-2 m-2 flex justify-around items-center">
-                <h1 className="text-3xl font-bold underline">
-                    Setting!
-                </h1>
-                <p className="m-0 text-gray-400">Tailwind CSSです</p>
-                <button className="bg-gray-300 border-0 p-2 rounded-md hover:bg-gray-400 hover:text-white">ボタン</button>
+            <div className="flex flex-col min-h-screen">
+                <Header />
+                <TabMainMenu />
+
+                <div className="flex flex-col justify-center items-center overflow-auto mb-1">
+                    <div className="flex space-x-20">
+                        <div>
+                            設定画面
+                        </div>
+                    </div>
+                </div>
+                <Footer />
             </div>
+
+
+
+
+
         </>
 
     );
 }
-
 
 export default Setting;

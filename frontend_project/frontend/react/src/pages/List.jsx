@@ -1,12 +1,14 @@
 import React from 'react';
-import MainMenu from "../components/MainMenu";
+import TabMainMenu from "../components/TabMainMenu";
 import { Header, Footer } from "../components/HeaderImg";
 
 function List() {
     return (
         <>
             <Header />
-            <MainMenu />
+
+
+                <TabMainMenu />
             <Footer />
         </>
 
