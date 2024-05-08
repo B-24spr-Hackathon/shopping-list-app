@@ -37,6 +37,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=50, blank=True, null=True)
 
     line_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    line_status = models.BooleanField(default=False)
     user_icon = models.CharField(max_length=100, blank=True, null=True)
     invitation = models.BooleanField(default=False)
     request = models.BooleanField(default=False)
@@ -44,13 +45,13 @@ class User(AbstractUser):
     default_list = models.BooleanField(default=True)
     remind = models.BooleanField(default=False)
     remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
-    remind_time = models.TimeField( blank=True, null=True)
+    remind_time = models.TimeField(blank=True, null=True)
 
     objects = UserManager()
 
     # ユーザーを一意に識別するフィールド
-    USERNAME_FIELD = 'user_id'    
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     class Meta:
         db_table = 'users'
