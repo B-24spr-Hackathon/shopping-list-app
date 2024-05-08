@@ -24,6 +24,11 @@ function Login() {
                 password: password,
             });
             console.log(response.data);
+
+             // JWTトークンをクッキーに保存する
+            const token = response.data.access; // レスポンスからトークンを取得
+            document.cookie = `jwt_token=${token}; path=/; max-age=3600`; // クッキーに保存。max-ageは有効期限(秒)
+            
             //リダイレクト
             navigate('/home');
 

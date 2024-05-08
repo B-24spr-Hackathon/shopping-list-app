@@ -38,6 +38,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    height: 70vh;
 }
 
 .items-tabs__tab {
@@ -64,6 +65,8 @@
     background-color: #fff;
     display: none;
     width: 90%;
+    flex: 1;
+    overflow: auto;
 
 }
 
