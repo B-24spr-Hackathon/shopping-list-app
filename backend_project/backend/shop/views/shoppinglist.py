@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from shop.models import Item, List
+from shop.models import Item, List, Member
 from shop.serializers.shoppinglist import ShoppingListSerializer
 from django.db.models import Q
 from rest_framework.response import Response
@@ -25,26 +25,13 @@ class ShoppingListView(APIView):
         # リストに紐づくアイテムを取得
         items = Item.objects.filter(list_id=list_id, to_list=True)
         serializer = ShoppingListSerializer(items, many=True)
-
         # authorityの値を取得(オーナーの場合は自動的にTrue)
         if list_instance.owner_id == request.user:
             authority = True
         else:
             member = Member.objects.filter(list_id=list_id, invitee_id=request.user).first()
             authority = member.authority
-            #else:
-                #authority = False
-
-            
-
-        #list_instance = List.objects.filter(filters)
-        # リストが見つからない場合エラーを返す
-        #f not lists.exists():
-            #return Response({"message": "リストが見つからないか、アクセス権限がありません。"}, status=status.HTTP_404_NOT_FOUND)
-        
-
-        serializer = ShoppingListSerializer(list_instance)
-
+      
         response_data = {
             'list_id': list_id,
             'list_name': list_instance.list_name,
