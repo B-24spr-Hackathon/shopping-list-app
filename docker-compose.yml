@@ -21,6 +21,8 @@ services:
     # ポートを指定、ホスト：コンテナ
     ports:
       - "8000:8000"
+    environment:
+      TZ: 'Asia/Tokyo'
     # コンテナがフォアグラウンドで実行される
     tty: true
     depends_on:
