@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import '../styles/Tabs.css';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 //デフォルト状態のタブ構成
 function TabItems({ children }) {
@@ -16,32 +17,24 @@ function TabItems({ children }) {
         return tabs.length ? Math.max(...tabs.map(tab => tab.id)) + 1 : 1;
     }
 
+    const [cookies] = useCookies(['jwt_token']);
+
     const addNewList = async() => {
-        const jwtToken = document.cookie.split(';').find(row => row.startsWith('jwt_token')).split('=')[1];
-        console.log(`JWT Token: ${jwtToken}`); // JWTトークンの確認
-
-        if (!jwtToken) {
-            console.log("jwt_tokenが見つかりません。");
-            return;
-        }
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${jwtToken}`
-            },
-            withCredentials: true
-        };
-
-        const requestBody = JSON.stringify({ list_name: "新しい"});
-        console.log(`Request Body: ${requestBody}`);
-        console.log(`Headers: `, config.headers);
-
-        try {
-            const response = await axios.post('http://127.0.0.1:8000/api/list/', {list_name: "新しい"}, config);
-            console.log("Response Data:", response.data);
-            console.log("成功");
-        } catch (err) {
+            try {
+                console.log(cookies);
+                const response = await axios.post('http://127.0.0.1:8000/api/list/', {
+                list_name : "新しい"
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': cookies.jwt_token
+                },
+                withCredentials: true
+            });
+            console.log(response);
+            console.log(response.data);
+            } catch(err) {
+            console.log('sippai',err);
             console.log("Request Failed:", err.response || err.message || err);
         }
     }

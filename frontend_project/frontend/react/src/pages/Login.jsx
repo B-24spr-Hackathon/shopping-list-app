@@ -7,7 +7,7 @@ import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
-import { setUser } from "../reducers";
+import { clearUser, setUser } from "../reducers";
 
 function Login() {
     const dispatch = useDispatch();
@@ -33,9 +33,8 @@ function Login() {
             console.log(response.data);
 
              // JWTトークンをクッキーに保存する
-            const token = response.data.access; // レスポンスからトークンを取得
-            setCookie('jwt_token', token, { path: '/', maxAge:3600 });
-
+            const token = response.data.access; // レスポンスからトークンを取得;
+            setCookie('jwt_token', token, { path: '/', maxAge:3600, sameSite: "Strict"});
             //レスポンスでユーザー情報を受け取ってstoreに保存
             dispatch(setUser(response.data.user));
             //リダイレクト
