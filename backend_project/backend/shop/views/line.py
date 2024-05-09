@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework import status
@@ -123,3 +123,29 @@ class LineLoginView(APIView):
                 "access": str(token)
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+LineLinkView
+LINE連携に対応するView
+"""
+class LineLinkView(APIView):
+    def get(self, request):
+        user = request.user
+        secret = settings.SECRET_KEY
+        channel_url = settings.CHANNEL_URL
+        
+        # JWTを生成するためのペイロードを定義
+        payload = {
+            "user_id": user.user_id,
+            "exp": datetime.now() + timedelta(minutes=10),
+            "iat": datetime.now()
+        }
+    
+        # JWTの生成
+        token = jwt.encode(payload, secret, algorithm="HS256")
+        
+        return Response({
+                "url": channel_url,
+                "otp": str(token)
+            }, status=status.HTTP_200_OK)
