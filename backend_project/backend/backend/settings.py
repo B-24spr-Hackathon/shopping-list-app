@@ -195,3 +195,6 @@ SHOPPING_LIST_URL = "http://127.0.0.1:5173/"
 # Celery設定
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_TIMEZONE = 'Asia/Tokyo'
+
+# Celery Beatの呼出し時間
+BATCH_TIME = 3

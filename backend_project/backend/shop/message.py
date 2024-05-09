@@ -1,6 +1,9 @@
 from backend.backend.celery import app
+from django.utils import timezone
 from django.conf import settings
-import requests
+from datetime import datetime, timedelta
+import requests, calendar
+from shop.models import User
 
 
 # リクエストに必要なデータ
@@ -9,12 +12,52 @@ token = settings.CHANNEL_ACCESS_TOKEN
 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
 """
-batch_task
-毎日定時にDBからデータを取得しLINEに通知を送る処理を呼出す
+shopping_batch
+毎日定時にDBからデータを取得し買い物日前日の通知を送るタスクを呼出す
 """
 @app.task
-def batch_task():
-    return
+def shopping_batch():
+    # 買い物日を通知するタスクを呼出す
+    today = timezone.now()
+    year = today.year
+    month = today.month
+    day = today.day
+
+    # 今月の最終日を取得
+    _, last_day = calendar.monthrange(year, month)
+
+    # 今日が今月最終日に場合は買い物日が1のユーザーを取得
+    if day == last_day:
+        users = User.objects.raw("""
+            SELECT u.line_id, u.remind_time FROM users AS u
+            INNER JOIN lists AS l ON u.user_id = l.owner_id
+            WHERE u.remind = 1 AND l.shopping_day = 1;
+            """)
+    # 今日が今月最終日前日の場合は買い物日が月末のユーザーを取得
+    elif day == last_day - 1:
+        users = User.objects.raw("""
+            SELECT u.line_id, u.remind_time FROM users AS u
+            INNER JOIN lists AS l ON u.user_id = l.owner_id
+            WHERE u.remind = 1 AND l.shopping_day > %s;
+            """, [day])
+    # 今日が上記以外の場合は買い物日が翌日のユーザーを取得
+    else:
+        day += 1
+        users = User.objects.raw("""
+            SELECT u.line_id, u.remind_time FROM users AS u
+            INNER JOIN lists AS l ON u.user_id = l.owner_id
+            WHERE u.remind = 1 AND l.shopping_day = %s;
+            """, [day])
+
+    # ユーザーを取出してshopping_requestを呼出す
+    for user in users:
+        # 通知時間の設定
+        hour = user.remind_time - settings.BATCH_TIME
+        if hour < 0:
+            hour += 24
+        count = hour * 3600
+
+        shopping_request.apply_async(args=[user.line_id], countdown=count)
 
 
 """
@@ -93,9 +136,12 @@ def remind_request(line_id, items):
         }
 
     # 通知を送信
-    response = requests.post(url, headers=headers, json=data)
+    try:
+        response = requests.post(url, headers=headers, json=data)
+    except Exception:
+        print(f"{line_id}への開封通知でネットワークエラー発生")
 
-    if response.status_code == 200:
+    if response.ok:
         print(f"{line_id}への開封通知を適切に送信しました")
     else:
         print(f"{line_id}への開封通知に失敗しました")
@@ -107,7 +153,7 @@ LINEにPOSTリクエストを送信するタスク
 買い物日前日の通知
 """
 @app.task
-def shopping_request(line_id, date):
+def shopping_request(line_id):
     data = {
         "to": line_id,
         "messages": [
@@ -116,7 +162,7 @@ def shopping_request(line_id, date):
                 "altText": "買い物日通知",
                 "template": {
                     "type": "buttons",
-                    "text": f"{date}は買い物予定日です！",
+                    "text": "明日は買い物予定日です！",
                     "actions": [
                         {
                             "type": "uri",
@@ -130,9 +176,12 @@ def shopping_request(line_id, date):
     }
 
     # 通知を送信
-    response = requests.post(url, headers=headers, json=data)
+    try:
+        response = requests.post(url, headers=headers, json=data)
+    except Exception:
+        print(f"{line_id}への買い物日通知でネットワークエラー発生")
 
-    if response.status_code == 200:
+    if response.ok:
         print(f"{line_id}への買い物日通知を適切に送信しました")
     else:
         print(f"{line_id}への買い物日通知に失敗しました")
