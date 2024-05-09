@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.lists import ShoppingListSerializer, ListCreateSerializer, ListResponseSerializer, ListUpdateSerializer
+from shop.serializers.lists import ListCreateSerializer, ListResponseSerializer, ListUpdateSerializer
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
