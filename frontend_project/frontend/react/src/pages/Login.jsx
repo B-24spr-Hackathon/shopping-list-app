@@ -1,13 +1,18 @@
 import React, { useState } from "react";
+import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Header, Footer } from "../components/HeaderImg";
 import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
+import { useDispatch } from 'react-redux';
+import { setUser } from "../reducers";
 
 function Login() {
+    const dispatch = useDispatch();
     //状態管理
+    const [cookies, setCookie] = useCookies(['jwt_token']);
     const [user_id, setUser_id] = useState("");
     const [user_name, setUser_name] = useState("");
     const [email, setEmail] = useState("");
@@ -23,12 +28,16 @@ function Login() {
                 email: email,
                 password: password,
             });
+            
+            console.log(response);
             console.log(response.data);
 
              // JWTトークンをクッキーに保存する
             const token = response.data.access; // レスポンスからトークンを取得
-            document.cookie = `jwt_token=${token}; path=/; max-age=3600`; // クッキーに保存。max-ageは有効期限(秒)
-            
+            setCookie('jwt_token', token, { path: '/', maxAge:3600 });
+
+            //レスポンスでユーザー情報を受け取ってstoreに保存
+            dispatch(setUser(response.data.user));
             //リダイレクト
             navigate('/home');
 
