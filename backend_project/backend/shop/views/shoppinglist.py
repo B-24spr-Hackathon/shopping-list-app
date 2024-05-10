@@ -11,13 +11,13 @@ from shop.permissions import IsOwnerOrInvitee
 
 # 買い物リスト表示(GET)
 class ShoppingListView(APIView):
-    # JWT認証を要求する
+    # JWT認証を要求、オーナーまたは招待者のみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrInvitee] 
 
     def get(self, request, list_id):
         # リストを取得
         list_instance = get_object_or_404(List, pk=list_id)
-        # オブジェクトレベルのパーミッションチェックを実行
+        # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         # リストに紐づくアイテムを取得
         items = Item.objects.filter(list_id=list_id, to_list=True)

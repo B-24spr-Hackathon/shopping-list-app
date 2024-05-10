@@ -6,7 +6,6 @@ from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List
 from shop.authentication import CustomJWTAuthentication
 from shop.serializers.lists import ListCreateSerializer, ListResponseSerializer, ListUpdateSerializer
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 
@@ -51,7 +50,7 @@ class ListView(APIView):
 
         if serializer.is_valid():
             # データベースのデータを更新して保存
-            saved_list = serializer.save()
+            serializer.save()
             # 更新されたフィールドのみを辞書として取得
             update_fields = {field: request.data[field] for field in request.data}
             # 更新されたフィールドのみをレスポンスとして返す
