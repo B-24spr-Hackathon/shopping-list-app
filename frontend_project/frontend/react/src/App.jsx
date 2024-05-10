@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { AuthProvider } from "./common/Auth";
 
 import {
   BrowserRouter as Router,
@@ -18,16 +19,18 @@ import Signup from "./pages/Signup";
 function App() {
   return (
     <Router>
-      <div>
-        <Routes>
-          <Route exact path="/" element={<Login />} />
-          <Route path="/items" element={<Items />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/list" element={<List />} />
-          <Route path="/setting" element={<Setting />} />
-          <Route path="/home" element={<Home />} />
-        </Routes>
-      </div>
+      <AuthProvider>
+        <div>
+          <Routes>
+            <Route exact path="/" element={<Login />} />
+            <Route path="/items" element={<Items />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/list" element={<List />} />
+            <Route path="/setting" element={<Setting />} />
+            <Route path="/home" element={<Home />} />
+          </Routes>
+        </div>
+      </AuthProvider>
     </Router>
   );
 }

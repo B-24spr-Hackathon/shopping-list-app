@@ -36,9 +36,9 @@ function Signup() {
     };
     return (
         <>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col items-center">
                 <Header />
-                <div className="flex flex-col justify-center items-center flex-grow overflow-auto mb-1">
+                <div className="flex flex-col justify-center items-center overflow-auto mb-1">
                     <Title children="IDを登録" />
                     <LineBtn onClick={""} children="LINEでログイン"/>
                     <Bar children="またはメールアドレスで登録"/>
