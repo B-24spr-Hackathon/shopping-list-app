@@ -5,6 +5,9 @@ import { Header, Footer } from "../components/HeaderImg";
 import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
+import { useDispatch } from 'react-redux';
+import { clearUser, setUser } from "../reducers";
+import { useCookies } from 'react-cookie';
 
 function Signup() {
     //状態管理
@@ -13,6 +16,8 @@ function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const [cookies, setCookie] = useCookies(['jwt_token']);
 
     //ユーザー登録関数
     const navigate = useNavigate();
@@ -26,6 +31,11 @@ function Signup() {
                 password: password,
             });
             console.log(response.data);
+             // JWTトークンをクッキーに保存する
+            const token = response.data.access; // レスポンスからトークンを取得;
+            setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
+            //レスポンスでユーザー情報を受け取ってstoreに保存
+            dispatch(setUser(response.data.user));
             //リダイレクト
             navigate('/home');
 
@@ -36,9 +46,9 @@ function Signup() {
     };
     return (
         <>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col items-center">
                 <Header />
-                <div className="flex flex-col justify-center items-center flex-grow overflow-auto mb-1">
+                <div className="flex flex-col justify-center items-center overflow-auto mb-1">
                     <Title children="IDを登録" />
                     <LineBtn onClick={""} children="LINEでログイン"/>
                     <Bar children="またはメールアドレスで登録"/>

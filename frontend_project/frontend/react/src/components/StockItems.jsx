@@ -11,7 +11,7 @@ function StockItems() {
         <>
         <div className="flex justify-center mt-12 pb-3 items-center w-full text-s">
             <div className="flex space-x-20">
-                <div><input type="checkbox" checked="" onChange={""} /></div>
+                <div><input type="checkbox"  /></div>
                 <div>アタック</div>
                 <div>3</div>
                 <div>4週間</div>

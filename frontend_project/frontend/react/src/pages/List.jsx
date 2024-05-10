@@ -1,12 +1,21 @@
 import React from 'react';
-import MainMenu from "../components/MainMenu";
+import TabMainMenu from "../components/TabMainMenu";
 import { Header, Footer } from "../components/HeaderImg";
+import ListField from '../components/ListField';
+import UserNameAndIcon from '../components/UserNameIcon';
 
 function List() {
     return (
         <>
             <Header />
-            <MainMenu />
+            <UserNameAndIcon />
+
+
+                <TabMainMenu />
+                <div className='flex justify-center mt-4'>
+
+                <ListField />
+                </div>
             <Footer />
         </>
 
