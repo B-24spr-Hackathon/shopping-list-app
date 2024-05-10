@@ -19,7 +19,9 @@ export const AuthProvider = ({ children }) => {
             setIsLogin(true);
         } else {
             setIsLogin(false);
-            navigate('/');
+            if(window.location.pathname !== '/signup'){
+                navigate('/');
+            }
         }
     }, [cookies, navigate]);
 
