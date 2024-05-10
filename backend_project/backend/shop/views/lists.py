@@ -8,11 +8,16 @@ from shop.authentication import CustomJWTAuthentication
 from shop.serializers.lists import ListCreateSerializer, ListResponseSerializer, ListUpdateSerializer
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-
+from shop.permissions import IsOwner
 
 class ListView(APIView):
-    # JWT認証を要求する
-    permission_classes = [IsAuthenticated]
+    # JWT認証を要求、オーナーのみ許可
+    permission_classes = [IsAuthenticated, IsOwner]
+    # POSTメソッドだけは誰でも可
+    def get_permission(self):
+       if self.request.method == 'POST':
+           return [IsAuthenticated()] 
+       return [IsAuthenticated(), IsOwner()]
 
     # リスト設定（登録）POST
     def post(self, request):
@@ -27,16 +32,20 @@ class ListView(APIView):
         
     # リスト設定（表示）GET
     def get(self, request, list_id):
-        # オーナーのみフィルタリング
-        list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
+        # リストを取得
+        list_instance = get_object_or_404(List, pk=list_id)
+        # パーミッションチェックを実行
+        self.check_object_permissions(self.request, list_instance)
 
         serializer = ListResponseSerializer(list_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     # リスト設定（更新）PATCH
     def patch(self, request, list_id):
-        # オーナーのみフィルタリング
-        list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
+        # リストを取得
+        list_instance = get_object_or_404(List, pk=list_id)
+        # パーミッションチェックを実行
+        self.check_object_permissions(self.request, list_instance)
 
         serializer = ListUpdateSerializer(list_instance, data=request.data, context={"request":request}, partial=True)
 
@@ -52,8 +61,10 @@ class ListView(APIView):
                    
     # リスト設定（削除）DELETE
     def delete(self, request, list_id):
-        # オーナーのみフィルタリング
-        list_instance = get_object_or_404(List, pk=list_id, owner_id=request.user)
+        # リストを取得
+        list_instance = get_object_or_404(List, pk=list_id)
+        # パーミッションチェックを実行
+        self.check_object_permissions(self.request, list_instance)
         # 削除する前にシリアライズしたデータを保存
         response_serializer = ListResponseSerializer(list_instance)
         serialized_data = response_serializer.data
