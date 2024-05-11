@@ -14,7 +14,6 @@ function Home() {
     //default_listを更新する処理
     const handleChangeDefault_list = async() => {
         try {
-            console.log(cookies);
             const response = await axios.patch('http://127.0.0.1:8000/api/user/', {
                 default_list: true
             }, {
@@ -36,16 +35,20 @@ function Home() {
 
     const handleGetRequestTest = async() => {
         try {
-            // const response = await axios({
-                // withCredentials: true,
-                // method: "GET",
-                // url: 'http://127.0.0.1:8000/api/user/',
-                
-            // });
-            fetch('http://127.0.0.1:8000/api/user/',{
+            const response = await axios({
+                withCredentials: true,
                 method: "GET",
-                credentials: 'include'
-            })
+                url: 'http://127.0.0.1:8000/api/user/',
+                
+                
+            });
+            console.log(response);
+            console.log(response.data);
+            // fetch('http://127.0.0.1:8000/api/user/',{
+            //     method: "GET",
+            //     credentials: 'include'
+                
+            // })
             // then(response => {
             //     if (!response.ok) {
             //         // サーバーからのレスポンスが成功を示していない場合、エラーを投げる

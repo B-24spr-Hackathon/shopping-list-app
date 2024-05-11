@@ -27,10 +27,10 @@ function ListField() {
     return (
         <>
         <div className='list-field-container'>
-            <div class="list-field-title">
+            <div className="list-field-title">
                 MyHome
             </div>
-            <div class="list-field">
+            <div className="list-field">
                 <p className='text-center'>ここに日付</p>
                 <ShoppingItems />
             </div>
@@ -38,5 +38,8 @@ function ListField() {
         </>
     )
 }
+
+
+
 
 export default ListField;

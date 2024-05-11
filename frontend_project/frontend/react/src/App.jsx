@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { AuthProvider } from "./common/Auth";
+import { AuthProvider } from "./utils/Auth";
 
 import {
   BrowserRouter as Router,
