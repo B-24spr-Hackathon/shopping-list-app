@@ -6,3 +6,4 @@ requests==2.31.0
 celery==5.4
 redis==5.0.4
 mysqlclient
+django-sslserver # デプロイ時に削除

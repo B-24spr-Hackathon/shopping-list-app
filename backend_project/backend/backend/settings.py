@@ -13,6 +13,33 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 
+
+"""
+デプロイ時に変更する項目（始点）
+"""
+BACKEND_URL = "https://127.0.0.1:8000"
+FRONTEND_URL = "http://127.0.0.1:5173"
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "django-db",
+        "USER": "django",
+        "PASSWORD": "django",
+        "HOST": "db",
+        "PORT": "3306",
+    }
+}
+
+CORS_ALLOWED_ORIGINS = [f"{FRONTEND_URL}", "http://localhost:5173"]
+
+"""
+デプロイ時に変更する項目（終点）
+"""
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,8 +56,6 @@ JWT_KEY = 'eaef77e7815fe048132cb830be2641c966306d78aa27dbad1cfe24a28300e3f5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
 
 # Application definition
 
@@ -44,6 +69,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'shop',
     'corsheaders',
+    
+    # デプロイ時に削除
+    'sslserver'
 ]
 
 # AbstractUserを使うため追記
@@ -59,14 +87,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -89,21 +111,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django-db',
-        'USER': 'django',
-        'PASSWORD': 'django',
-        'HOST': 'db',
-        'PORT': '3306',
-    }
-}
 
 
 # Password validation
@@ -173,15 +180,18 @@ SIMPLE_JWT = {
 # LINEログインの設定
 LINE_CHANNEL_ID = '2004751038'
 LINE_CHANNEL_SECRET = 'b2b453579e5786b991a979e0c555f1a0'
-REDIRECT_URL = 'http://127.0.0.1:8000/api/callback/'
+REDIRECT_URL = f'{BACKEND_URL}/api/callback/'
 STATE = 'shopping-list12345'
 
 # LINEログインでのフロントエンドリダイレクトURL
-FRONT_REDIRECT_URL = 'http://127.0.0.1:5173/'
-FRONT_ERROR_URL = 'http://127.0.0.1:5173/'
+FRONT_REDIRECT_URL = f'{FRONTEND_URL}/'
+FRONT_ERROR_URL = f"{FRONTEND_URL}/"
 
 # LINE連携後のフロントエンドリダイレクトURL
-LINK_REDIRECT_URL = 'http://127.0.0.1:5173/'
+LINK_REDIRECT_URL = f"{FRONTEND_URL}/"
+
+# 買い物リストのURL
+SHOPPING_LIST_URL = f"{FRONTEND_URL}/"
 
 # LINE公式チャンネルの設定
 CHANNEL_URL = 'https://lin.ee/Ekblccd'
@@ -190,9 +200,6 @@ PUSH_URL = 'https://api.line.me/v2/bot/message/push'
 
 # チャンネルアクセストークン
 CHANNEL_ACCESS_TOKEN = '3XxTjzUjmAoJC2uybNTaRAis+pRQtbfsr/Lf48T7VHPxvrchvxqkwCHL8W2WOaw8AZRPwzFFStB25Hi50j/0Rn2lg/i9q2+uxRxF+iOoNwgUMpGdF2YEElhVrPXnD6g1Gj/6y2gYwlZT5lQ+wu2Y4AdB04t89/1O/w1cDnyilFU='
-
-# 買い物リストのURL
-SHOPPING_LIST_URL = "http://127.0.0.1:5173/"
 
 # Celery設定
 CELERY_BROKER_URL = 'redis://redis:6379/0'

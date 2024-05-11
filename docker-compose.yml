@@ -17,7 +17,7 @@ services:
       # ホストディレクトリ：コンテナディレクトリにマウント
       - ./backend_project/backend:/backend
     # コンテナ起動時に実行するコマンド
-    command: python3 /backend/manage.py runserver 0.0.0.0:8000
+    command: python3 /backend/manage.py runsslserver 0.0.0.0:8000 --certificate /backend/server.crt --key /backend/server.key
     # ポートを指定、ホスト：コンテナ
     ports:
       - "8000:8000"
