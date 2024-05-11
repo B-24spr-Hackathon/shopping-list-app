@@ -74,7 +74,7 @@ class LineCallbackView(APIView):
 
         # ユーザーがDBに存在する場合
         if User.objects.filter(line_id=line_id).exists():
-            return redirect(f"{redirect_ok}?line_id={line_id}&status={status}")
+            return redirect(f"{redirect_ok}?line_id={line_id}")
 
         # ユーザーがDBに存在しない場合
         return redirect(
