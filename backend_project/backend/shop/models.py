@@ -22,11 +22,10 @@ class UserManager(BaseUserManager):
     
 # Create your models here.
 REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
-SHOPPING_CYCLE_CHOICES = [(0,'毎月'), (1,'隔週'), (2,'毎週'),]
 SHOPPING_DAY = [(i, i) for i in range(1, 31)]
-DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'), (6,'日'),]
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
+MEMBER_STATUS_CHOICES = [(0, '追加済み'), (1, '招待中'), (2,'申請中')]
 
 class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=50)
@@ -62,11 +61,9 @@ class User(AbstractUser):
 
 class List(models.Model):
     list_id = models.AutoField(primary_key=True)
-    owner_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='owner_id')
     list_name = models.CharField(max_length=50)
-    shopping_cycle = models.IntegerField(choices=SHOPPING_CYCLE_CHOICES,  default=0)
     shopping_day = models.IntegerField(choices=SHOPPING_DAY, blank=True, null=True)
-    day_of_week = models.IntegerField(choices=DAY_OF_WEEK, blank=True, null=True)
 
     class Meta:
         db_table = 'lists'
@@ -75,9 +72,10 @@ class List(models.Model):
 
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
-    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members')
-    invitee_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members', db_column='list_id')
+    invitee_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='invitee_id')
     authority = models.BooleanField(default=False)
+    status = models.IntegerField(choices=MEMBER_STATUS_CHOICES, blank=False, null=False)
 
     class Meta:
         db_table = 'members'
@@ -87,7 +85,7 @@ class Member(models.Model):
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length=50) 
-    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='items')
+    list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='items', db_column='list_id')
     color = models.IntegerField(choices=COLOR_CHOICES, blank=True, null=True)
     consume_cycle = models.IntegerField(default=30)
     last_purchase_at = models.DateField(blank=True, null=True)
