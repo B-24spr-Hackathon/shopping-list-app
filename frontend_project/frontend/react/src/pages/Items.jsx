@@ -6,7 +6,7 @@ import UserNameAndIcon from "../components/UserNameIcon";
 import TabItems from "../components/TabItems";
 import { AddBtn } from "../components/Buttons";
 import { addNewListHandler } from "../components/TabItems";
-import { FetchUserInfo } from "../utils/Requests";
+
 
 
 function Items() {

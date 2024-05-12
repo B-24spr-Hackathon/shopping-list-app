@@ -1,14 +1,26 @@
 import axios from "axios";
 
-export const FetchUserInfo = async() => {
+const backendUrl = "https://127.0.0.1:8000/";
+export const apiEndpoint = {
+    user : "/api/user",
+};
+
+export const apiRequest = async({ method, url = backendUrl, apiEndpoint = {}, payload, headers = {}, withCredentials }) => {
     try {
         const response = await axios({
-            withCredentials: true,
-            method: "GET",
-            url: 'http://127.0.0.1:8000/api/user/',
+            method: method,
+            url: url + apiEndpoint,
+            data: payload,
+            headers: {
+                'Content-Type': 'application/json',
+                ...headers
+
+            },
+            withCredentials:  withCredentials,
         });
-        console.log(response);
-    } catch (err) {
-        console.log('Failure in fetch setup:', err);
+        console.log("Response:", response);
+        return response.data;
+    }catch (err) {
+        console.log('Request failed', err);
     }
-};
+}

@@ -4,6 +4,8 @@ import { TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import axios from "axios";
 import { useCookies } from 'react-cookie';
+import { apiRequest } from "../utils/Requests";
+import { apiEndpoint } from "../utils/Requests";
 
 function Home() {
     const navigate = useNavigate();
@@ -33,6 +35,16 @@ function Home() {
         }
     }
 
+    const handleFetchUserInfo = async() => {
+        const response = await apiRequest({
+            method :'get',
+            apiEndpoint: apiEndpoint.user,
+            withCredentials: true,
+
+        });
+        }
+    
+    
     const handleGetRequestTest = async() => {
         try {
             const response = await axios({
@@ -89,7 +101,7 @@ function Home() {
                 )}
             </div>
             <TestBtn onClick={handleChangeDefault_list} children="change" />
-            <TestBtn onClick={handleGetRequestTest} children="get" />
+            <TestBtn onClick={handleFetchUserInfo} children="get" />
 
         </>
 
