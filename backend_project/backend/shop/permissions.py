@@ -15,7 +15,7 @@ class IsOwnerOrInvitee(permissions.BasePermission):
         # オブジェクトのオーナーであるかどうかチェック
         owner_check = list_instance.owner_id == request.user
         # 招待者であるかどうかチェック
-        invitee_check = list_instance.members.filter(invitee_id=request.user, status=0).exists()
+        invitee_check = list_instance.members.filter(invitee_id=request.user).exists()
 
         return owner_check or invitee_check  
    
