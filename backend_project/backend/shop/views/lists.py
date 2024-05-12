@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.lists import ListCreateSerializer, ListResponseSerializer, ListUpdateSerializer
+from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 
@@ -20,7 +20,7 @@ class ListView(APIView):
 
     # リスト設定（登録）POST
     def post(self, request):
-        serializer = ListCreateSerializer(data=request.data)
+        serializer = ListCreateUpdateSerializer(data=request.data)
 
         if serializer.is_valid():
             serializer.save(owner_id=request.user)
@@ -46,7 +46,7 @@ class ListView(APIView):
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
 
-        serializer = ListUpdateSerializer(list_instance, data=request.data, context={"request":request}, partial=True)
+        serializer = ListCreateUpdateSerializer(list_instance, data=request.data, context={"request":request}, partial=True)
 
         if serializer.is_valid():
             # データベースのデータを更新して保存
