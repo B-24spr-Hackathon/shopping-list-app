@@ -24,7 +24,7 @@ function Signup() {
 
     const handleSignup = async() => {
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/user/', {
+            const response = await axios.post('https://127.0.0.1:8000/api/user/', {
                 user_id:user_id,
                 user_name: user_name,
                 email: email,

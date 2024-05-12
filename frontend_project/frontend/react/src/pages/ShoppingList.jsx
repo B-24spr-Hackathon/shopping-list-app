@@ -4,7 +4,7 @@ import { Header, Footer } from "../components/HeaderImg";
 import ListField from '../components/ListField';
 import UserNameAndIcon from '../components/UserNameIcon';
 
-function List() {
+function ShoppingList() {
     return (
         <>
             <Header />
@@ -23,4 +23,4 @@ function List() {
 }
 
 
-export default List;
+export default ShoppingList;

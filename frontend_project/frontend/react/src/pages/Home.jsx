@@ -14,7 +14,7 @@ function Home() {
     //default_listを更新する処理
     const handleChangeDefault_list = async() => {
         try {
-            const response = await axios.patch('http://127.0.0.1:8000/api/user/', {
+            const response = await axios.patch('https://127.0.0.1:8000/api/user/', {
                 default_list: true
             }, {
                 headers: {
@@ -38,7 +38,7 @@ function Home() {
             const response = await axios({
                 withCredentials: true,
                 method: "GET",
-                url: 'http://127.0.0.1:8000/api/user/',
+                url: 'https://127.0.0.1:8000/api/user/',
                 
                 
             });
@@ -63,7 +63,7 @@ function Home() {
             //     console.error('Error during fetch operation:', error); // レスポンス処理またはJSON変換中のエラー
             // });
         } catch (err) {
-            console.log('Failure in fetch setup:', err); 
+            console.log('Failure in fetch setup:', err);
             // console.log(cookies);
             // const response = await axios.get('http://127.0.0.1:8000/api/user/', {
             //     withCredentials: true,
