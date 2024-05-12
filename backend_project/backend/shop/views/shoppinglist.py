@@ -54,7 +54,6 @@ class ShoppingListView(APIView):
         _, last_day_this_month = calendar.monthrange(current_year, current_month)
         adjusted_day_this_month = min(shopping_day, last_day_this_month)
         shopping_date_this_month = datetime(current_year, current_month, adjusted_day_this_month)
-        shopping_date_this_month = datetime(current_year, current_month, shopping_day)
 
         if today <= shopping_date_this_month:
             return shopping_date_this_month
