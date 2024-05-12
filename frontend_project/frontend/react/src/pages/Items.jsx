@@ -10,8 +10,11 @@ import { addNewListHandler } from "../components/TabItems";
 
 
 function Items() {
+
+    const fetchUserInfo = 
+
     useEffect(() => {
-        FetchUserInfo();
+        // FetchUserInfo();
     }, [AddBtn]);
 
     return (

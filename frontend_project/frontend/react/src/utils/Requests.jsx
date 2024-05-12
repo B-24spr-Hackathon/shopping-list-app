@@ -1,16 +1,16 @@
 import axios from "axios";
 
-const backendUrl = "https://127.0.0.1:8000/";
+const apiBaseUrl = "https://127.0.0.1:8000/";
 export const apiEndpoint = {
-    user : "/api/user",
+    user : "api/user/",
 };
 
-export const apiRequest = async({ method, url = backendUrl, apiEndpoint = {}, payload, headers = {}, withCredentials }) => {
+export const apiRequest = async( method, apiEndpoint, data, headers, withCredentials ) => {
     try {
         const response = await axios({
             method: method,
-            url: url + apiEndpoint,
-            data: payload,
+            url: apiBaseUrl + apiEndpoint,
+            data: data,
             headers: {
                 'Content-Type': 'application/json',
                 ...headers

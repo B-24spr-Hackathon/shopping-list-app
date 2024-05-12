@@ -27,6 +27,8 @@ function Login() {
             const response = await axios.post('https://127.0.0.1:8000/api/login/', {
                 email: email,
                 password: password,
+            },{
+                withCredentials: true,
             });
             
             console.log(response);
