@@ -23,8 +23,8 @@ class UserManager(BaseUserManager):
 # Create your models here.
 REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
 SHOPPING_DAY = [(i, i) for i in range(1, 31)]
-# フロントエンドからのカラー設定連絡待ち
-COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
+
+COLOR_CHOICES = [(0, '赤'), (1, 'ピンク'), (2, 'オレンジ'),(3, '黄'), (4, '黄緑'), (5, '緑'),(6, '水色'), (7, '青'), (8, '薄紫'),(9, '紫'), (10, 'グレー'),]
 MEMBER_STATUS_CHOICES = [(0, '追加済み'), (1, '招待中'), (2,'申請中')]
 
 class User(AbstractUser):
