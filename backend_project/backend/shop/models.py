@@ -22,9 +22,7 @@ class UserManager(BaseUserManager):
     
 # Create your models here.
 REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
-SHOPPING_CYCLE_CHOICES = [(0,'毎月'), (1,'隔週'), (2,'毎週'),]
 SHOPPING_DAY = [(i, i) for i in range(1, 31)]
-DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'), (6,'日'),]
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
 MEMBER_STATUS_CHOICES = [(0, '追加済み'), (1, '招待中'), (2,'申請中')]
@@ -65,9 +63,7 @@ class List(models.Model):
     list_id = models.AutoField(primary_key=True)
     owner_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='owner_id')
     list_name = models.CharField(max_length=50)
-    shopping_cycle = models.IntegerField(choices=SHOPPING_CYCLE_CHOICES,  default=0)
     shopping_day = models.IntegerField(choices=SHOPPING_DAY, blank=True, null=True)
-    day_of_week = models.IntegerField(choices=DAY_OF_WEEK, blank=True, null=True)
 
     class Meta:
         db_table = 'lists'
