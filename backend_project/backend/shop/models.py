@@ -27,6 +27,7 @@ SHOPPING_DAY = [(i, i) for i in range(1, 31)]
 DAY_OF_WEEK = [(0,'月'), (1,'火'), (2,'水'), (3,'木'), (4,'金'), (5,'土'), (6,'日'),]
 # フロントエンドからのカラー設定連絡待ち
 COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
+MEMBER_STATUS_CHOICES = [(0, '追加済み'), (1, '招待中'), (2,'申請中')]
 
 class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=50)
@@ -78,6 +79,7 @@ class Member(models.Model):
     list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members', db_column='list_id')
     invitee_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='invitee_id')
     authority = models.BooleanField(default=False)
+    status = models.IntegerField(choices=MEMBER_STATUS_CHOICES, blank=False, null=False)
 
     class Meta:
         db_table = 'members'
