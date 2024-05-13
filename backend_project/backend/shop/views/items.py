@@ -6,11 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from shop.permissions import IsOwnerOrInviteeWithAuthority
+from shop.permissions import IsOwnerOrGuestWithAuthority
 
 class ItemCreateView(APIView):
     # JWT認証を要求、オーナーまたは編集権限を持つ招待者のみ許可
-    permission_classes = [IsAuthenticated, IsOwnerOrInviteeWithAuthority]
+    permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
     # アイテムリスト表示
     def get(self, request, list_id):      
@@ -48,9 +48,9 @@ class ItemCreateView(APIView):
 
 class ItemDetailView(APIView):
     # JWT認証を要求、オーナーまたは編集権限を持つ招待者のみ許可
-    permission_classes = [IsAuthenticated, IsOwnerOrInviteeWithAuthority]
+    permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
-        # アイテム更新            
+    # アイテム更新            
     def patch(self, request, list_id, item_id):
         # リストを取得
         list_instance = get_object_or_404(List, pk=list_id)
@@ -64,7 +64,8 @@ class ItemDetailView(APIView):
     
         if serializer.is_valid():
             # データを更新して保存
-            serializer.save()
+            to_list = request.data.get('to_list', item_instance.to_list)
+            serializer.save(to_list=to_list)
             # 更新されたフィールドのみ辞書として取得
             update_fields = {field: request.data[field] for field in request.data}
             # 更新されたフィールドのみをレスポンスとして返す
