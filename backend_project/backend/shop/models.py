@@ -21,7 +21,7 @@ class UserManager(BaseUserManager):
         return self.create_user(user_id, email, password, **extra_fields)
     
 # Create your models here.
-REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
+REMIND_TIMING_CHOICES = [(i, i) for i in range(11)]
 SHOPPING_DAY = [(i, i) for i in range(1, 31)]
 
 COLOR_CHOICES = [(0, '赤'), (1, 'ピンク'), (2, 'オレンジ'),(3, '黄'), (4, '黄緑'), (5, '緑'),(6, '水色'), (7, '青'), (8, '薄紫'),(9, '紫'), (10, 'グレー'),]
@@ -43,7 +43,7 @@ class User(AbstractUser):
     have_list = models.BooleanField(default=False)
     default_list = models.BooleanField(default=True)
     remind = models.BooleanField(default=False)
-    remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
+    remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES, default=0)    
     remind_time = models.TimeField(blank=True, null=True)
 
     objects = UserManager()
