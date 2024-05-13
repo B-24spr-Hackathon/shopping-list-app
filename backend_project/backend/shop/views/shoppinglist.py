@@ -13,7 +13,7 @@ from datetime import datetime
 
 # 買い物リスト表示(GET)
 class ShoppingListView(APIView):
-    # JWT認証を要求、オーナーまたは招待者のみ許可
+    # JWT認証を要求、オーナーまたはゲストのみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrGuest] 
 
     def get(self, request, list_id):

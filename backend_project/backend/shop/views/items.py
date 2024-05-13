@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from shop.permissions import IsOwnerOrGuestWithAuthority
 
 class ItemCreateView(APIView):
-    # JWT認証を要求、オーナーまたは編集権限を持つ招待者のみ許可
+    # JWT認証を要求、オーナーまたは編集権限を持つゲストのみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
     # アイテムリスト表示
@@ -47,7 +47,7 @@ class ItemCreateView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ItemDetailView(APIView):
-    # JWT認証を要求、オーナーまたは編集権限を持つ招待者のみ許可
+    # JWT認証を要求、オーナーまたは編集権限を持つゲストのみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
     # アイテム更新            

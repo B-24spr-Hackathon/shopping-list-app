@@ -37,7 +37,7 @@ class ListView(APIView):
         self.check_object_permissions(self.request, list_instance)
         list_data = ListResponseSerializer(list_instance).data
 
-        # 招待者の情報を取得
+        # ゲストの情報を取得
         guests = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
         if guests.exists():
             guests_info = ListGuestSerializer([guest.guest_id for guest in guests], many=True).data
