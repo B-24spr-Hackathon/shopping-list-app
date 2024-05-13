@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List, Member
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer, ListInviteeSerializer
+from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer, ListGuestSerializer
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 
@@ -38,13 +38,13 @@ class ListView(APIView):
         list_data = ListResponseSerializer(list_instance).data
 
         # 招待者の情報を取得
-        invitees = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
-        if invitees.exists():
-            invitees_info = ListInviteeSerializer([invitee.guest_id for invitee in invitees], many=True).data
+        guests = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
+        if guests.exists():
+            guests_info = ListGuestSerializer([guest.guest_id for guest in guests], many=True).data
         else:
-            invitees_info = []
+            guests_info = []
 
-        list_data['invitees_info'] = invitees_info
+        list_data['guests_info'] = guests_info
 
         return Response(list_data, status=status.HTTP_200_OK)
 

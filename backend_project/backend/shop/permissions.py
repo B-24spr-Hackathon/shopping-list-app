@@ -8,29 +8,29 @@ class IsOwner(permissions.BasePermission):
         return list_instance.owner_id == request.user
 
 # リストのオーナーと招待者許可
-class IsOwnerOrInvitee(permissions.BasePermission):
+class IsOwnerOrGuest(permissions.BasePermission):
     message ='アクセスする権限がありません'
 
     def has_object_permission(self, request, view, list_instance):
         # オブジェクトのオーナーであるかどうかチェック
         owner_check = list_instance.owner_id == request.user
         # 招待者であるかどうかチェック
-        invitee_check = list_instance.members.filter(guest_id=request.user, member_status=0).exists()
+        guest_check = list_instance.members.filter(guest_id=request.user, member_status=0).exists()
 
-        return owner_check or invitee_check  
+        return owner_check or guest_check  
    
 
 # リストのオーナーと編集権限を持つ招待者許可
-class IsOwnerOrInviteeWithAuthority(permissions.BasePermission):
+class IsOwnerOrGuestWithAuthority(permissions.BasePermission):
     message ='アクセスする権限がありません'
 
     def has_object_permission(self, request, view, list_instance):
         # オブジェクトのオーナーであるかどうかチェック
         owner_check = list_instance.owner_id == request.user
         # 招待者であるかどうかチェック
-        invitee_check = list_instance.members.filter(guest_id=request.user, authority=True, member_status=0).exists()
+        guest_check = list_instance.members.filter(guest_id=request.user, authority=True, member_status=0).exists()
 
-        return owner_check or invitee_check  
+        return owner_check or guest_check  
    
 
 

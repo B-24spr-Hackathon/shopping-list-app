@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from shop.permissions import IsOwnerOrInvitee
+from shop.permissions import IsOwnerOrGuest
 import calendar
 from datetime import datetime
 
@@ -14,7 +14,7 @@ from datetime import datetime
 # 買い物リスト表示(GET)
 class ShoppingListView(APIView):
     # JWT認証を要求、オーナーまたは招待者のみ許可
-    permission_classes = [IsAuthenticated, IsOwnerOrInvitee] 
+    permission_classes = [IsAuthenticated, IsOwnerOrGuest] 
 
     def get(self, request, list_id):
         # リストを取得

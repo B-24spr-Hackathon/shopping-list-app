@@ -17,7 +17,7 @@ class ListResponseSerializer(serializers.ModelSerializer):
         fields = ('list_id', 'list_name', 'shopping_day', )
 
 # リスト表示　招待者一覧用     
-class ListInviteeSerializer(serializers.ModelSerializer):
+class ListGuestSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
