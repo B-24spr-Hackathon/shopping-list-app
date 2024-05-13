@@ -15,11 +15,13 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.conf.beat_schedule = {
     "shopping-batch": {
         "task": "shop.tasks.shopping_batch",
-        "schedule": crontab(hour=(settings.BATCH_TIME), minute=0),
+        "schedule": crontab(hour=settings.BATCH_HOUR,
+                            minute=settings.BATCH_MINUTE),
     },
     "remind-batch": {
         "task": "shop.tasks.remind_batch",
-        "schedule": crontab(hour=settings.BATCH_TIME, minute=0),
+        "schedule": crontab(hour=settings.BATCH_HOUR,
+                            minute=settings.BATCH_MINUTE),
     },
 }
 

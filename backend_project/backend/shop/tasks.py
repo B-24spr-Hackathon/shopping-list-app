@@ -22,31 +22,31 @@ def remind_batch():
     # 現在の日にちを取得
     today_datetime = timezone.now()
     today = today_datetime.date()
-    
+
     # 通知対象のユーザーとそのユーザーの持つ通知対象となるアイテムを抽出
     # アイテムの取得条件のクエリセット
     item_queryset = Item.objects.filter(
         to_list=False,
         remind_by_item=True,
         manage_target=True)
-    
+
     # アイテムをPrefetch
     item_prefetch = Prefetch("items", queryset=item_queryset,
                              to_attr="item_list")
-    
+
     # リストのクエリセット
     list_queryset = List.objects.prefetch_related(item_prefetch)
-    
+
     # リストの紐づけてアイテムをPrefetch
     list_prefetch = Prefetch("list_set", queryset=list_queryset,
                              to_attr="lists")
-    
+
     # 通知対象となるユーザーを取得し、紐づくアイテムをPrefetch
     users = User.objects.filter(
         line_status=True,
         have_list=True,
         remind=True).prefetch_related("list_set", list_prefetch)
-    
+
     # データをまとめる
     user_items = []
     for user in users:
@@ -67,29 +67,29 @@ def remind_batch():
                 list_items.append(item_attr)
         user_item["items"] = list_items
         user_items.append(user_item)
-        
+
     # まとめたデータよりユーザー毎に通知送信のタスクを実行
     for remind_user in user_items:
         remind_items = []
         for remind_item in remind_user["items"]:
             # アイテムの通知日時を算出（最終開封日+消費頻度+通知タイミング）
             remind_date = remind_item["last_open_at"] + timedelta(days=(remind_item["consume_cycle"] + remind_user["remind_timing"]))
-            
+
             # 今日が通知日時よりも後の場合
             if today >= remind_date:
                 remind_items.append({
                     "item_id": remind_item["item_id"],
                     "item_name": remind_item["item_name"]
                 })
-        
+
         # 通知時間（秒）の設定
-        hours = remind_user["remind_time"].hour
-        minutes = remind_user["remind_time"].minute
-        hour = hours - settings.BATCH_TIME
-        if hour < 0:
-            hour += 24
-        count = (hour * 3600) + (minutes * 60)
-        
+        remind_time = (remind_user["remind_time"].hour * 3600) + (remind_user["remind_time"].minute * 60)
+        batch_time = (settings.BATCH_HOUR * 3600) + (settings.BATCH_MINUTE * 60)
+        count = remind_time - batch_time
+        # 通知時間がバッチ処理時間よりも早い場合
+        if count < 0:
+            count += 24 * 3600
+
         # 通知送信のタスクを呼出し
         remind_request.apply_async([remind_user["line_id"], remind_items], countdown=count)
 
@@ -115,7 +115,7 @@ def shopping_batch():
             INNER JOIN lists AS l ON u.user_id = l.owner_id
             WHERE u.remind = 1 AND l.shopping_day = 1;
             """)
-    
+
     # 今日が今月最終日前日の場合は買い物日が月末のユーザーを取得
     elif day == last_day - 1:
         users = User.objects.raw("""
@@ -123,7 +123,7 @@ def shopping_batch():
             INNER JOIN lists AS l ON u.user_id = l.owner_id
             WHERE u.remind = 1 AND l.shopping_day > %s;
             """, [day])
-    
+
     # 今日が上記以外の場合は買い物日が翌日のユーザーを取得
     else:
         day += 1
@@ -136,13 +136,13 @@ def shopping_batch():
     # ユーザーを取出してshopping_requestを呼出す
     for user in users:
         # 通知時間（秒）の設定
-        hours = user.remind_time.hour
-        minutes = user.remind_time.minute
-        hour = hours - settings.BATCH_TIME - 1
-        if hour < 0:
-            hour += 24
-        count = (hour * 3600) + (minutes * 60)
-        
+        remind_time = (user.remind_time.hour * 3600) + (user.remind_time.minute * 60)
+        batch_time = (settings.BATCH_HOUR * 3600) + (settings.BATCH_MINUTE * 60)
+        count = remind_time - batch_time
+        # 通知時間がバッチ処理時間よりも早い場合
+        if count < 0:
+            count += 24 * 3600
+
         # 非同期で通知を送る関数を呼出す
         shopping_request.apply_async([user.line_id], countdown=count)
 
