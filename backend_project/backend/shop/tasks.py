@@ -1,9 +1,10 @@
-from backend.backend.celery import app
+from backend.celery import app
 from django.utils import timezone
 from django.conf import settings
-from datetime import datetime, timedelta
+from django.db.models import Prefetch
+from datetime import timedelta
 import requests, calendar
-from shop.models import User
+from shop.models import User, List, Item
 
 
 # リクエストに必要なデータ
@@ -11,13 +12,94 @@ url = settings.PUSH_URL
 token = settings.CHANNEL_ACCESS_TOKEN
 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
+
+"""
+remind_batch
+毎日定時にDBからデータを取得し開封確認通知を送るタスクを呼出す
+"""
+@app.task
+def remind_batch():
+    # 現在の日にちを取得
+    today_datetime = timezone.now()
+    today = today_datetime.date()
+    
+    # 通知対象のユーザーとそのユーザーの持つ通知対象となるアイテムを抽出
+    # アイテムの取得条件のクエリセット
+    item_queryset = Item.objects.filter(
+        to_list=False,
+        remind_by_item=True,
+        manage_target=True)
+    
+    # アイテムをPrefetch
+    item_prefetch = Prefetch("items", queryset=item_queryset,
+                             to_attr="item_list")
+    
+    # リストのクエリセット
+    list_queryset = List.objects.prefetch_related(item_prefetch)
+    
+    # リストの紐づけてアイテムをPrefetch
+    list_prefetch = Prefetch("list_set", queryset=list_queryset,
+                             to_attr="lists")
+    
+    # 通知対象となるユーザーを取得し、紐づくアイテムをPrefetch
+    users = User.objects.filter(
+        line_status=True,
+        have_list=True,
+        remind=True).prefetch_related("list_set", list_prefetch)
+    
+    # データをまとめる
+    user_items = []
+    for user in users:
+        user_item = {
+            "line_id": user.line_id,
+            "remind_timing": user.remind_timing,
+            "remind_time": user.remind_time
+        }
+        list_items = []
+        for list in user.lists:
+            for item in list.item_list:
+                item_attr = {
+                    "item_id": item.item_id,
+                    "item_name": item.item_name,
+                    "consume_cycle": item.consume_cycle,
+                    "last_open_at": item.last_open_at
+                }
+                list_items.append(item_attr)
+        user_item["items"] = list_items
+        user_items.append(user_item)
+        
+    # まとめたデータよりユーザー毎に通知送信のタスクを実行
+    for remind_user in user_items:
+        remind_items = []
+        for remind_item in remind_user["items"]:
+            # アイテムの通知日時を算出（最終開封日+消費頻度+通知タイミング）
+            remind_date = remind_item["last_open_at"] + timedelta(days=(remind_item["consume_cycle"] + remind_user["remind_timing"]))
+            
+            # 今日が通知日時よりも後の場合
+            if today >= remind_date:
+                remind_items.append({
+                    "item_id": remind_item["item_id"],
+                    "item_name": remind_item["item_name"]
+                })
+        
+        # 通知時間（秒）の設定
+        hours = remind_user["remind_time"].hour
+        minutes = remind_user["remind_time"].minute
+        hour = hours - settings.BATCH_TIME
+        if hour < 0:
+            hour += 24
+        count = (hour * 3600) + (minutes * 60)
+        
+        # 通知送信のタスクを呼出し
+        remind_request.apply_async([remind_user["line_id"], remind_items], countdown=count)
+
+
 """
 shopping_batch
 毎日定時にDBからデータを取得し買い物日前日の通知を送るタスクを呼出す
 """
 @app.task
 def shopping_batch():
-    # 買い物日を通知するタスクを呼出す
     today = timezone.now()
     year = today.year
     month = today.month
@@ -26,38 +108,43 @@ def shopping_batch():
     # 今月の最終日を取得
     _, last_day = calendar.monthrange(year, month)
 
-    # 今日が今月最終日に場合は買い物日が1のユーザーを取得
+    # 今日が今月最終日の場合は買い物日が1のユーザーを取得
     if day == last_day:
         users = User.objects.raw("""
-            SELECT u.line_id, u.remind_time FROM users AS u
+            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
             INNER JOIN lists AS l ON u.user_id = l.owner_id
             WHERE u.remind = 1 AND l.shopping_day = 1;
             """)
+    
     # 今日が今月最終日前日の場合は買い物日が月末のユーザーを取得
     elif day == last_day - 1:
         users = User.objects.raw("""
-            SELECT u.line_id, u.remind_time FROM users AS u
+            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
             INNER JOIN lists AS l ON u.user_id = l.owner_id
             WHERE u.remind = 1 AND l.shopping_day > %s;
             """, [day])
+    
     # 今日が上記以外の場合は買い物日が翌日のユーザーを取得
     else:
         day += 1
         users = User.objects.raw("""
-            SELECT u.line_id, u.remind_time FROM users AS u
+            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
             INNER JOIN lists AS l ON u.user_id = l.owner_id
             WHERE u.remind = 1 AND l.shopping_day = %s;
             """, [day])
 
     # ユーザーを取出してshopping_requestを呼出す
     for user in users:
-        # 通知時間の設定
-        hour = user.remind_time - settings.BATCH_TIME
+        # 通知時間（秒）の設定
+        hours = user.remind_time.hour
+        minutes = user.remind_time.minute
+        hour = hours - settings.BATCH_TIME - 1
         if hour < 0:
             hour += 24
-        count = hour * 3600
-
-        shopping_request.apply_async(args=[user.line_id], countdown=count)
+        count = (hour * 3600) + (minutes * 60)
+        
+        # 非同期で通知を送る関数を呼出す
+        shopping_request.apply_async([user.line_id], countdown=count)
 
 
 """
@@ -67,8 +154,8 @@ LINEにPOSTリクエストを送信するタスク
 """
 @app.task
 def remind_request(line_id, items):
-    # itemsが複数（リスト)の場合
-    if type(items) == list:
+    # itemsが複数の場合
+    if len(items) > 1:
         # 1度のメッセージで送信できるアイテム数は10
         # 1度のリクエストで送信できるメッセージ数は5
         message_num = (len(items) // 10) + 1
@@ -93,12 +180,12 @@ def remind_request(line_id, items):
                         {
                             "type": "postback",
                             "label": "追加する",
-                            "data": "to_list=true",
+                            "data": item["item_id"],
                         },
                         {
                             "type": "postback",
                             "label": "追加しない",
-                            "data": "to_list=false",
+                            "data": item["item_name"],
                         },
                     ],
                 }
@@ -109,6 +196,7 @@ def remind_request(line_id, items):
 
     # itemsが1つの場合
     else:
+        item = items[0]
         data = {
             "to": line_id,
             "messages": [
@@ -117,17 +205,17 @@ def remind_request(line_id, items):
                     "altText": "開封確認",
                     "template": {
                         "type": "buttons",
-                        "text": f"{items.item_name}がそろそろ無くなる頃です。\n買い物リストに追加しますか？",
+                        "text": f"{item['item_name']}がそろそろ無くなる頃です。\n買い物リストに追加しますか？",
                         "actions": [
                             {
                                 "type": "postback",
                                 "label": "追加する",
-                                "data": "to_list=true",
+                                "data": item["item_id"],
                             },
                             {
                                 "type": "postback",
                                 "label": "追加しない",
-                                "data": "to_list=false",
+                                "data": item["item_name"],
                             },
                         ],
                     },
