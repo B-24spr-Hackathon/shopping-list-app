@@ -6,7 +6,7 @@ import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
-import { clearUser, setUser } from "../reducers";
+import { setUser, clearUser } from "../reducers/userSlice";
 import { useCookies } from 'react-cookie';
 
 function Signup() {
@@ -35,7 +35,7 @@ function Signup() {
             const token = response.data.access; // レスポンスからトークンを取得;
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
-            dispatch(setUser(response.data.user));
+            dispatch(setUser( response.data.user ));
             //リダイレクト
             navigate('/home');
 

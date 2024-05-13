@@ -4,27 +4,33 @@ import { TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import axios from "axios";
 import { useCookies } from 'react-cookie';
-import { apiRequest } from "../utils/Requests";
+import { fetchUserInfoRequest, apiRequest } from "../utils/Requests";
 import { apiEndpoint } from "../utils/Requests";
+import { useDispatch } from "react-redux";
+import { setUser, clearUser } from "../reducers/userSlice";
 
 function Home() {
+    const dispatch = useDispatch();
+
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
+
     const [cookies] = useCookies(['jwt_token']);
 
-    //default_listを更新する処理
-    const handleChangeDefault_list = async() => {
-        const response = await apiRequest(
-            'PATCH', apiEndpoint.user, {default_list: true}, "", true
-        );
-    }
 
     const handleFetchUserInfo = async() => {
-        const response = await apiRequest(
-            'GET', apiEndpoint.user, "", "", true
-        );
-        }
+        try {
+            const response = await fetchUserInfoRequest();
+            console.log("fetch:",response.data);
+            dispatch(setUser(response.data.user));
+            dispatch(setUser({lists:response.data.lists}));
+        }catch(err){
+            // console.log(err.response.data);
+            console.log("era-")
+            console.log(err.response);
+        };
+    }
 
     return (
         <>
@@ -38,7 +44,6 @@ function Home() {
                     <p>ログイン情報がありません。</p>
                 )}
             </div>
-            <TestBtn onClick={handleChangeDefault_list} children="change" />
             <TestBtn onClick={handleFetchUserInfo} children="get" />
 
         </>

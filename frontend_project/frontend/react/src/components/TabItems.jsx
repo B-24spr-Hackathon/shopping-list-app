@@ -1,48 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import '../styles/Tabs.css';
-import axios from 'axios';
-import { useCookies } from 'react-cookie';
+import { addNewListRequest } from "../utils/Requests";
+import { useSelector } from "react-redux";
 
 
-// const [cookies] = useCookies(['jwt_token']);
-const addNewListRequest = async(title) => {
-    try {
-        // console.log(cookies);
-        const response = await axios.post('http://127.0.0.1:8000/api/list/', {
-        list_name : title
-    }, {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        withCredentials: true
-    });
-    console.log(response);
-    } catch(err) {
-    console.log('sippai',err);
-    console.log("Request Failed:", err.response || err.message || err);
-}
-}
-
-//タブの追加
-export const addNewListHandler = () => {
-try{
-    const newList = {
-        id: 1,
-        title: '新しいリスト1',
-    };
-    addNewListRequest(newList.title);
-}catch{
-    console.log('リストを追加しませんでした');
-}
-// //IDが0ではないタブを取り出して、[それら、新しいタブ、ID=0のタブ]の順にstateに入れる
-// setTabs(tabs => {
-//     const filteredTabs = tabs.filter(tab => tab.id !== 0);
-//     return [...filteredTabs, newTab, tabs.find(tab => tab.id === 0)];
-};
-
-//デフォルト状態のタブ構成
 function TabItems({ children }) {
+    const listTitle = useSelector((state) => state.user.lists[0].list_name);
     const [tabs, setTabs] = useState([
         { id: 0, title: "+", content: "", isEditing: false },
     ]);
@@ -54,7 +18,6 @@ function TabItems({ children }) {
         return tabs.length ? Math.max(...tabs.map(tab => tab.id)) + 1 : 1;
     }
 
-    
 
     
 
@@ -117,7 +80,7 @@ function TabItems({ children }) {
     );
 
     const itemsData = [
-        { 管理: "管理内容1", 商品名: "商品1", 消費サイクル: "1ヶ月", 開封日: "2021-09-01", リンク: "http://example.com", 購入日: "2021-08-01", 通知: "はい" },
+        { 管理: "", 商品名: "商品1", 消費サイクル: "1ヶ月", 開封日: "2021-09-01", リンク: "http://example.com", 購入日: "2021-08-01", 通知: "はい" },
     ];
 
 

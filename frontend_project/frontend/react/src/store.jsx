@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from "./reducers.jsx";
+import rootReducer from './reducers/index.jsx';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
@@ -9,12 +9,10 @@ const persistConfig = {
     // whitelist: ['user']
 };
 
-const persistedReducer = persistReducer(persistConfig, userReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-    reducer: {
-        user: persistedReducer,
-    },
+    reducer: persistedReducer,
 });
 
 export const persistor = persistStore(store);

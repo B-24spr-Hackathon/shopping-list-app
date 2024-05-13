@@ -16,6 +16,7 @@ export const userSlice = createSlice({
 		user_icon: null,
         user_id: null,
         user_name: null,
+        lists: [],
     },
     reducers: {
         setUser: (state, action) => {
@@ -42,5 +43,4 @@ export const userSlice = createSlice({
 });
 
 export const { setUser, clearUser } = userSlice.actions;
-
 export default userSlice.reducer;

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
 import { Header, Footer } from "../components/HeaderImg";
 import TextInput from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
-import { clearUser, setUser } from "../reducers";
+import { setUser,clearUser } from "../reducers/userSlice";
+import { loginRequest } from "../utils/Requests";
 
 function Login() {
     const dispatch = useDispatch();
@@ -23,37 +23,31 @@ function Login() {
     const navigate = useNavigate();
 
     const handleLogin = async() => {
-        try {
-            const response = await axios.post('https://127.0.0.1:8000/api/login/', {
-                email: email,
-                password: password,
-            },{
-                withCredentials: true,
-            });
-            
-            console.log(response);
-            console.log(response.data);
-
-             // JWTトークンをクッキーに保存する
-            const token = response.data.access; // レスポンスからトークンを取得;
+        try{
+            const data = await loginRequest(email, password);
+            console.log("login:", data);
+            const token = data.data.access;
+            // レスポンスからトークンを取得;
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
-            dispatch(setUser(response.data.user));
+            dispatch(setUser(data.data.user));
             //リダイレクト
             navigate('/home');
+        }catch(err){
+            console.log(err.response.data);
 
-        } catch (err) {
-            setError("失敗");
-            console.error(err);
-        }
-    };
+        };
+    }
+
+
+
     return (
         <>
             <div className="flex flex-col">
                 <Header />
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ログイン" />
-                    <LineBtn onClick={() => window.location.href='https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid'} children="LINEでログイン"/>
+                    <LineBtn onClick={() => window.location.href='https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid'} children="LINEでログイン"/>
                     <Bar children="またはメールアドレスでログイン"/>
                     <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                     <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
