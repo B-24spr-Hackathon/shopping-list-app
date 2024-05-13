@@ -28,7 +28,7 @@ class ShoppingListView(APIView):
         if list_instance.owner_id == request.user:
             authority = True
         else:
-            member = Member.objects.filter(list_id=list_id, invitee_id=request.user).first()
+            member = Member.objects.filter(list_id=list_id, guest_id=request.user).first()
             authority = member.authority
 
         # 買い物予定日

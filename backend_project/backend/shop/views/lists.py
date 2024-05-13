@@ -38,9 +38,9 @@ class ListView(APIView):
         list_data = ListResponseSerializer(list_instance).data
 
         # 招待者の情報を取得
-        invitees = Member.objects.filter(list_id=list_instance, status=0).select_related('invitee_id')
+        invitees = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
         if invitees.exists():
-            invitees_info = ListInviteeSerializer([invitee.invitee_id for invitee in invitees], many=True).data
+            invitees_info = ListInviteeSerializer([invitee.guest_id for invitee in invitees], many=True).data
         else:
             invitees_info = []
 
