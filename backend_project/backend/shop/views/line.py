@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.conf import settings
 from django.shortcuts import redirect
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -138,8 +139,8 @@ class LineLinkView(APIView):
         # JWTを生成するためのペイロードを定義
         payload = {
             "user_id": user.user_id,
-            "exp": datetime.now() + timedelta(minutes=10),
-            "iat": datetime.now()
+            "exp": timezone.now() + timedelta(minutes=10),
+            "iat": timezone.now()
         }
     
         # JWTの生成
