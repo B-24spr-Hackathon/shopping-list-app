@@ -73,14 +73,14 @@ class List(models.Model):
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members', db_column='list_id')
-    invitee_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='invitee_id')
+    guest_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='guest_id')
     authority = models.BooleanField(default=False)
-    status = models.IntegerField(choices=MEMBER_STATUS_CHOICES, blank=False, null=False)
+    member_status = models.IntegerField(choices=MEMBER_STATUS_CHOICES)
 
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee_id.user_name
+        return self.guest_id.user_name
 
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
