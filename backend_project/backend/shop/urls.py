@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from shop.views import (
-    items, user, login, line, lists, healthcheck, webhook, test, shoppinglist, invite,
+    items, user, login, line, lists, healthcheck, webhook, shoppinglist
 )
 
 urlpatterns = [
@@ -30,7 +30,6 @@ urlpatterns += [
     path("api/line-login/", line.LineLoginView.as_view(), name="line-login"),
     path("api/line-link/", line.LineLinkView.as_view(), name='line-link'),
     path("api/line-webhook/", webhook.LineWebhookView.as_view(),
-         name="line-webhook"),
-    path("api/test/", test.TestView.as_view())
+         name="line-webhook")
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

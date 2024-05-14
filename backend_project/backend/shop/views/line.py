@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.conf import settings
 from django.shortcuts import redirect
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,7 +19,8 @@ redirect_uri = settings.REDIRECT_URL
 state = settings.STATE
 
 # フロントエンドへのリダイレクト先
-redirect_ok = settings.FRONT_REDIRECT_URL
+redirect_signup = settings.FRONT_SIGNUP_URL
+redirect_login = settings.FRONT_LOGIN_URL
 redirect_ng = settings.FRONT_ERROR_URL
 
 """
@@ -74,11 +76,11 @@ class LineCallbackView(APIView):
 
         # ユーザーがDBに存在する場合
         if User.objects.filter(line_id=line_id).exists():
-            return redirect(f"{redirect_ok}?line_id={line_id}")
+            return redirect(f"{redirect_login}?line_id={line_id}")
 
         # ユーザーがDBに存在しない場合
         return redirect(
-            f"{redirect_ok}?line_id={line_id}&user_name={user_name}&status={status}"
+            f"{redirect_signup}?line_id={line_id}&user_name={user_name}&status={status}"
         )
 
 
@@ -138,8 +140,8 @@ class LineLinkView(APIView):
         # JWTを生成するためのペイロードを定義
         payload = {
             "user_id": user.user_id,
-            "exp": datetime.now() + timedelta(minutes=10),
-            "iat": datetime.now()
+            "exp": timezone.now() + timedelta(minutes=10),
+            "iat": timezone.now()
         }
     
         # JWTの生成
