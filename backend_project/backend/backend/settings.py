@@ -184,7 +184,8 @@ REDIRECT_URL = f'{BACKEND_URL}/api/callback/'
 STATE = 'shopping-list12345'
 
 # LINEログインでのフロントエンドリダイレクトURL
-FRONT_REDIRECT_URL = f'{FRONTEND_URL}/'
+FRONT_SIGNUP_URL = f'{FRONTEND_URL}/lineloginform'
+FRONT_LOGIN_URL = f"{FRONTEND_URL}/todefault"
 FRONT_ERROR_URL = f"{FRONTEND_URL}/lineloginerror"
 
 # LINE連携後のフロントエンドリダイレクトURL

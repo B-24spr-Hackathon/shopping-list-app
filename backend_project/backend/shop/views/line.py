@@ -19,7 +19,8 @@ redirect_uri = settings.REDIRECT_URL
 state = settings.STATE
 
 # フロントエンドへのリダイレクト先
-redirect_ok = settings.FRONT_REDIRECT_URL
+redirect_signup = settings.FRONT_SIGNUP_URL
+redirect_login = settings.FRONT_LOGIN_URL
 redirect_ng = settings.FRONT_ERROR_URL
 
 """
@@ -75,11 +76,11 @@ class LineCallbackView(APIView):
 
         # ユーザーがDBに存在する場合
         if User.objects.filter(line_id=line_id).exists():
-            return redirect(f"{redirect_ok}?line_id={line_id}")
+            return redirect(f"{redirect_login}?line_id={line_id}")
 
         # ユーザーがDBに存在しない場合
         return redirect(
-            f"{redirect_ok}?line_id={line_id}&user_name={user_name}&status={status}"
+            f"{redirect_signup}?line_id={line_id}&user_name={user_name}&status={status}"
         )
 
 
