@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from shop.views import (
-    items, user, login, line, lists, healthcheck, webhook, shoppinglist
+    items, user, login, line, lists, healthcheck, webhook, shoppinglist, invite
 )
 
 urlpatterns = [
@@ -15,8 +15,10 @@ urlpatterns = [
     path('api/list/', lists.ListView.as_view(), name="list-post"),
     # リスト設定（表示）GET,（更新）PATCH, (削除）DELETE
     path('api/list/<list_id>/', lists.ListView.as_view(), name="list-get-patch-delete"),
-    # 招待機能　GET
+    # 招待機能 GET
     path('api/invite/<user_id>/', invite.InviteView.as_view(), name="find-invitee-get"),
+    # 招待機能 POST
+    path('/api/invite/<list_id>/', invite.InviteView.as_view(), name="invitee-post"),
 
 ]
 

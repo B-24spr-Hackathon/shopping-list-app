@@ -21,15 +21,38 @@ class InviteView(APIView):
     # 招待処理　招待者情報取得 GET
     def get(self, request, user_id):
         # 招待者を取得
-        invitee = get_object_or_404(User, pk=user_id)
+        guest = get_object_or_404(User, pk=user_id)
         # パーミッションチェックを実行
-        self.check_object_permissions(self.request,invitee)
-        invitee_data = FindUserSerializer(invitee).data
+        self.check_object_permissions(self.request,guest)
+        guest_data = FindUserSerializer(guest).data
 
-        return Response(invitee_data, status=status.HTTP_200_OK)
+        return Response(guest_data, status=status.HTTP_200_OK)
 
     # 招待処理　招待送信　POST
-    def post(self, request)
+    def post(self, request, list_id):
+        user_id = request.data.get('user_id')
+        authority = request.data.get('authority')
+        # 対象リストを取得
+        list_instance = List.objects.get(list_id=list_id)
+        # 招待者を取得
+        guest = User.objects.get(user_id=user_id)
+        # パーミッションチェックを実行
+        self.check_object_permissions(self.request, list_instance)
+        # Memberを作成
+        member = Member.objects.create(list_id=list_instance, guest_id=guest, authority=authority, member_status=1)
+        # レスポンス用のデータ作成
+        data = {
+            'list_id' : list_instance.list_id,
+            'list_name' : list_instance.list_name,
+            'guest_id' : guest.user_id,
+            'user_name' : guest.user_name,
+            'user_icon' : guest.user_icon,
+            'authority' : member.authority,
+            'member_status' : member.member_status 
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
         
 
 
