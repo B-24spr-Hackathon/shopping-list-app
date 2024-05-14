@@ -32,10 +32,7 @@
     /* align-self: flex-start; */
 }
 
-input[type='text'] {
-    width: 100%;
-    /* text-align: center; */
-}
+
 
 .item-name-input {
     text-align: center;

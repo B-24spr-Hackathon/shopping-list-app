@@ -6,6 +6,8 @@ export const apiEndpoint = {
     login: "api/login/",
     list: "api/list/",
     items: "api/items/",
+    line: "api/line",
+    lineLogin: "api/line-login",
 };
 
 export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials }) => {
@@ -51,6 +53,35 @@ export const loginRequest = async(email, password) => {
     });
     return response;
 }
+export const signUpRequest = async(user_id, user_name, email, password) => {
+    const response = await apiRequest({
+        method: 'POST',
+        apiEndpoint: apiEndpoint.user,
+        data: {
+                user_id: user_id,
+                user_name: user_name,
+                email: email,
+                password: password,
+            },
+        withCredentials: false,
+    });
+    return response;
+}
+//LINEログイン初回
+export const firstLineLoginRequest = async(user_id, user_name, line_id, line_status) => {
+    const response = await apiRequest({
+        method: 'POST',
+        apiEndpoint: apiEndpoint.line,
+        data: {
+                user_id: user_id,
+                user_name: user_name,
+                line_id: line_id,
+                line_status: line_status,
+            },
+        withCredentials: false,
+    });
+    return response;
+}
 
 //新しい管理商品リストを作成するリクエスト
 export const addNewListRequest = async() => {
@@ -58,7 +89,7 @@ export const addNewListRequest = async() => {
         method: 'POST',
         apiEndpoint: apiEndpoint.list,
         data: {
-            list_name: "新しいタイトル",
+            list_name: "新しいリスト",
         },
         withCredentials: true,
     });

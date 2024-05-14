@@ -24,13 +24,13 @@ function Login() {
 
     const handleLogin = async() => {
         try{
-            const data = await loginRequest(email, password);
-            console.log("login:", data);
-            const token = data.data.access;
+            const response = await loginRequest(email, password);
+            console.log("login:", response);
+            const token = response.data.access;
             // レスポンスからトークンを取得;
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
-            dispatch(setUser(data.data.user));
+            dispatch(setUser(response.data.user));
             //リダイレクト
             navigate('/todefault');
         }catch(err){

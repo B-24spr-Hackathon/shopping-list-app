@@ -28,12 +28,6 @@ function Items() {
         console.log(err.response.data);
         };
     }
-    // useEffect(() => {
-    //     const fetchUserInfo = async() => {
-    //         const data = await FetchUserInfoRequest();
-    //     };
-    //     fetchUserInfo();
-    // }, []);
 
 
     return (
