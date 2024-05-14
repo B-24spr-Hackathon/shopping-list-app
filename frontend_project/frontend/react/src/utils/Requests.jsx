@@ -95,24 +95,23 @@ export const addNewListRequest = async() => {
     });
     return response;
 }
-
-export const fetchItemsOfListRequest = async( list_id ) => {
+//新しい商品を追加するリクエスト
+export const addNewItemRequest = async( list_id ) => {
     const response = await apiRequest({
-        method: 'GET',
+        method: 'POST',
         apiEndpoint: apiEndpoint.items + list_id + '/',
+        data: {
+            item_name: "商品名を入力",
+        },
         withCredentials: true,
     });
     return response;
 }
 
-
-export const updateItemRemindByItemRequest = async( list_id, item_id, newRemindByItem  ) => {
+export const fetchItemsOfListRequest = async( list_id ) => {
     const response = await apiRequest({
-        method: 'PATCH',
-        apiEndpoint: apiEndpoint.items + list_id + "/" + item_id + "/",
-        data: {
-            remind_by_item: newRemindByItem
-        },
+        method: 'GET',
+        apiEndpoint: apiEndpoint.items + list_id + '/',
         withCredentials: true,
     });
     return response;

@@ -7,10 +7,10 @@ function EditableDateInput({ initialValue, onSave }) {
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
-        onSave(formatDate(date));
+        onSave(formatDateForSave(date));
     };
 
-    const formatDate = (date) => {
+    const formatDateForSave = (date) => {
         return date.toISOString().slice(0, 10);
     };
 
@@ -18,8 +18,8 @@ function EditableDateInput({ initialValue, onSave }) {
         <DatePicker
             selected={selectedDate}
             onChange={handleDateChange}
-            dateFormat="yyyy-MM-dd"
-            className="form-control"
+            dateFormat="M/d"
+            className="form-control w-full text-center"
         />
     );
 }

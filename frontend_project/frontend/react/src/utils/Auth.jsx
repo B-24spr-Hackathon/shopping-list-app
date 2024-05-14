@@ -20,12 +20,13 @@ export const AuthProvider = ({ children }) => {
             setIsLogin(true);
         } else {
             setIsLogin(false);
-            if(window.location.pathname !== '/signup'){
+            if (window.location.pathname !== '/signup' &&
+                window.location.pathname !== '/lineloginform' &&
+                window.location.pathname !== '/lineloginerror'){
                 navigate('/');
             }
         }
     }, [cookies, navigate]);
-
     return (
         <AuthContext.Provider value={{ isLogin }}>
             { children }

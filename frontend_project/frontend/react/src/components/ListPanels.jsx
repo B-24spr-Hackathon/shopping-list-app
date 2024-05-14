@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState }  from 'react';
 import '../styles/Lists.css'
-import { ShoppingBtn, ToShoppingListBtn } from './Buttons';
+import { AddBtn, ShoppingBtn, ToShoppingListBtn } from './Buttons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchItemsOfListRequest, updateItemInfoRequest } from '../utils/Requests';
 import { setItemAllInfo, updateColor, updateConsumeCycle, updateItemName, updateItemUrl, updateLastOpenAt, updateLastPurchaseAt, updateManageTarget, updateRemindByItem, updateToList } from '../reducers/itemSlice';
 import "../styles/CategoryColor.css";
 import EditableDateInput from './EditableDateInput';
+import AddNewItem from '../utils/AddNewItem';
 
 function ListFieldTitle({ title }) {
     return(
@@ -71,6 +72,7 @@ function EditableInput({ initialValue, onSave, onComposition }) {
 
     return (
         <input
+            className='w-full text-center'
             ref={inputRef}
             type="text"
             value={value}
@@ -92,6 +94,7 @@ function ItemsListPanel() {
     const dispatch = useDispatch();
     const selectedList = useSelector(state => state.selectedList);
     const items = useSelector(state => state.item.items);
+    const handleAddNewItem = AddNewItem(selectedList.list_id);
 
     //読み込み時にitemデータを取得
     useEffect(() => {
@@ -199,7 +202,8 @@ function ItemsListPanel() {
     );
 
     const itemsData = items.map((item, index) => (
-        <tr className="text-center" key={index}>
+        <>
+        <tr className="text-center border-b" key={index}>
             {/*管理対象*/}
             <td>
                 <input
@@ -217,7 +221,6 @@ function ItemsListPanel() {
             {/*商品名*/}
             <td>
                 <EditableInput
-                    className="item-name-input"
                     initialValue={item.item_name}
                     onSave={newValue => updateItem(item, 'item_name', newValue)}
                     />
@@ -265,7 +268,10 @@ function ItemsListPanel() {
                     checked={item.remind_by_item}
                     onChange={ () => changeRemindByItem(item) } />
             </td>
+            
         </tr>
+            
+        </>
         )
     );
 
@@ -277,10 +283,14 @@ function ItemsListPanel() {
                 { itemsHeader }
                 <tbody>
                     { itemsData }
+
                 </tbody>
             </table>
+            <AddBtn children="+" onClick={handleAddNewItem} />
         </div>
     );
+
+    
 
 
     return (
@@ -288,6 +298,7 @@ function ItemsListPanel() {
             <div className='item-field-container'>
                 <ListFieldTitle title={selectedList.list_name} />
                 { itemsListFieldPanel }
+                
 
             </div>
         </>
