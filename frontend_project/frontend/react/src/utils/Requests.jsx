@@ -6,8 +6,8 @@ export const apiEndpoint = {
     login: "api/login/",
     list: "api/list/",
     items: "api/items/",
-    line: "api/line",
-    lineLogin: "api/line-login",
+    line: "api/line/",
+    lineLogin: "api/line-login/",
 };
 
 export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials }) => {

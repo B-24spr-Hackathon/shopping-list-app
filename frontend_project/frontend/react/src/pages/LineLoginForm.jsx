@@ -46,7 +46,7 @@ function LineLoginForm() {
             //レスポンスでユーザー情報を受け取ってstoreに保存
             dispatch(setUser(response.data.user));
             //リダイレクト
-            navigate('/todefault');
+            navigate('/home');
         }catch(err){
             console.log(err.response.data);
 
