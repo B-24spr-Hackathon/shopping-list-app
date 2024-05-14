@@ -23,10 +23,10 @@ export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, with
             },
             withCredentials:  withCredentials,
         });
-        console.log("Response:", response);
+        console.log("apiRequest.Response:", response);
         return response;
     }catch (err) {
-        console.log('Request failed', err);
+        console.log('apiRequest failed', err);
         throw err;
     }
 }

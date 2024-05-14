@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { AddBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import { Footer, Header } from "../components/HeaderImg";
 import { Title } from "../components/Title";
 import { SelectList } from "../components/SelectBox";
 import AddNewList from "../utils/AddNewList";
+import { setSelectedList } from "../reducers/selectedListSlice";
 
 function Home() {
     const dispatch = useDispatch();
@@ -19,16 +20,20 @@ function Home() {
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
+    const lists = useSelector(state => state.user.lists);
     const handleAddNewList = AddNewList();
     const [cookies] = useCookies(['jwt_token']);
 
+    
 
     const handleFetchUserInfo = async() => {
         try {
             const response = await fetchUserInfoRequest();
-            console.log("fetch:",response.data);
+            console.log("fetch:",response);
             dispatch(setUser(response.data.user));
             dispatch(setUser({lists:response.data.lists}));
+            console.log("lists;",lists.length);
+            return response;
         }catch(err){
             // console.log(err.response.data);
             console.log("era-")

@@ -11,11 +11,14 @@ const ToDefault = () => {
     useEffect(() => {
         const fetchUserInfo = async () => {
             const response = await fetchUserInfoRequest();
+            
             dispatch(setUser(response.data.user));
             if (default_list) {
+                console.log("true")
                 navigate('/items');
             } else {
                 navigate('/shoppinglist');
+                console.log('false');
             }
         }
         fetchUserInfo();

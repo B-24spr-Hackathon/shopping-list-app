@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header, Footer } from "../components/HeaderImg";
 import StockItems from "../components/StockItems";
 import TabMainMenu from "../components/TabMainMenu";
@@ -17,6 +17,11 @@ import { SelectList } from "../components/SelectBox.jsx";
 function Items() {
 
     const dispatch = useDispatch();
+    // const items = 
+
+    // useEffect(() => {
+    //     if()
+    // })
 
 
     const handleAddNewList = async() => {
