@@ -49,7 +49,7 @@ function Signup() {
     //ユーザー新規登録関数
     const handleSignup = async() => {
         if (passwordError || emailError) return;
-        if (!user_id || !user_name || !email) return;
+        if (!user_id || !user_name || !email || !password1 || !password2) return;
         try {
             const response = await signUpRequest(user_id, user_name, email, password1);
              // JWTトークンをクッキーに保存する

@@ -6,7 +6,7 @@ export const apiEndpoint = {
     login: "api/login/",
     list: "api/list/",
     items: "api/items/",
-    line: "api/line/",
+    lineFirst: "api/line/",
     lineLogin: "api/line-login/",
 };
 
@@ -71,12 +71,23 @@ export const signUpRequest = async(user_id, user_name, email, password) => {
 export const firstLineLoginRequest = async(user_id, user_name, line_id, line_status) => {
     const response = await apiRequest({
         method: 'POST',
-        apiEndpoint: apiEndpoint.line,
+        apiEndpoint: apiEndpoint.lineFirst,
         data: {
                 user_id: user_id,
                 user_name: user_name,
                 line_id: line_id,
                 line_status: line_status,
+            },
+        withCredentials: false,
+    });
+    return response;
+}
+export const lineLoginRequest = async(line_id) => {
+    const response = await apiRequest({
+        method: 'POST',
+        apiEndpoint: apiEndpoint.lineLogin,
+        data: {
+                line_id: line_id,
             },
         withCredentials: false,
     });

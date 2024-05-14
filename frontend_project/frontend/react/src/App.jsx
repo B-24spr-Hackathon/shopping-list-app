@@ -17,6 +17,7 @@ import LineLoginError from "./pages/LineLoginError";
 import ShoppingList from "./pages/ShoppingList";
 import LineLoginForm from "./pages/LineLoginForm";
 import ToDefault from "./pages/ToDefault";
+import LineLoginMethod from "./utils/LineLoginMethod";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/lineloginerror" element={<LineLoginError />} />
             <Route path="/lineloginform" element={<LineLoginForm />} />
+            <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
             
 

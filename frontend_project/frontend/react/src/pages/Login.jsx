@@ -13,8 +13,6 @@ function Login() {
     const dispatch = useDispatch();
     //状態管理
     const [cookies, setCookie] = useCookies(['jwt_token']);
-    const [user_id, setUser_id] = useState("");
-    const [user_name, setUser_name] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -35,6 +33,7 @@ function Login() {
             navigate('/todefault');
         }catch(err){
             console.log(err.response.data);
+            setError("入力した情報で登録されていません。")
 
         };
     }
@@ -53,7 +52,7 @@ function Login() {
                     <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
                     <CertifyBtn onClick={handleLogin} children="ログインする"/>
                     <RegisterOrLogin children="新規登録はこちらから" onClick={ () => navigate('/signup')} />
-                    {error && <p>{error}</p>} { }
+                    {error && <p className="text-red-500">{error}</p>} { }
                 </div>
                 <Footer />
             </div>

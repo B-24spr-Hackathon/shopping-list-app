@@ -3,11 +3,13 @@ import TabMainMenu from "../components/TabMainMenu";
 import { Header, Footer } from "../components/HeaderImg";
 import UserNameAndIcon from '../components/UserNameIcon';
 import { ShoppingListPanel } from '../components/ListPanels';
+import LogoutButton from '../components/Logout';
 
 function ShoppingList() {
     return (
         <>
             <Header />
+            <LogoutButton />
             <UserNameAndIcon />
 
 

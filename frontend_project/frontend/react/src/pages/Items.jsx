@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { setItemAllInfo, clearItem } from "../reducers/itemSlice.jsx";
 import { ItemsListPanel } from "../components/ListPanels.jsx";
 import { SelectList } from "../components/SelectBox.jsx";
+import LogoutButton from "../components/Logout.jsx";
 
 
 
@@ -39,6 +40,7 @@ function Items() {
         <>
 
             <Header />
+            <LogoutButton />
             <UserNameAndIcon />
             <TabMainMenu />
             <AddBtn children="+" onClick={handleAddNewList}/>

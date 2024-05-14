@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { resetAppState } from '../reducers/actionCreator';
+
 
 const AuthContext = createContext(null);
 
@@ -13,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [cookies] = useCookies(['jwt_token']);
     const [isLogin, setIsLogin] = useState(false);
     const navigate =useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const token = cookies.jwt_token;
@@ -20,9 +23,11 @@ export const AuthProvider = ({ children }) => {
             setIsLogin(true);
         } else {
             setIsLogin(false);
+            dispatch(resetAppState());
             if (window.location.pathname !== '/signup' &&
                 window.location.pathname !== '/lineloginform' &&
-                window.location.pathname !== '/lineloginerror'){
+                window.location.pathname !== '/lineloginerror' &&
+                window.location.pathname !== '/lineloginmethod'){
                 navigate('/');
             }
         }

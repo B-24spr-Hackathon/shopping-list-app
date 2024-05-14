@@ -93,7 +93,7 @@ function EditableInput({ initialValue, onSave, onComposition }) {
 function ItemsListPanel() {
     const dispatch = useDispatch();
     const selectedList = useSelector(state => state.selectedList);
-    const items = useSelector(state => state.item.items);
+    const items = useSelector(state => state.items.items);
     const handleAddNewItem = AddNewItem(selectedList.list_id);
 
     //読み込み時にitemデータを取得
