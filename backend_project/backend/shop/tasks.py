@@ -104,34 +104,29 @@ def shopping_batch():
     year = today.year
     month = today.month
     day = today.day
+    time = today.time()
 
     # 今月の最終日を取得
     _, last_day = calendar.monthrange(year, month)
 
+    # 通知対象となるユーザーを通知時間のタイミング毎に取得
+    # early: 通知時間がバッチ処理より早い　normal: それ以外
+    early_users = User.objects.filter(remind=True, remind_time__lt=time)
+    normal_users = User.objects.filter(remind=True, remind_time__gte=time)
+
+    # normal_usersの処理
     # 今日が今月最終日の場合は買い物日が1のユーザーを取得
     if day == last_day:
-        users = User.objects.raw("""
-            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
-            INNER JOIN lists AS l ON u.user_id = l.owner_id
-            WHERE u.remind = 1 AND l.shopping_day = 1;
-            """)
+        users = normal_users.filter(list__shopping_day=1).distinct()
 
     # 今日が今月最終日前日の場合は買い物日が月末のユーザーを取得
     elif day == last_day - 1:
-        users = User.objects.raw("""
-            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
-            INNER JOIN lists AS l ON u.user_id = l.owner_id
-            WHERE u.remind = 1 AND l.shopping_day > %s;
-            """, [day])
+        users = normal_users.filter(list__shopping_day__gt=day).distinct()
 
     # 今日が上記以外の場合は買い物日が翌日のユーザーを取得
     else:
         day += 1
-        users = User.objects.raw("""
-            SELECT u.user_id, u.line_id, u.remind_time FROM users AS u
-            INNER JOIN lists AS l ON u.user_id = l.owner_id
-            WHERE u.remind = 1 AND l.shopping_day = %s;
-            """, [day])
+        users = normal_users.filter(list__shopping_day=day).distinct()
 
     # ユーザーを取出してshopping_requestを呼出す
     for user in users:
@@ -139,9 +134,33 @@ def shopping_batch():
         remind_time = (user.remind_time.hour * 3600) + (user.remind_time.minute * 60)
         batch_time = (settings.BATCH_HOUR * 3600) + (settings.BATCH_MINUTE * 60)
         count = remind_time - batch_time
-        # 通知時間がバッチ処理時間よりも早い場合
-        if count < 0:
-            count += 24 * 3600
+        # 通知時間がバッチ処理時間と同じ場合（10秒後に通知）
+        if count == 0:
+            count = 10
+
+        # 非同期で通知を送る関数を呼出す
+        shopping_request.apply_async([user.line_id], countdown=count)
+
+    # early_usersの処理
+    # 今日が今月最終日の前日の場合は買い物日が1のユーザーを取得
+    if day == last_day - 1:
+        users = early_users.filter(list__shopping_day=1).distinct()
+
+    # 今日が今月最終日の2日前の場合は買い物日が月末のユーザーを取得
+    elif day == last_day - 2:
+        day += 1
+        users = early_users.filter(list__shopping_day__gt=day)
+    # 今日が上記以外の場合は買い物日が2日後のユーザーを取得
+    else:
+        day += 2
+        users = early_users.filter(list__shopping_day=day)
+
+    # ユーザーを取出してshopping_requestを呼出す
+    for user in users:
+        # 通知時間（秒）の設定
+        remind_time = (user.remind_time.hour * 3600) + (user.remind_time.minute * 60)
+        batch_time = (settings.BATCH_HOUR * 3600) + (settings.BATCH_MINUTE * 60)
+        count = (24 * 3600) - remind_time - batch_time
 
         # 非同期で通知を送る関数を呼出す
         shopping_request.apply_async([user.line_id], countdown=count)
