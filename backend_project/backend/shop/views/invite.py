@@ -27,5 +27,10 @@ class InviteView(APIView):
         invitee_data = FindUserSerializer(invitee).data
 
         return Response(invitee_data, status=status.HTTP_200_OK)
-  
+
+    # 招待処理　招待送信　POST
+    def post(self, request)
+        
+
+
     
