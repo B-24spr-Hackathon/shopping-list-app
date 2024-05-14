@@ -15,6 +15,8 @@ import Setting from "./pages/Setting";
 import Signup from "./pages/Signup";
 import LineLoginError from "./pages/LineLoginError";
 import ShoppingList from "./pages/ShoppingList";
+import LineLoginForm from "./pages/LineLoginForm";
+import ToDefault from "./pages/ToDefault";
 
 function App() {
   return (
@@ -29,6 +31,9 @@ function App() {
             <Route path="/setting" element={<Setting />} />
             <Route path="/home" element={<Home />} />
             <Route path="/lineloginerror" element={<LineLoginError />} />
+            <Route path="/lineloginform" element={<LineLoginForm />} />
+            <Route path="/todefault" element={<ToDefault />} />
+            
 
           </Routes>
         </div>

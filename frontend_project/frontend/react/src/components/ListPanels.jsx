@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState }  from 'react';
 import '../styles/Lists.css'
-import { ShoppingBtn } from './Buttons';
+import { ShoppingBtn, ToShoppingListBtn } from './Buttons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchItemsOfListRequest, updateItemInfoRequest } from '../utils/Requests';
 import { setItemAllInfo, updateColor, updateConsumeCycle, updateItemName, updateItemUrl, updateLastOpenAt, updateLastPurchaseAt, updateManageTarget, updateRemindByItem, updateToList } from '../reducers/itemSlice';
+import "../styles/CategoryColor.css";
+import EditableDateInput from './EditableDateInput';
 
 function ListFieldTitle({ title }) {
     return(
@@ -84,6 +86,7 @@ function EditableInput({ initialValue, onSave, onComposition }) {
     );
 }
 
+
 //管理商品画面のパネル
 function ItemsListPanel() {
     const dispatch = useDispatch();
@@ -105,22 +108,22 @@ function ItemsListPanel() {
             const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'item_name', newValue);
             dispatch(updateItemName({ item_id: item.item_id, item_name: response.data.item_name }));
         }
-        // if (key === "color") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'color', newValue);
-        //     dispatch(updateColor({ item_id: item.item_id, color: response.data.color }));
-        // }
+        if (key === "color") {
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'color', newValue);
+            dispatch(updateColor({ item_id: item.item_id, color: response.data.color }));
+        }
         if (key === "consume_cycle") {
             const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'consume_cycle', newValue);
             dispatch(updateConsumeCycle({ item_id: item.item_id, consume_cycle: response.data.consume_cycle }));
         }
-        // if (key === "last_purchase_at") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_purchase_at', newValue);
-        //     dispatch(updateLastPurchaseAt({ item_id: item.item_id, last_purchase_at: response.data.last_purchase_at }));
-        // }
-        // if (key === "last_open_at") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_open_at', newValue);
-        //     dispatch(updateLastOpenAt({ item_id: item.item_id, last_open_at: response.data.last_open_at }));
-        // }
+        if (key === "last_purchase_at") {
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_purchase_at', newValue);
+            dispatch(updateLastPurchaseAt({ item_id: item.item_id, last_purchase_at: response.data.last_purchase_at }));
+        }
+        if (key === "last_open_at") {
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_open_at', newValue);
+            dispatch(updateLastOpenAt({ item_id: item.item_id, last_open_at: response.data.last_open_at }));
+        }
         if (key === "item_url") {
             const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'item_url', newValue);
             dispatch(updateItemUrl({ item_id: item.item_id, item_url: response.data.item_url }));
@@ -150,6 +153,35 @@ function ItemsListPanel() {
             console.error('Failed to update manage target:', err);
         }
     }
+    //買い物リストに入れる
+    const toShoppingLists = async(item) => {
+        try {
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", true);
+            dispatch(updateToList({ item_id: item.item_id, to_list: response.data.to_list }));
+        }catch (err){
+            console.error('Failed to update manage target:', err);
+        }
+    }
+    //カテゴリカラーのselect
+    const CategoryColorSelector = ({ color, onChange }) => {
+        return(
+            <>
+                <select value={ color } onChange={ onChange } className='category-color-selector'>
+                    <option value="0" >赤</option>
+                    <option value="1" >ピンク</option>
+                    <option value="2" >オレンジ</option>
+                    <option value="3" >黄</option>
+                    <option value="4" >黄緑</option>
+                    <option value="5" >緑</option>
+                    <option value="6" >水色</option>
+                    <option value="7" >青</option>
+                    <option value="8" >薄紫</option>
+                    <option value="9" >紫</option>
+                    <option value="10" >グレー</option>
+                </select>
+            </>
+        );
+    };
 
     const itemsHeader = (
         <thead>
@@ -176,10 +208,16 @@ function ItemsListPanel() {
                     onChange={() => changeManageTarget(item)}  />
             </td>
             {/*カテゴリカラー*/}
-            <td>{item.color}</td>
+            <td>
+                <CategoryColorSelector
+                    color={item.color}
+                    onChange={(e) => updateItem(item, 'color', e.target.value)}
+                />
+            </td>
             {/*商品名*/}
             <td>
                 <EditableInput
+                    className="item-name-input"
                     initialValue={item.item_name}
                     onSave={newValue => updateItem(item, 'item_name', newValue)}
                     />
@@ -193,9 +231,9 @@ function ItemsListPanel() {
             </td>
             {/*直近の開封日*/}
             <td>
-                <EditableInput
-                    initialValue={item.last_open_at}
-                    onSave={newValue => updateItem(item, 'last_open_at', newValue)}
+                <EditableDateInput
+                initialValue={item.last_open_at}
+                onSave={newValue => updateItem(item, 'last_open_at', newValue)}
                     />
             </td>
             {/*リンク*/}
@@ -207,19 +245,25 @@ function ItemsListPanel() {
             </td>
             {/*最終購入日*/}
             <td>
-                <EditableInput
+                <EditableDateInput
                     initialValue={item.last_purchase_at}
                     onSave={newValue => updateItem(item, 'last_purchase_at', newValue)}
                     />
             </td>
             {/*リスト追加ボタン*/}
-            <td>ボタンto_listfalse</td>
+            <td>
+                <ToShoppingListBtn 
+                    onClick={ () => toShoppingLists(item) }
+                    children="追加する"
+                    disabled={item.to_list}
+                />
+            </td>
             {/*通知対象*/}
             <td>
                 <input
                     type='checkbox'
                     checked={item.remind_by_item}
-                    onChange={() => changeRemindByItem(item) } />
+                    onChange={ () => changeRemindByItem(item) } />
             </td>
         </tr>
         )

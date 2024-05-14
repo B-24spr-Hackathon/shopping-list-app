@@ -19,5 +19,8 @@ function ShoppingBtn({ onClick, children }) {
 function AddBtn({ onClick, children }) {
     return <button className="h-12 w-12 rounded-full bg-white border" onClick={onClick}>{children}</button>
 }
+function ToShoppingListBtn({ onClick, children, disabled }) {
+    return <button className="h-8 w-auto rounded-full text-white bg-base-orange border" onClick={onClick} disabled={disabled}>{children}</button>
+}
 
-export { CertifyBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn }
+export { CertifyBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn, ToShoppingListBtn }

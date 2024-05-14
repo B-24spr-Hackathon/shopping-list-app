@@ -11,16 +11,16 @@ function SelectList() {
     const selectedList = useSelector(state => state.selectedList)
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        if(list.length > 0) {
-            dispatch(setSelectedList({
-                list_id: list[0].list_id,
-                list_name: list[0].list_name
-            }));
-        } else {
-            dispatch(clearSelectedList());
-        }
-    }, [list, dispatch]);
+    // useEffect(() => {
+    //     if(list.length > 0) {
+    //         dispatch(setSelectedList({
+    //             list_id: list[0].list_id,
+    //             list_name: list[0].list_name
+    //         }));
+    //     } else {
+    //         dispatch(clearSelectedList());
+    //     }
+    // }, [list, dispatch]);
 
     const handleSelectChange = async(event) => {
         const selected = list.find(item => item.list_id == event.target.value);
@@ -38,7 +38,9 @@ function SelectList() {
     return (
         <>
             <div>
-                <select value={selectedList.list_id} onChange={handleSelectChange}>
+                <select 
+                    value={selectedList.list_id}
+                    onChange={handleSelectChange}>
                     {list.map((item, index) => (
                         <option key={index} value={item.list_id}>
                             {item.list_name}{item.list_id}{index}
