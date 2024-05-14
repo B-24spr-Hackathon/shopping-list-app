@@ -13,8 +13,14 @@ WORKDIR /backend
 # Pythonの依存関係をコピー
 COPY requirements.txt /backend/
 
+# シェルスクリプトをコピー
+COPY backend/command.sh /backend/
+
 # パッケージのインストール
 RUN pip install -r requirements.txt
+
+# シェルスクリプトの権限付与
+RUN chmod +x command.sh
 
 # 現在のディレクトリをbackendディレクトリにコピー
 COPY . /backend/
