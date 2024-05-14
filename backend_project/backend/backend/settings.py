@@ -185,13 +185,13 @@ STATE = 'shopping-list12345'
 
 # LINEログインでのフロントエンドリダイレクトURL
 FRONT_REDIRECT_URL = f'{FRONTEND_URL}/'
-FRONT_ERROR_URL = f"{FRONTEND_URL}/"
+FRONT_ERROR_URL = f"{FRONTEND_URL}/lineloginerror"
 
 # LINE連携後のフロントエンドリダイレクトURL
 LINK_REDIRECT_URL = f"{FRONTEND_URL}/"
 
 # 買い物リストのURL
-SHOPPING_LIST_URL = f"{FRONTEND_URL}/"
+SHOPPING_LIST_URL = f"{FRONTEND_URL}/shoppinglist"
 
 # LINE公式チャンネルの設定
 CHANNEL_URL = 'https://lin.ee/Ekblccd'
@@ -206,4 +206,5 @@ CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_TIMEZONE = 'Asia/Tokyo'
 
 # Celery Beatの呼出し時間
-BATCH_TIME = 3
+BATCH_HOUR = 3
+BATCH_MINUTE = 0

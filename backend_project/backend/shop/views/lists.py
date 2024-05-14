@@ -3,9 +3,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from shop.models import List
+from shop.models import List, Member
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer
+from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer, ListGuestSerializer
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 
@@ -35,9 +35,19 @@ class ListView(APIView):
         list_instance = get_object_or_404(List, pk=list_id)
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
+        list_data = ListResponseSerializer(list_instance).data
 
-        serializer = ListResponseSerializer(list_instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # ゲストの情報を取得
+        guests = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
+        if guests.exists():
+            guests_info = ListGuestSerializer([guest.guest_id for guest in guests], many=True).data
+        else:
+            guests_info = []
+
+        list_data['guests_info'] = guests_info
+
+        return Response(list_data, status=status.HTTP_200_OK)
+
     
     # リスト設定（更新）PATCH
     def patch(self, request, list_id):

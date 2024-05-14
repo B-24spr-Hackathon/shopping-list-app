@@ -21,10 +21,10 @@ class UserManager(BaseUserManager):
         return self.create_user(user_id, email, password, **extra_fields)
     
 # Create your models here.
-REMIND_TIMING_CHOICES = [(i, i) for i in range(1, 11)]
+REMIND_TIMING_CHOICES = [(i, i) for i in range(11)]
 SHOPPING_DAY = [(i, i) for i in range(1, 31)]
-# フロントエンドからのカラー設定連絡待ち
-COLOR_CHOICES = [(0, '赤'), (1, '青'), (2, '緑')]
+
+COLOR_CHOICES = [(0, '赤'), (1, 'ピンク'), (2, 'オレンジ'),(3, '黄'), (4, '黄緑'), (5, '緑'),(6, '水色'), (7, '青'), (8, '薄紫'),(9, '紫'), (10, 'グレー'),]
 MEMBER_STATUS_CHOICES = [(0, '追加済み'), (1, '招待中'), (2,'申請中')]
 
 class User(AbstractUser):
@@ -43,7 +43,7 @@ class User(AbstractUser):
     have_list = models.BooleanField(default=False)
     default_list = models.BooleanField(default=True)
     remind = models.BooleanField(default=False)
-    remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES,  blank=True, null=True)    
+    remind_timing = models.IntegerField(choices=REMIND_TIMING_CHOICES, default=0)    
     remind_time = models.TimeField(blank=True, null=True)
 
     objects = UserManager()
@@ -73,14 +73,14 @@ class List(models.Model):
 class Member(models.Model):
     member_id = models.AutoField(primary_key=True)
     list_id = models.ForeignKey(List, on_delete=models.CASCADE, related_name='members', db_column='list_id')
-    invitee_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='invitee_id')
+    guest_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='guest_id')
     authority = models.BooleanField(default=False)
-    status = models.IntegerField(choices=MEMBER_STATUS_CHOICES, blank=False, null=False)
+    member_status = models.IntegerField(choices=MEMBER_STATUS_CHOICES)
 
     class Meta:
         db_table = 'members'
     def __str__(self):
-        return self.invitee_id.user_name
+        return self.guest_id.user_name
 
 class Item(models.Model):
     item_id = models.AutoField(primary_key=True)
