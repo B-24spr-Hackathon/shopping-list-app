@@ -37,7 +37,7 @@ class ShoppingListView(APIView):
         response_data = {
             'list_id': list_id,
             'list_name': list_instance.list_name,
-            'next_shopping_day': next_shopping_day.strftime('%Y-%m-%d'),
+            'next_shopping_day': next_shopping_day,
             'authority': authority,
             'items': serializer.data
         }
@@ -46,6 +46,9 @@ class ShoppingListView(APIView):
 
     # 買い物予定日の計算
     def calculate_next_shopping_day(self, shopping_day):
+        if shopping_day in [None, '', 'null'] :
+            return "買い物日は設定されていません"
+    
         today = datetime.today()
         current_year = today.year
         current_month = today.month
