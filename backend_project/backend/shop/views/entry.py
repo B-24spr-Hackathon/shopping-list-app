@@ -61,3 +61,23 @@ class EntryView(APIView):
             'user_name': user_name,
         }
         return Response(data, status=status.HTTP_200_OK)
+    
+class EntryAcceptView(APIView):
+    # JWT認証を要求
+    permission_classes = [IsAuthenticated] 
+        # 招待 承認機能 PATCH
+    def patch(self, request, member_id):
+        # ゲスト、リストを取得
+        guest = get_object_or_404(Member, pk=member_id)
+        list_instance = guest.list_id
+        # member_statusカラムの値を更新
+        guest.member_status = 0
+        guest.save()
+         # have_listをTrueに更新
+        guest.guest_id.have_list = True
+        guest.guest_id.save()
+
+        data ={
+            'member_status': guest.member_status,
+        }
+        return Response(data, status=status.HTTP_200_OK)

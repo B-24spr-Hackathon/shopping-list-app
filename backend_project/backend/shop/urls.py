@@ -21,7 +21,8 @@ urlpatterns = [
     path('api/invite/', invite.InviteView.as_view(), name="invitee-post"),
     # 招待/申請機能 PATCH, DELETE
     path('api/entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
-
+    # 招待/申請機能 承認PATCH
+    path('api/entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept-patch"),
 ]
 
 urlpatterns += [
