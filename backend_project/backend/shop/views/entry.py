@@ -15,17 +15,19 @@ class EntryView(APIView):
 
     # 招待・申請機能  編集権限変更 PATCH
     def patch(self, request, member_id):
-        # ゲストを取得
+        # ゲスト、リストを取得
         guest = get_object_or_404(Member, pk=member_id)
+        list_instance = guest.list_id
         # パーミッションチェックを実行
-        self.check_object_permissions(self.request, guest)
+        self.check_object_permissions(self.request, list_instance)
         # authorityカラムの値を更新
-        new_authority = 'new_authority_value'
-        guest.authority = new_authority
-        guest.save()
-        # 更新後のデータを返す
-        data = {
-            'authority' : guest.authority,
+        new_authority = request.data.get('authority')
+        if new_authority is not None:
+            guest.authority = new_authority
+            guest.save()
+
+        data ={
+            'authority': guest.authority,
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -37,18 +39,6 @@ class EntryView(APIView):
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, guest) 
 
+        guest.delete()
 
-
-    # リスト設定（削除）DELETE
-    def delete(self, request, list_id):
-        # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
-        # パーミッションチェックを実行
-        self.check_object_permissions(self.request, list_instance)
-        # 削除する前にシリアライズしたデータを保存
-        response_serializer = ListResponseSerializer(list_instance)
-        serialized_data = response_serializer.data
-
-        list_instance.delete()
-
-        return Response(serialized_data, status=status.HTTP_200_OK)
+        return Response(guest, status=status.HTTP_200_OK)
