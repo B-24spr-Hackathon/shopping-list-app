@@ -1,92 +1,86 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import { TestBtn } from "../components/Buttons";
+import { AddBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
-import axios from "axios";
 import { useCookies } from 'react-cookie';
+import { fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
+import { useDispatch } from "react-redux";
+import { setUser, clearUser } from "../reducers/userSlice";
+import { Footer, Header } from "../components/HeaderImg";
+import { Title } from "../components/Title";
+import { SelectList } from "../components/SelectBox";
+import AddNewList from "../utils/AddNewList";
+import { setSelectedList } from "../reducers/selectedListSlice";
+import LogoutButton from "../components/Logout";
+import AddNewItem from "../utils/AddNewItem";
 
 function Home() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
+    const lists = useSelector(state => state.user.lists);
+    const items = useSelector(state => state.items.items);
+    const selectedListId = useSelector(state => state.selectedList.list_id);
+    const handleAddNewList = AddNewList();
+    const handleAddNewItem = AddNewItem();
     const [cookies] = useCookies(['jwt_token']);
 
-    //default_listを更新する処理
-    const handleChangeDefault_list = async() => {
-        try {
-            console.log(cookies);
-            const response = await axios.patch('http://127.0.0.1:8000/api/user/', {
-                default_list: true
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'Authorization': `Bearer jwt_token=${cookies.jwt_token}`
-                    // 'Cookie': `jwt_token=${cookies.jwt_token}`
-                    // 'Cookie': `Bearer ${cookies.jwt_token}`
-                },
-                withCredentials: true
-            });
-            console.log(response);
-            console.log(response.data);
+    useEffect(() => {
+        const fetchUserInfo = async() => {
+            const response = await fetchUserInfoRequest();
+            dispatch(setUser(response.data.user))
+            dispatch(setUser({lists:response.data.lists}));
+            console.log(lists,lists.length);
+            console.log(items,items.length);
+            if (lists.length == 0){
+                handleAddNewList();
+            } else {
+                dispatch(setSelectedList(lists[lists.length -1]));
+            }
 
+        };
+        fetchUserInfo();
+    }, []);
+
+    const handleFetchUserInfo = async() => {
+        try {
+            const response = await fetchUserInfoRequest();
+            console.log("fetch:",response);
+            dispatch(setUser(response.data.user));
+            dispatch(setUser({lists:response.data.lists}));
+            console.log('lists:',lists.length);
+            console.log('lists:',lists[0]);
+
+            return response;
         }catch(err){
-            console.log('失敗',err);
-        }
+            // console.log(err.response.data);
+            console.log("era-")
+            console.log(err.response);
+        };
     }
 
-    const handleGetRequestTest = async() => {
-        try {
-            // const response = await axios({
-                // withCredentials: true,
-                // method: "GET",
-                // url: 'http://127.0.0.1:8000/api/user/',
-                
-            // });
-            fetch('http://127.0.0.1:8000/api/user/',{
-                method: "GET",
-                credentials: 'include'
-            })
-            // then(response => {
-            //     if (!response.ok) {
-            //         // サーバーからのレスポンスが成功を示していない場合、エラーを投げる
-            //         throw new Error('Network response was not ok: ' + response.statusText);
-            //     }
-            //     return response.json();
-            // })
-            // .then(data => {
-            //     console.log(data); // 成功したデータ処理
-            // })
-            // .catch(error => {
-            //     console.error('Error during fetch operation:', error); // レスポンス処理またはJSON変換中のエラー
-            // });
-        } catch (err) {
-            console.log('Failure in fetch setup:', err); 
-            // console.log(cookies);
-            // const response = await axios.get('http://127.0.0.1:8000/api/user/', {
-            //     withCredentials: true,
-            // });
-            // console.log(response);
-            // console.log(response.data);
-
-        // }catch(err){
-        //     console.log('sippai',err);
-        }
+    const handleFetchShoppingList = async() => {
+        const response = await fetchShoppingListRequest(4)
+        console.log('fetchshopping:', response);
     }
 
     return (
         <>
-            <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
-            <div></div>
-            <TestBtn onClick={ () => navigate('/list')} children="listへ"/>
-            <div>
-                {user_name ? (
-                    <p>ようこそ、{user_name}さん（ユーザーID: {user_id}）！</p>
-                ) : (
-                    <p>ログイン情報がありません。</p>
-                )}
+            <div className="flex flex-col">
+                <Header />
+                <LogoutButton />
+                <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
+                    <Title children="ようこそ" />
+                    <SelectList />
+                    <AddBtn children="+" onClick={handleAddNewList} />
+                    <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
+                    <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
+                    <TestBtn onClick={handleFetchUserInfo} children="get" />
+                    <TestBtn children='test' onClick={handleFetchShoppingList}/>
+                </div>
+                <Footer />
             </div>
-            <TestBtn onClick={handleChangeDefault_list} children="change" />
-            <TestBtn onClick={handleGetRequestTest} children="get" />
 
         </>
 
