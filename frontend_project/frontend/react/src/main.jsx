@@ -8,7 +8,7 @@ import { store, persistor } from "./store.jsx";
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <CookiesProvider>
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </CookiesProvider>
       </PersistGate>
     </Provider>
-  </React.StrictMode>,
+  // </React.StrictMode>
 )

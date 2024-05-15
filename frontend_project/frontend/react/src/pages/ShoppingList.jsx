@@ -1,20 +1,22 @@
 import React from 'react';
 import TabMainMenu from "../components/TabMainMenu";
 import { Header, Footer } from "../components/HeaderImg";
-import ListField from '../components/ListField';
 import UserNameAndIcon from '../components/UserNameIcon';
+import { ShoppingListPanel } from '../components/ListPanels';
+import LogoutButton from '../components/Logout';
 
-function List() {
+function ShoppingList() {
     return (
         <>
             <Header />
+            <LogoutButton />
             <UserNameAndIcon />
 
 
                 <TabMainMenu />
                 <div className='flex justify-center mt-4'>
 
-                <ListField />
+                <ShoppingListPanel />
                 </div>
             <Footer />
         </>
@@ -23,4 +25,4 @@ function List() {
 }
 
 
-export default List;
+export default ShoppingList;
