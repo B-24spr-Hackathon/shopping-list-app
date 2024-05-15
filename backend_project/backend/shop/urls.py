@@ -18,9 +18,9 @@ urlpatterns = [
     # 招待機能 GET
     path('api/invite/<user_id>/', invite.InviteView.as_view(), name="find-invitee-get"),
     # 招待機能 POST
-    path('/api/invite/<list_id>/', invite.InviteView.as_view(), name="invitee-post"),
+    path('api/invite/', invite.InviteView.as_view(), name="invitee-post"),
     # 招待/申請機能 PATCH, DELETE
-    path('/api/entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
+    path('api/entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
 
 ]
 
