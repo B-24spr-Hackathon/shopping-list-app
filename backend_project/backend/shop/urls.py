@@ -6,35 +6,35 @@ from shop.views import (
 
 urlpatterns = [
     # アイテムリスト表示GET、アイテム作成POST
-    path('api/items/<list_id>/', items.ItemCreateView.as_view(),name="item-post-get"),
+    path('items/<list_id>/', items.ItemCreateView.as_view(),name="item-post-get"),
     # アイテム更新PATCH、削除DELETE
-    path('api/items/<list_id>/<item_id>/', items.ItemDetailView.as_view(), name="item-patch-delete"),
+    path('items/<list_id>/<item_id>/', items.ItemDetailView.as_view(), name="item-patch-delete"),
     # 買い物リスト表示GET
-    path('api/shopping-list/<list_id>/', shoppinglist.ShoppingListView.as_view(), name="shoppinglist"),
+    path('shopping-list/<list_id>/', shoppinglist.ShoppingListView.as_view(), name="shoppinglist"),
     # リスト設定（登録）POST
-    path('api/list/', lists.ListView.as_view(), name="list-post"),
+    path('list/', lists.ListView.as_view(), name="list-post"),
     # リスト設定（表示）GET,（更新）PATCH, (削除）DELETE
-    path('api/list/<list_id>/', lists.ListView.as_view(), name="list-get-patch-delete"),
+    path('list/<list_id>/', lists.ListView.as_view(), name="list-get-patch-delete"),
     # 招待機能 GET
-    path('api/invite/<user_id>/', invite.InviteView.as_view(), name="find-invitee-get"),
+    path('invite/<user_id>/', invite.InviteView.as_view(), name="find-invitee-get"),
     # 招待機能 POST
-    path('api/invite/', invite.InviteView.as_view(), name="invitee-post"),
+    path('invite/', invite.InviteView.as_view(), name="invitee-post"),
     # 招待/申請機能 PATCH, DELETE
-    path('api/entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
+    path('entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
     # 招待/申請機能 承認PATCH
-    path('api/entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept-patch"),
+    path('entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept-patch"),
 ]
 
 urlpatterns += [
-    path("api/", healthcheck.HealthcheckView.as_view(), name="healthcheck"),
-    path("api/user/", user.UserView.as_view(), name="user"),
-    path("api/login/", login.LoginView.as_view(), name="login"),
-    path("api/callback/", line.LineCallbackView.as_view(),
+    path("", healthcheck.HealthcheckView.as_view(), name="healthcheck"),
+    path("user/", user.UserView.as_view(), name="user"),
+    path("login/", login.LoginView.as_view(), name="login"),
+    path("callback/", line.LineCallbackView.as_view(),
          name="line-callback"),
-    path("api/line/", line.LineSignupView.as_view(), name="line-signup"),
-    path("api/line-login/", line.LineLoginView.as_view(), name="line-login"),
-    path("api/line-link/", line.LineLinkView.as_view(), name='line-link'),
-    path("api/line-webhook/", webhook.LineWebhookView.as_view(),
+    path("line/", line.LineSignupView.as_view(), name="line-signup"),
+    path("line-login/", line.LineLoginView.as_view(), name="line-login"),
+    path("line-link/", line.LineLinkView.as_view(), name='line-link'),
+    path("line-webhook/", webhook.LineWebhookView.as_view(),
          name="line-webhook")
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
