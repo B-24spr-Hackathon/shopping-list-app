@@ -94,13 +94,12 @@ class ListView(APIView):
         # 他のリストに登録されているか確認
         owner_lists_count = List.objects.filter(owner_id=request.user).count()
         guest_lists_count = Member.objects.filter(guest_id=request.user, member_status=0).count()
-        print(owner_lists_count)
-        print(guest_lists_count)
+
         other_lists_count = owner_lists_count + guest_lists_count
         # have_listを更新
         if other_lists_count == 0:
             request.user.have_list = False
-        print(request.user.have_list)
+
         request.user.save()
 
         return Response(serialized_data, status=status.HTTP_200_OK)
