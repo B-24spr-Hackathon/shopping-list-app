@@ -33,12 +33,18 @@ class EntryView(APIView):
 
     # 招待・申請機能　共有解除 DELETE
     def delete(self, request, member_id):
-        # ゲストを取得
+        print(member_id)
+        
+        # ゲスト、リストを取得
         guest = get_object_or_404(Member, pk=member_id)
-        guest_user_name = guest.guest_id.user_name
+        list_instance = guest.list_id
         # パーミッションチェックを実行
-        self.check_object_permissions(self.request, guest) 
-
+        self.check_object_permissions(self.request, list_instance)
+        # ユーザー名を取得
+        user_name = guest.guest_id.user_name
         guest.delete()
-
-        return Response(guest, status=status.HTTP_200_OK)
+        # レスポンス用データ
+        data = {
+            'user_name': user_name,
+        }
+        return Response(data, status=status.HTTP_200_OK)
