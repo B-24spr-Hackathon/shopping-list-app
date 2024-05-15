@@ -25,6 +25,11 @@ class ListView(APIView):
         if serializer.is_valid():
             serializer.save(owner_id=request.user)
             response_serializer = ListResponseSerializer(serializer.instance)
+
+            # Userモデルのhave_listをTrueにする
+            request.user.have_list = True
+            request.user.save()
+
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
