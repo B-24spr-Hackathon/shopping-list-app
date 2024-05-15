@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { fetchUserInfoRequest } from "../utils/Requests";
+import { fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -49,12 +49,20 @@ function Home() {
             console.log("fetch:",response);
             dispatch(setUser(response.data.user));
             dispatch(setUser({lists:response.data.lists}));
+            console.log('lists:',lists.length);
+            console.log('lists:',lists[0]);
+
             return response;
         }catch(err){
             // console.log(err.response.data);
             console.log("era-")
             console.log(err.response);
         };
+    }
+
+    const handleFetchShoppingList = async() => {
+        const response = await fetchShoppingListRequest(4)
+        console.log('fetchshopping:', response);
     }
 
     return (
@@ -69,6 +77,7 @@ function Home() {
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
                     <TestBtn onClick={handleFetchUserInfo} children="get" />
+                    <TestBtn children='test' onClick={handleFetchShoppingList}/>
                 </div>
                 <Footer />
             </div>

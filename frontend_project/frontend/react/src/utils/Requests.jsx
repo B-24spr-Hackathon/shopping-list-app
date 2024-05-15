@@ -6,6 +6,7 @@ export const apiEndpoint = {
     login: "api/login/",
     list: "api/list/",
     items: "api/items/",
+    shoppingList: "api/shopping-list/",
     lineFirst: "api/line/",
     lineLogin: "api/line-login/",
 };
@@ -82,6 +83,7 @@ export const firstLineLoginRequest = async(user_id, user_name, line_id, line_sta
     });
     return response;
 }
+//LINEログイン2回目以降
 export const lineLoginRequest = async(line_id) => {
     const response = await apiRequest({
         method: 'POST',
@@ -118,7 +120,7 @@ export const addNewItemRequest = async( list_id ) => {
     });
     return response;
 }
-
+//リスト内のアイテムを取得するリクエスト
 export const fetchItemsOfListRequest = async( list_id ) => {
     const response = await apiRequest({
         method: 'GET',
@@ -127,7 +129,7 @@ export const fetchItemsOfListRequest = async( list_id ) => {
     });
     return response;
 }
-
+//アイテムの情報を更新するリクエスト
 export const updateItemInfoRequest = async( list_id, item_id, key, newItemName  ) => {
     const response = await apiRequest({
         method: 'PATCH',
@@ -135,6 +137,15 @@ export const updateItemInfoRequest = async( list_id, item_id, key, newItemName  
         data: {
             [key]: newItemName
         },
+        withCredentials: true,
+    });
+    return response;
+}
+//お買い物リストを取得するリクエスト
+export const fetchShoppingListRequest = async( list_id ) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.shoppingList + list_id + "/",
         withCredentials: true,
     });
     return response;

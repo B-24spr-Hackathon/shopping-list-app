@@ -4,7 +4,7 @@ import StockItems from "../components/StockItems";
 import TabMainMenu from "../components/TabMainMenu";
 import UserNameAndIcon from "../components/UserNameIcon";
 import TabItems from "../components/TabItems";
-import { AddBtn } from "../components/Buttons";
+import { AddBtn, TestBtn } from "../components/Buttons";
 import { addNewListRequest } from "../utils/Requests.jsx";
 import { useDispatch } from "react-redux";
 import { setItemAllInfo, clearItem } from "../reducers/itemSlice.jsx";

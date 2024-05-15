@@ -3,16 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { fetchUserInfoRequest } from '../utils/Requests';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../reducers/userSlice';
+import { setSelectedList } from '../reducers/selectedListSlice';
 
 const ToDefault = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const lists = useSelector(state => state.user.lists);
     const default_list = useSelector(state => state.user.default_list);
     useEffect(() => {
         const fetchUserInfo = async () => {
             const response = await fetchUserInfoRequest();
-
             dispatch(setUser(response.data.user));
+            dispatch(setUser({lists:response.data.lists}));
+            if(response.data.lists.length > 0){
+                dispatch(setSelectedList(response.data.lists[response.data.lists.length -1]));
+            }
+
             if (default_list) {
                 navigate('/items');
             } else {
