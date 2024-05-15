@@ -90,8 +90,10 @@ def remind_batch():
         if count < 0:
             count += 24 * 3600
 
-        # 通知送信のタスクを呼出し
-        remind_request.apply_async([remind_user["line_id"], remind_items], countdown=count)
+        # remind_itemsが空じゃない場合
+        if len(remind_items) > 0:
+            # 通知送信のタスクを呼出し
+            remind_request.apply_async([remind_user["line_id"], remind_items], countdown=count)
 
 
 """
@@ -117,16 +119,16 @@ def shopping_batch():
     # normal_usersの処理
     # 今日が今月最終日の場合は買い物日が1のユーザーを取得
     if day == last_day:
-        users = normal_users.filter(list__shopping_day=1).distinct()
+        users = normal_users.filter(list__shopping_day=1).exclude(list__shopping_day=None).distinct()
 
     # 今日が今月最終日前日の場合は買い物日が月末のユーザーを取得
     elif day == last_day - 1:
-        users = normal_users.filter(list__shopping_day__gt=day).distinct()
+        users = normal_users.filter(list__shopping_day__gt=day).exclude(list__shopping_day=None).distinct()
 
     # 今日が上記以外の場合は買い物日が翌日のユーザーを取得
     else:
         day += 1
-        users = normal_users.filter(list__shopping_day=day).distinct()
+        users = normal_users.filter(list__shopping_day=day).exclude(list__shopping_day=None).distinct()
 
     # ユーザーを取出してshopping_requestを呼出す
     for user in users:
@@ -144,16 +146,16 @@ def shopping_batch():
     # early_usersの処理
     # 今日が今月最終日の前日の場合は買い物日が1のユーザーを取得
     if day == last_day - 1:
-        users = early_users.filter(list__shopping_day=1).distinct()
+        users = early_users.filter(list__shopping_day=1).exclude(list__shopping_day=None).distinct()
 
     # 今日が今月最終日の2日前の場合は買い物日が月末のユーザーを取得
     elif day == last_day - 2:
         day += 1
-        users = early_users.filter(list__shopping_day__gt=day)
+        users = early_users.filter(list__shopping_day__gt=day).exclude(list__shopping_day=None).distinct()
     # 今日が上記以外の場合は買い物日が2日後のユーザーを取得
     else:
         day += 2
-        users = early_users.filter(list__shopping_day=day)
+        users = early_users.filter(list__shopping_day=day).exclude(list__shopping_day=None).distinct()
 
     # ユーザーを取出してshopping_requestを呼出す
     for user in users:
