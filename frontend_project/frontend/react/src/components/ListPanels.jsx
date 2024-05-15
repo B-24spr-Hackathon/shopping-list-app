@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState }  from 'react';
 import '../styles/Lists.css'
-import { AddBtn, ShoppingBtn, ToShoppingListBtn } from './Buttons';
+import { AddBtn, BoughtOrPassBtn, ShoppingBtn, ToShoppingListBtn } from './Buttons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchItemsOfListRequest, updateItemInfoRequest } from '../utils/Requests';
 import { setItemAllInfo, updateColor, updateConsumeCycle, updateItemName, updateItemUrl, updateLastOpenAt, updateLastPurchaseAt, updateManageTarget, updateRemindByItem, updateToList } from '../reducers/itemSlice';
@@ -20,31 +20,60 @@ function ListFieldTitle({ title }) {
 
 //買い物リスト画面のパネル
 function ShoppingListPanel() {
-    const list_title = useSelector((state) => state.user.lists[0].list_name);
+    const selectedList = useSelector(state => state.selectedList);
+    // const list_title = useSelector((state) => state.);
     const shoppingItems = (
         <div className='flex justify-center text-center items-center border-b'>
-            <img className='flex-none ' alt='ctg' />
-            <div className='flex-none' >商品名</div>
-            <div className='flex-none'>
-                <ShoppingBtn children="買った"/>
-            </div>
-            <div className='flex-none'>
-                <ShoppingBtn children="見送り"/>
-            </div>
+            
         </div>
+    );
+
+    const shoppingItemsHeader = (
+        <thead>
+            <tr className='text-center'>
+                <th colSpan="4">日付</th>
+
+            </tr>
+        </thead>
+    )
+
+    const shoppingItemsData = (
+        <tr className="text-center border-b">
+            <td>
+                test
+            </td>
+            <td>
+                test
+            </td>
+            <td>
+                <BoughtOrPassBtn
+                    children="買った"
+                />
+            </td>
+            <td>
+                <BoughtOrPassBtn
+                    children="見送る"
+                />
+            </td>
+        </tr>
     );
 
     const shoppingListFieldPanel = (
         <div className='list-field'>
-            <p className='text-center'>日付</p>
-            { shoppingItems }
+            <table className='table-fixed w-full'>
+                { shoppingItemsHeader }
+                <tbody>
+                    {shoppingItemsData}
+                </tbody>
+            </table>
+
         </div>
     );
 
     return(
         <>
             <div className='list-field-container'>
-                <ListFieldTitle title={list_title} />
+                <ListFieldTitle title={selectedList.list_name} />
                 { shoppingListFieldPanel }
             </div>
         </>
@@ -255,7 +284,7 @@ function ItemsListPanel() {
             </td>
             {/*リスト追加ボタン*/}
             <td>
-                <ToShoppingListBtn 
+                <ToShoppingListBtn
                     onClick={ () => toShoppingLists(item) }
                     children="追加する"
                     disabled={item.to_list}

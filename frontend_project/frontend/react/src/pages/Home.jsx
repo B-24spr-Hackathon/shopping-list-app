@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
+import { fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -13,6 +13,8 @@ import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
 import AddNewItem from "../utils/AddNewItem";
+import { setItemAllInfo } from "../reducers/itemSlice";
+import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice";
 
 function Home() {
     const dispatch = useDispatch();
@@ -25,20 +27,31 @@ function Home() {
     const handleAddNewList = AddNewList();
     const handleAddNewItem = AddNewItem();
     const [cookies] = useCookies(['jwt_token']);
-
+    
+    //homeを読み込み時に実行
     useEffect(() => {
         const fetchUserInfo = async() => {
-            const response = await fetchUserInfoRequest();
-            dispatch(setUser(response.data.user))
-            dispatch(setUser({lists:response.data.lists}));
-            console.log(lists,lists.length);
-            console.log(items,items.length);
-            if (lists.length == 0){
+            //ユーザー情報取得
+            const userInfo = await fetchUserInfoRequest();
+            dispatch(setUser(userInfo.data.user));
+            dispatch(setUser({lists:userInfo.data.lists}));
+            //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
+            if (userInfo.data.lists.length == 0){
                 handleAddNewList();
             } else {
-                dispatch(setSelectedList(lists[lists.length -1]));
+                dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
             }
-
+            //改めてユーザー情報取得
+            const newUserInfo = await fetchUserInfoRequest();
+            //selectedListのリスト情報を取得
+            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[newUserInfo.data.lists.length-1].list_id);
+            dispatch(setSelectedList(listInfo.data));
+            //該当リスト内のitem情報を取得
+            const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
+            dispatch(setItemAllInfo(itemsInfo.data.items));
+            //該当リストの買い物リストを取得
+            const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
+            dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
         };
         fetchUserInfo();
     }, []);
@@ -61,7 +74,7 @@ function Home() {
     }
 
     const handleFetchShoppingList = async() => {
-        const response = await fetchShoppingListRequest(4)
+        const response = await fetchShoppingListRequest(selectedListId)
         console.log('fetchshopping:', response);
     }
 

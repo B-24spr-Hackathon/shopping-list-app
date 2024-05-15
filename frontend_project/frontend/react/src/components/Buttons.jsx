@@ -22,5 +22,8 @@ function AddBtn({ onClick, children }) {
 function ToShoppingListBtn({ onClick, children, disabled }) {
     return <button className="h-8 w-auto rounded-full text-white bg-base-orange border" onClick={onClick} disabled={disabled}>{children}</button>
 }
+function BoughtOrPassBtn({ onClick, children, disabled }) {
+    return <button className="h-8 w-1/2 rounded-full text-white bg-base-orange border" onClick={onClick} disabled={disabled}>{children}</button>
+}
 
-export { CertifyBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn, ToShoppingListBtn }
+export { CertifyBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn, ToShoppingListBtn, BoughtOrPassBtn }

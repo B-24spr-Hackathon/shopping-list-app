@@ -103,11 +103,22 @@ export const addNewListRequest = async() => {
         apiEndpoint: apiEndpoint.list,
         data: {
             list_name: "新しいリスト",
+            shopping_day: 1,
         },
         withCredentials: true,
     });
     return response;
 }
+//管理商品リストを取得するリクエスト
+export const fetchListInfoRequest = async( list_id ) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.list + list_id + '/',
+        withCredentials: true,
+    });
+    return response;
+}
+
 //新しい商品を追加するリクエスト
 export const addNewItemRequest = async( list_id ) => {
     const response = await apiRequest({
