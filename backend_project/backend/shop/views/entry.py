@@ -48,8 +48,7 @@ class EntryView(APIView):
         # 削除されたゲストが他のリストに登録されているか確認
         owner_lists_count = List.objects.filter(owner_id=guest.guest_id).count()
         guest_lists_count = Member.objects.filter(guest_id=guest.guest_id, member_status=0).count()
-        print(owner_lists_count)
-        print(guest_lists_count)
+
         other_lists_count = owner_lists_count + guest_lists_count
         # have_listを更新
         if other_lists_count == 0:
