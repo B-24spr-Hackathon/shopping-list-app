@@ -42,6 +42,10 @@ class InviteView(APIView):
         new_guest = Member(list_id=list_instance, guest_id=guest, authority=authority, member_status = 1)        
         new_guest.save()
 
+        # ゲストのinvitationをTrueにする処理
+        guest.invitation = True
+        guest.save()
+        
         member_status = 1
         
         # レスポンス用のデータ作成
