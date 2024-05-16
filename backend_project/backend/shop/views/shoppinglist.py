@@ -8,7 +8,7 @@ from shop.authentication import CustomJWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from shop.permissions import IsOwnerOrGuest
 import calendar
-from datetime import datetime
+from datetime import date
 
 
 # 買い物リスト表示(GET)
@@ -49,14 +49,14 @@ class ShoppingListView(APIView):
         if shopping_day in [None, '', 'null'] :
             return "買い物日は設定されていません"
     
-        today = datetime.today()
+        today = date.today()
         current_year = today.year
         current_month = today.month
 
         # 今月の最終日を取得
         _, last_day_this_month = calendar.monthrange(current_year, current_month)
         adjusted_day_this_month = min(shopping_day, last_day_this_month)
-        shopping_date_this_month = datetime(current_year, current_month, adjusted_day_this_month)
+        shopping_date_this_month = date(current_year, current_month, adjusted_day_this_month)
 
         if today <= shopping_date_this_month:
             return shopping_date_this_month
@@ -66,7 +66,7 @@ class ShoppingListView(APIView):
             _, last_day_next_month = calendar.monthrange(next_year, next_month)
             adjusted_day_next_month = min(shopping_day, last_day_next_month)
 
-            return datetime(next_year, next_month, adjusted_day_next_month)
+            return date(next_year, next_month, adjusted_day_next_month)
         
 
 
