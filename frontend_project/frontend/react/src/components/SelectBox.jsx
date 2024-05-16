@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { clearSelectedList, setSelectedList } from "../reducers/selectedListSlice";
-import { setItemAllInfo, clearItem } from "../reducers/itemSlice.jsx";
+import { setItemAllInfo } from "../reducers/itemSlice.jsx";
 import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice.jsx";
 
 
@@ -18,22 +18,20 @@ function SelectList() {
         dispatch(setSelectedList(selected));
         //選んだリストの情報を取得
         const listInfo = await fetchListInfoRequest(event.target.value);
-        console.log('listinfo', listInfo.data);
         dispatch(setSelectedList(listInfo.data));
         //選んだリストの中のアイテムを取得
         const itemsInfo = await fetchItemsOfListRequest(event.target.value);
         dispatch(setItemAllInfo(itemsInfo.data.items))
         //選んだリストの買い物リストを取得
         const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
-        //ここでdispatchしたい
-        dispatch(setShoppingItemsAllInfo(shoppingListInfo.data.items));
+        dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
 
     }
 
     return (
         <>
             <div>
-                <select 
+                <select
                     value={selectedList.list_id}
                     onChange={handleSelectChange}
                     >

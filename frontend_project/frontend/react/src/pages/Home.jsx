@@ -37,14 +37,15 @@ function Home() {
             dispatch(setUser({lists:userInfo.data.lists}));
             //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
             if (userInfo.data.lists.length == 0){
-                handleAddNewList();
+                await handleAddNewList();
             } else {
                 dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
             }
             //改めてユーザー情報取得
             const newUserInfo = await fetchUserInfoRequest();
+            const lastIndex = newUserInfo.data.lists.length - 1;
             //selectedListのリスト情報を取得
-            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[newUserInfo.data.lists.length-1].list_id);
+            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
             dispatch(setSelectedList(listInfo.data));
             //該当リスト内のitem情報を取得
             const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);

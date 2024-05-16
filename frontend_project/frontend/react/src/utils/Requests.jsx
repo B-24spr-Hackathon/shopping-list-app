@@ -125,6 +125,7 @@ export const addNewItemRequest = async( list_id ) => {
         method: 'POST',
         apiEndpoint: apiEndpoint.items + list_id + '/',
         data: {
+            color: 0,
             item_name: "商品名を入力",
         },
         withCredentials: true,
@@ -148,6 +149,15 @@ export const updateItemInfoRequest = async( list_id, item_id, key, newItemName  
         data: {
             [key]: newItemName
         },
+        withCredentials: true,
+    });
+    return response;
+}
+//アイテムを削除するリクエスト
+export const deleteItemRequest = async( list_id, item_id ) => {
+    const response = await apiRequest({
+        method: 'DELETE',
+        apiEndpoint: apiEndpoint.items + list_id + "/" + item_id + "/",
         withCredentials: true,
     });
     return response;

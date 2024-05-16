@@ -3,6 +3,9 @@ import { createSlice } from '@reduxjs/toolkit';
 export const shoppingItemsSlice = createSlice({
     name: 'shoppingItems',
     initialState: {
+        list_id: null,
+        list_name: null,
+        next_shopping_day: null,
         items:[]
     },
     reducers: {
@@ -81,6 +84,6 @@ export const shoppingItemsSlice = createSlice({
 export const
     {
         setShoppingItemsAllInfo,
-        
+
     } = shoppingItemsSlice.actions;
 export default shoppingItemsSlice.reducer;

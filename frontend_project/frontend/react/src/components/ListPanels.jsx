@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState }  from 'react';
 import '../styles/Lists.css'
 import { AddBtn, BoughtOrPassBtn, ShoppingBtn, ToShoppingListBtn } from './Buttons';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchItemsOfListRequest, updateItemInfoRequest } from '../utils/Requests';
-import { setItemAllInfo, updateColor, updateConsumeCycle, updateItemName, updateItemUrl, updateLastOpenAt, updateLastPurchaseAt, updateManageTarget, updateRemindByItem, updateToList } from '../reducers/itemSlice';
+import { deleteItemRequest, fetchItemsOfListRequest, fetchShoppingListRequest, updateItemInfoRequest } from '../utils/Requests';
+import { setItemAllInfo, updateColor, updateConsumeCycle, updateItemName, updateItemUrl, updateLastOpenAt, updateLastPurchaseAt, updateManageTarget, updateRemindByItem, updateToList, deleteItem } from '../reducers/itemSlice';
 import "../styles/CategoryColor.css";
 import EditableDateInput from './EditableDateInput';
 import AddNewItem from '../utils/AddNewItem';
+import { setShoppingItemsAllInfo } from '../reducers/shoppingItemsSlice';
 
 function ListFieldTitle({ title }) {
     return(
@@ -21,41 +22,86 @@ function ListFieldTitle({ title }) {
 //買い物リスト画面のパネル
 function ShoppingListPanel() {
     const selectedList = useSelector(state => state.selectedList);
+    const shoppingItems = useSelector(state => state.shoppingItems)
     // const list_title = useSelector((state) => state.);
-    const shoppingItems = (
-        <div className='flex justify-center text-center items-center border-b'>
+    const items = useSelector(state => state.shoppingItems.items);
+    const dispatch = useDispatch();
+    //読み込み時にshoppingItemデータを取得
+    useEffect(() => {
+        const fetchShoppingList = async() => {
+            const response = await fetchShoppingListRequest(selectedList.list_id);
+            console.log('data;',response.data);
+            dispatch(setShoppingItemsAllInfo(response.data));
+            console.log(shoppingItems);
+        }
+        fetchShoppingList();
+    },[]);
+
+    //見送りボタン（買い物リストから外す）
+    const handlePass = async(item) => {
+        try {
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false);
+            // dispatch(updateToList({ item_id: item.item_id, to_list: response.data.to_list }));
+            const currentShoppingList = await fetchShoppingListRequest(selectedList.list_id);
+            console.log(currentShoppingList.data);
+            dispatch(setShoppingItemsAllInfo(currentShoppingList.data));
+        }catch (err){
+            console.error('Failed to update manage target:', err);
+        }
+    }
+    //買ったボタン（買い物リストから外す・購入日を今日にする）
+    const handleBought = async(item) => {
+        try{
+            const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false);
             
-        </div>
-    );
+            const today = new Date();
+            const formattedDate = today.toISOString().slice(0, 10);
+            const response2 = await updateItemInfoRequest(selectedList.list_id, item.item_id, "last_purchase_at", formattedDate);
+            const currentShoppingList = await fetchShoppingListRequest(selectedList.list_id);
+            dispatch(setShoppingItemsAllInfo(currentShoppingList.data));
+            
+            const response3 = await fetchItemsOfListRequest(selectedList.list_id);
+            console.log("response3:",response3);
+            dispatch(setItemAllInfo(response3.data.items));
+
+        }catch (err){
+            console.error('Failed to update manage target:', err);
+        }
+    }
 
     const shoppingItemsHeader = (
         <thead>
             <tr className='text-center'>
-                <th colSpan="4">日付</th>
-
+                <th colSpan="4">次の買い物予定日：{shoppingItems.items.next_shopping_day}</th>
             </tr>
         </thead>
     )
 
-    const shoppingItemsData = (
-        <tr className="text-center border-b">
+    const shoppingItemsData = shoppingItems.items.items.map((item, index) => (
+
+        <tr className="text-center border-b" key={index}>
             <td>
-                test
+                {item.color}
             </td>
             <td>
-                test
+                {item.item_name}
             </td>
             <td>
                 <BoughtOrPassBtn
+                    onClick={ () => handleBought(item) }
                     children="買った"
-                />
+                    disabled={!item.to_list}
+                    />
             </td>
             <td>
                 <BoughtOrPassBtn
+                    onClick={ () => handlePass(item) }
                     children="見送る"
-                />
+                    disabled={!item.to_list}
+                    />
             </td>
         </tr>
+                )
     );
 
     const shoppingListFieldPanel = (
@@ -120,6 +166,7 @@ function EditableInput({ initialValue, onSave, onComposition }) {
 
 //管理商品画面のパネル
 function ItemsListPanel() {
+    const [itemListItems, setItemListItems] = useState([]);
     const dispatch = useDispatch();
     const selectedList = useSelector(state => state.selectedList);
     const items = useSelector(state => state.items.items);
@@ -129,7 +176,10 @@ function ItemsListPanel() {
     useEffect(() => {
         const fetchItemsOfList = async() => {
             const response = await fetchItemsOfListRequest(selectedList.list_id);
-            dispatch(setItemAllInfo(response.data.items))
+            setItemListItems(response.data.items);
+            console.log(itemListItems);
+            console.log('update',itemListItems);
+            dispatch(setItemAllInfo(response.data.items));
         };
         fetchItemsOfList();
     }, []);
@@ -194,6 +244,65 @@ function ItemsListPanel() {
             console.error('Failed to update manage target:', err);
         }
     }
+    //item削除
+    const deleteItemtest = async(item) => {
+    //     const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+    //     // dispatch(deleteItem(item.item_id));
+    //     // const updateItems = itemListItems.filter(listItem => listItem.item_id !== item.item_id);
+    //     setItemListItems(itemListItems.filter((listItem,i) => i !== index));
+    //     console.log(item.item_id);
+    //     console.log(itemListItems);
+    // };
+    //     try {
+    //         const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+    //         dispatch(deleteItem(item.item_id))
+    //         const response1 = await fetchItemsOfListRequest(selectedList.list_id);
+    //         dispatch(setItemAllInfo(response1.data.items));
+    //     }catch(err){
+    //         console.error('Failed to update manage target:', err);
+    //     }
+    // }
+        try {
+            const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+            if (response.status === 200) {
+                dispatch(deleteItem(item.item_id));
+                const response1 = await fetchItemsOfListRequest(selectedList.list_id);
+                if (response1.status === 200) {
+                    dispatch(setItemAllInfo(response1.data.items));
+                } else {
+                    console.error('Failed to refetch items:', response1);
+                }
+            } else {
+                console.error('Failed to delete item:', response);
+            }
+        } catch(err) {
+            console.error('Failed to delete item:', err);
+        }
+    }
+
+
+    //     try {
+    //             const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+    //             dispatch(clearItem(item.item_id))
+    //         }catch(err){
+    //             console.error('Failed to update manage target:', err);
+    //         }
+    //     }
+    //         const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+    //         if (response.status === 200) {
+    //             dispatch(deleteItem(item.item_id));
+    //             console.log('Item deleted successfully');
+    //         } else {
+    //             console.error('Failed to delete item');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error deleting item:', error);
+    //     }
+    // };
+    // const test = () => {
+    //     console.log(itemListItems);
+    // }
+
     //カテゴリカラーのselect
     const CategoryColorSelector = ({ color, onChange }) => {
         return(
@@ -230,9 +339,9 @@ function ItemsListPanel() {
         </thead>
     );
 
-    const itemsData = items.map((item, index) => (
+    const itemsData = items.map((item) => (
         <>
-        <tr className="text-center border-b" key={index}>
+        <tr className="text-center border-b" key={item.item_id}>
             {/*管理対象*/}
             <td>
                 <input
@@ -297,7 +406,10 @@ function ItemsListPanel() {
                     checked={item.remind_by_item}
                     onChange={ () => changeRemindByItem(item) } />
             </td>
-            
+            {/* 削除 */}
+            <td>
+                <button onClick={ () => deleteItemtest(item)}>削除</button>
+            </td>
         </tr>
             
         </>
