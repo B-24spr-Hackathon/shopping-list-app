@@ -15,3 +15,4 @@ backend_project/backend/celerybeat-schedule
 
 # テスト用のファイルを管理対象外とする
 backend_project/backend/shop/tests.py
+backend_project/backend/logs/backend.log

@@ -209,3 +209,37 @@ CELERY_TIMEZONE = 'Asia/Tokyo'
 # Celery Beatの呼出し時間
 BATCH_HOUR = 3
 BATCH_MINUTE = 0
+
+
+# Logging設定
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime} [{levelname}] {processName} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{asctime} [{levelname}] {message}",
+            "style": "{"
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "./logs/backend.log",
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "backend": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True
+        },
+    },
+}
