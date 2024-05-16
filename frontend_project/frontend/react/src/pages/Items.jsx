@@ -5,8 +5,8 @@ import TabMainMenu from "../components/TabMainMenu";
 import UserNameAndIcon from "../components/UserNameIcon";
 import TabItems from "../components/TabItems";
 import { AddBtn, TestBtn } from "../components/Buttons";
-import { addNewListRequest } from "../utils/Requests.jsx";
-import { useDispatch } from "react-redux";
+import { addNewListRequest, fetchListInfoRequest } from "../utils/Requests.jsx";
+import { useDispatch, useSelector } from "react-redux";
 import { setItemAllInfo } from "../reducers/itemSlice.jsx";
 import { ItemsListPanel } from "../components/ListPanels.jsx";
 import { SelectList } from "../components/SelectBox.jsx";
@@ -15,14 +15,21 @@ import LogoutButton from "../components/Logout.jsx";
 
 
 
+
 function Items() {
 
     const dispatch = useDispatch();
-    // const items = 
+    const selectedList = useSelector(state => state.selectedList);
+    const [lists, setLists] = useState([]);
 
-    // useEffect(() => {
-    //     if()
-    // })
+   useEffect(() => {
+    const fetchListAndItemsInfo = async() =>{
+        const response = await fetchListInfoRequest(selectedList.list_id);
+        setLists(response.data.lists);
+        
+    };
+    fetchListAndItemsInfo();
+   },[]);
 
 
     
@@ -32,16 +39,23 @@ function Items() {
         <>
 
             <Header />
-            <LogoutButton />
+            <div className="fixed right-2 mt-1 text-right">
+                <LogoutButton />
+            </div>
             <UserNameAndIcon />
             <TabMainMenu />
-            <SelectList />
+            <div className="">
 
-            <div className='flex justify-center mt-4'>
+                <SelectList />
 
-            <ItemsListPanel />
+                <div className='flex justify-center '>
+
+                    <ItemsListPanel />
+                </div>
             </div>
-            <Footer />
+
+            <footer>aaa</footer>
+            {/* <Footer /> */}
 
 
         </>

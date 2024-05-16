@@ -10,6 +10,7 @@ export const apiEndpoint = {
     shoppingList: "api/shopping-list/",
     lineFirst: "api/line/",
     lineLogin: "api/line-login/",
+    invite: "api/invite/",
 };
 // const token = useSelector(state => state.token.token);
 
@@ -39,7 +40,7 @@ export const fetchUserInfoRequest = async(token) => {
     const response = await apiRequest({
         method: 'GET',
         apiEndpoint: apiEndpoint.user,
-        withCredentials: false,
+        withCredentials: true,
         token: token,
     });
     return response;
@@ -114,6 +115,29 @@ export const addNewListRequest = async() => {
     });
     return response;
 }
+//リスト名を編集するリクエスト
+export const editListNameRequest = async( list_id, newValue, token ) => {
+    const response = await apiRequest({
+        method: 'PATCH',
+        apiEndpoint: apiEndpoint.list + list_id + '/',
+        data: {
+            list_name: newValue,
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//リストを削除するリクエスト
+export const deleteListRequest = async( list_id, token ) => {
+    const response = await apiRequest({
+        method: 'DELETE',
+        apiEndpoint: apiEndpoint.list + list_id + '/',
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
 //管理商品リストを取得するリクエスト
 export const fetchListInfoRequest = async( list_id ) => {
     const response = await apiRequest({
@@ -173,6 +197,16 @@ export const fetchShoppingListRequest = async( list_id ) => {
         method: 'GET',
         apiEndpoint: apiEndpoint.shoppingList + list_id + "/",
         withCredentials: true,
+    });
+    return response;
+}
+//招待時にユーザー検索するリクエスト
+export const searchFriendRequest = async( user_id, token ) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.invite + user_id + "/",
+        withCredentials: true,
+        token: token,
     });
     return response;
 }
