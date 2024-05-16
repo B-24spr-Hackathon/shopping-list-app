@@ -5,6 +5,9 @@ from django.db.models import Prefetch
 from datetime import timedelta
 import requests, calendar
 from shop.models import User, List, Item
+import logging
+
+logger = logging.getLogger("backend")
 
 
 # リクエストに必要なデータ
@@ -19,6 +22,7 @@ remind_batch
 """
 @app.task
 def remind_batch():
+    logger.info("開封確認バッチ処理の開始")
     # 現在の日にちを取得
     today_datetime = timezone.now()
     today = today_datetime.date()
@@ -69,13 +73,15 @@ def remind_batch():
         user_items.append(user_item)
 
     # まとめたデータよりユーザー毎に通知送信のタスクを実行
+    # 通知を送信するユーザー数をカウント
+    count_users = 0
     for remind_user in user_items:
         remind_items = []
         for remind_item in remind_user["items"]:
             # アイテムの通知日時を算出（最終開封日+消費頻度+通知タイミング）
             remind_date = remind_item["last_open_at"] + timedelta(days=(remind_item["consume_cycle"] + remind_user["remind_timing"]))
 
-            # 今日が通知日時よりも後の場合
+            # 通知日時が今日以前の場合
             if today >= remind_date:
                 remind_items.append({
                     "item_id": remind_item["item_id"],
@@ -94,6 +100,11 @@ def remind_batch():
         if len(remind_items) > 0:
             # 通知送信のタスクを呼出し
             remind_request.apply_async([remind_user["line_id"], remind_items], countdown=count)
+            
+            count_users += 1
+
+    logger.info(f"通知ユーザー数: {count_users}")
+    logger.info("開封確認バッチ処理の終了")
 
 
 """
@@ -102,6 +113,7 @@ shopping_batch
 """
 @app.task
 def shopping_batch():
+    logger.info("買い物日通知バッチ処理の開始")
     today = timezone.now()
     year = today.year
     month = today.month
@@ -111,8 +123,11 @@ def shopping_batch():
     # 今月の最終日を取得
     _, last_day = calendar.monthrange(year, month)
 
+    # 通知を送信するユーザー数をカウント
+    count_users = 0
+
     # 通知対象となるユーザーを通知時間のタイミング毎に取得
-    # early: 通知時間がバッチ処理より早い　normal: それ以外
+    # early: バッチ処理より早い　normal: バッチ処理移行
     early_users = User.objects.filter(remind=True, remind_time__lt=time)
     normal_users = User.objects.filter(remind=True, remind_time__gte=time)
 
@@ -143,6 +158,8 @@ def shopping_batch():
         # 非同期で通知を送る関数を呼出す
         shopping_request.apply_async([user.line_id], countdown=count)
 
+        count_users += 1
+
     # early_usersの処理
     # 今日が今月最終日の前日の場合は買い物日が1のユーザーを取得
     if day == last_day - 1:
@@ -167,6 +184,11 @@ def shopping_batch():
         # 非同期で通知を送る関数を呼出す
         shopping_request.apply_async([user.line_id], countdown=count)
 
+        count_users += 1
+
+    logger.info(f"通知ユーザー数: {count_users}")
+    logger.info("買い物日通知バッチ処理の終了")
+
 
 """
 remind_request
@@ -175,6 +197,7 @@ LINEにPOSTリクエストを送信するタスク
 """
 @app.task
 def remind_request(line_id, items):
+    logger.info("開封通知送信処理の開始")
     # itemsが複数の場合
     if len(items) > 1:
         # 1度のメッセージで送信できるアイテム数は10
@@ -247,13 +270,15 @@ def remind_request(line_id, items):
     # 通知を送信
     try:
         response = requests.post(url, headers=headers, json=data)
-    except Exception:
-        print(f"{line_id}への開封通知でネットワークエラー発生")
+    except Exception as e:
+        logger.error(f"{line_id}への通知失敗: {repr(e)}")
 
     if response.ok:
-        print(f"{line_id}への開封通知を適切に送信しました")
+        logger.info(f"{line_id}への通知成功")
     else:
-        print(f"{line_id}への開封通知に失敗しました")
+        logger.error(f"{line_id}への通知失敗: {response.text}")
+
+    logger.info("開封通知送信処理の終了")
 
 
 """
@@ -263,6 +288,7 @@ LINEにPOSTリクエストを送信するタスク
 """
 @app.task
 def shopping_request(line_id):
+    logger.info("買い物日通知送信処理の開始")
     data = {
         "to": line_id,
         "messages": [
@@ -287,10 +313,12 @@ def shopping_request(line_id):
     # 通知を送信
     try:
         response = requests.post(url, headers=headers, json=data)
-    except Exception:
-        print(f"{line_id}への買い物日通知でネットワークエラー発生")
+    except Exception as e:
+        logger.error(f"{line_id}への通知失敗: {repr(e)}")
 
     if response.ok:
-        print(f"{line_id}への買い物日通知を適切に送信しました")
+        logger.info(f"{line_id}への通知成功")
     else:
-        print(f"{line_id}への買い物日通知に失敗しました")
+        logger.error(f"{line_id}への通知失敗: {response.text}")
+
+    logger.info("買い物日通知送信処理の終了")
