@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from "../reducers/userSlice";
 import { useCookies } from 'react-cookie';
 import { signUpRequest } from "../utils/Requests";
+import { setToken } from "../reducers/tokenSlice";
 
 function Signup() {
     //状態管理
@@ -57,6 +58,7 @@ function Signup() {
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
             dispatch(setUser( response.data.user ));
+            dispatch(setToken(token));
             //リダイレクト
             navigate('/home');
 

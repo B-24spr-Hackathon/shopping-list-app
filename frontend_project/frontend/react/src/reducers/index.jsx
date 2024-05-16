@@ -3,6 +3,7 @@ import userReducer from './userSlice';
 import itemsReducer from './itemSlice';
 import selectedListReducer from './selectedListSlice';
 import shoppingItemsReducer from './shoppingItemsSlice';
+import tokenReducer from './tokenSlice';
 import { RESET_APP_STATE } from './actionTypes';
 
 const appReducer = combineReducers({
@@ -10,6 +11,7 @@ const appReducer = combineReducers({
     items: itemsReducer,
     selectedList: selectedListReducer,
     shoppingItems: shoppingItemsReducer,
+    token: tokenReducer,
 });
 
 const rootReducer = (state, action) => {

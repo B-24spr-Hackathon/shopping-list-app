@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const apiBaseUrl = "https://127.0.0.1:8000/";
 export const apiEndpoint = {
@@ -10,8 +11,9 @@ export const apiEndpoint = {
     lineFirst: "api/line/",
     lineLogin: "api/line-login/",
 };
+// const token = useSelector(state => state.token.token);
 
-export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials }) => {
+export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials, token }) => {
     try {
         const response = await axios({
             method: method,
@@ -19,6 +21,7 @@ export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, with
             data: data,
             headers: {
                 'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` }), // トークンが存在する場合のみ設定
                 ...headers
 
             },
@@ -32,14 +35,16 @@ export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, with
     }
 }
 //ユーザー情報を取得のリクエスト
-export const fetchUserInfoRequest = async() => {
+export const fetchUserInfoRequest = async(token) => {
     const response = await apiRequest({
-        method:'GET',
+        method: 'GET',
         apiEndpoint: apiEndpoint.user,
-        withCredentials: true,
+        withCredentials: false,
+        token: token,
     });
     return response;
-}
+};
+
 
 //ログインのリクエスト
 export const loginRequest = async(email, password) => {

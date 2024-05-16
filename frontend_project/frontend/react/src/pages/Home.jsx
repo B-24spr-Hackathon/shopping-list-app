@@ -27,12 +27,14 @@ function Home() {
     const handleAddNewList = AddNewList();
     const handleAddNewItem = AddNewItem();
     const [cookies] = useCookies(['jwt_token']);
+    const token = useSelector(state => state.token.token);
+
     
     //homeを読み込み時に実行
     useEffect(() => {
         const fetchUserInfo = async() => {
             //ユーザー情報取得
-            const userInfo = await fetchUserInfoRequest();
+            const userInfo = await fetchUserInfoRequest(token);
             dispatch(setUser(userInfo.data.user));
             dispatch(setUser({lists:userInfo.data.lists}));
             //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
@@ -42,7 +44,7 @@ function Home() {
                 dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
             }
             //改めてユーザー情報取得
-            const newUserInfo = await fetchUserInfoRequest();
+            const newUserInfo = await fetchUserInfoRequest(token);
             const lastIndex = newUserInfo.data.lists.length - 1;
             //selectedListのリスト情報を取得
             const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
@@ -53,6 +55,8 @@ function Home() {
             //該当リストの買い物リストを取得
             const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
             dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
+            console.log('token',token);
+
         };
         fetchUserInfo();
     }, []);

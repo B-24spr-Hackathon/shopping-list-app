@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setUser,clearUser } from "../reducers/userSlice";
 import { firstLineLoginRequest, lineLoginRequest, loginRequest } from "../utils/Requests";
 import { useLocation } from "react-router-dom";
+import { setToken } from "../reducers/tokenSlice";
 
 function LineLoginMethod() {
     const dispatch = useDispatch();
@@ -39,6 +40,7 @@ function LineLoginMethod() {
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
             dispatch(setUser(response.data.user));
+            dispatch(setToken(token));
             //リダイレクト
             navigate('/todefault');
         }catch(err){

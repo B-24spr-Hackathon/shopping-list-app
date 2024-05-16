@@ -14,8 +14,11 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
         # CookieからJWTを取得
         token = request.COOKIES.get(settings.SIMPLE_JWT["COOKIE_NAME"])
         if not token:
-            raise exceptions.AuthenticationFailed("トークンが存在しません")
-
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+            else:
+                raise exceptions.AuthenticationFailed("トークンが存在しません")
         # JWTを検証
         try:
             payload = jwt.decode(

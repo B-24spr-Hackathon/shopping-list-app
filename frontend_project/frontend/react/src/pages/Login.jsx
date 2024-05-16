@@ -8,6 +8,7 @@ import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
 import { setUser,clearUser } from "../reducers/userSlice";
 import { loginRequest } from "../utils/Requests";
+import { setToken } from "../reducers/tokenSlice";
 
 function Login() {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ function Login() {
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
             dispatch(setUser(response.data.user));
+            dispatch(setToken(token));
             //リダイレクト
             navigate('/todefault');
         }catch(err){
