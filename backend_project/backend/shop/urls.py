@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from shop.views import (
-    items, user, login, line, lists, healthcheck, webhook, shoppinglist, invite, entry
+    items, user, login, line, lists, healthcheck, webhook, shoppinglist, invite, entry, apply,
 )
 
 urlpatterns = [
@@ -25,6 +25,8 @@ urlpatterns = [
     path('entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept"),
     # 招待/申請機能 拒否DELETE
     path('entry/decline/<member_id>/', entry.EntryDeclineView.as_view(), name="decline"),
+    # 申請機能 GET
+    path('apply/<user_id>/', apply.ApplyView.as_view(), name="apply"),
 ]
 
 urlpatterns += [
