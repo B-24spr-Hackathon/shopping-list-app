@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List, Member
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer, ListGuestSerializer
+from shop.serializers.lists import ListCreateUpdateSerializer, ListResponseSerializer
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 
@@ -25,6 +25,11 @@ class ListView(APIView):
         if serializer.is_valid():
             serializer.save(owner_id=request.user)
             response_serializer = ListResponseSerializer(serializer.instance)
+
+            # Userモデルのhave_listをTrueにする
+            request.user.have_list = True
+            request.user.save()
+
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -38,11 +43,17 @@ class ListView(APIView):
         list_data = ListResponseSerializer(list_instance).data
 
         # ゲストの情報を取得
-        guests = Member.objects.filter(list_id=list_instance, member_status=0).select_related('guest_id')
-        if guests.exists():
-            guests_info = ListGuestSerializer([guest.guest_id for guest in guests], many=True).data
-        else:
-            guests_info = []
+        guests_info = []
+        guests = Member.objects.filter(list_id=list_instance)
+        for guest in guests:
+            guest_data = {
+                'guest_id' : guest.guest_id.user_id,
+                'member_id' : guest.member_id,
+                'user_name' : guest.guest_id.user_name,
+                'user_icon' : guest.guest_id.user_icon,
+                'member_status' : guest.member_status
+            }
+            guests_info.append(guest_data)          
 
         list_data['guests_info'] = guests_info
 
@@ -79,5 +90,16 @@ class ListView(APIView):
         serialized_data = response_serializer.data
 
         list_instance.delete()
+        
+        # 他のリストに登録されているか確認
+        owner_lists_count = List.objects.filter(owner_id=request.user).count()
+        guest_lists_count = Member.objects.filter(guest_id=request.user, member_status=0).count()
+
+        other_lists_count = owner_lists_count + guest_lists_count
+        # have_listを更新
+        if other_lists_count == 0:
+            request.user.have_list = False
+
+        request.user.save()
 
         return Response(serialized_data, status=status.HTTP_200_OK)
