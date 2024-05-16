@@ -22,7 +22,9 @@ urlpatterns = [
     # 招待/申請機能 PATCH, DELETE
     path('entry/<member_id>/', entry.EntryView.as_view(), name="entry-patch-delete"),
     # 招待/申請機能 承認PATCH
-    path('entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept-patch"),
+    path('entry/accept/<member_id>/', entry.EntryAcceptView.as_view(), name="accept"),
+    # 招待/申請機能 拒否DELETE
+    path('entry/decline/<member_id>/', entry.EntryDeclineView.as_view(), name="decline"),
 ]
 
 urlpatterns += [

@@ -5,10 +5,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List, Member, User
 from shop.authentication import CustomJWTAuthentication
-from shop.serializers.invite import FindUserSerializer
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
-from django.db.models import Q
 
 class EntryView(APIView):
     # JWT認証を要求、オーナーのみ許可
@@ -72,8 +70,7 @@ class EntryAcceptView(APIView):
         # ゲスト、リスト、アクセスしているユーザーを取得
         guest = get_object_or_404(Member, pk=member_id)
         list_instance = guest.list_id
-        current_user: User = request.user
-        
+        current_user: User = request.user    
         
         # member_statusカラムの値を更新
         guest.member_status = 0
@@ -104,7 +101,44 @@ class EntryAcceptView(APIView):
         
         data ={'member_status': guest.member_status,}
         return Response(data, status=status.HTTP_200_OK)
+    
+# 招待 申請 拒否・中止機能　DELETE
+class EntryDeclineView(APIView):
+    # JWT認証を要求
+    permission_classes = [IsAuthenticated] 
 
-
-
+    def delete(self, request, member_id):
+        # ゲスト、リスト、アクセスしているユーザーを取得
+        guest = get_object_or_404(Member, pk=member_id)
+        list_instance = guest.list_id
+        current_user: User = request.user
+        # member_statusを取得
+        member_status = guest.member_status
+        # ユーザー名を取得
+        user_name = guest.guest_id.user_name
+        # ゲストを削除
+        guest.delete()
+        # member_status=1の場合,ゲストがアクセス時は招待拒否、オーナーがアクセス時は招待中止
+        if member_status == 1:              
+            # ゲストについて他に招待中のステータスがなければinvitationをFalseに
+            other_invites = Member.objects.filter(guest_id=guest.guest_id, member_status=1).exists()
+            if not other_invites:
+                current_user.invitation = False
+                current_user.save()
+        # member_status=2の場合、ゲストがアクセス時は申請中止、オーナーがアクセス時は申請拒否
+        elif member_status == 2:
+            # オーナーについて他に申請中のステータスがなければrequestをFalseに
+            owner_lists = List.objects.filter(owner_id=current_user)
+            other_requests = Member.objects.filter(list_id__in=owner_lists, member_status=2).exists()
+            if not other_requests:
+                current_user.request = False
+                current_user.save()
+        else:
+            return Response({'detail': '拒否または中止する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
+                    
+        # レスポンス用データ
+        data = {
+            'user_name': user_name,
+        }
+        return Response(data, status=status.HTTP_200_OK)  
        
