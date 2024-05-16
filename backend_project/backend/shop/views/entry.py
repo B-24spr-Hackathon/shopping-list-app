@@ -19,6 +19,7 @@ class EntryView(APIView):
         # ゲスト、リストを取得
         guest = get_object_or_404(Member, pk=member_id)
         list_instance = guest.list_id
+
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         # authorityカラムの値を更新
@@ -61,23 +62,49 @@ class EntryView(APIView):
             'user_name': user_name,
         }
         return Response(data, status=status.HTTP_200_OK)
-    
+
+# 招待 申請承認機能　PATCH
 class EntryAcceptView(APIView):
     # JWT認証を要求
     permission_classes = [IsAuthenticated] 
-        # 招待 承認機能 PATCH
+
     def patch(self, request, member_id):
-        # ゲスト、リストを取得
+        # ゲスト、リスト、アクセスしているユーザーを取得
         guest = get_object_or_404(Member, pk=member_id)
         list_instance = guest.list_id
+        current_user: User = request.user
+        
+        
         # member_statusカラムの値を更新
         guest.member_status = 0
         guest.save()
-         # have_listをTrueに更新
+        # ゲストのhave_listをTrueに更新
         guest.guest_id.have_list = True
         guest.guest_id.save()
 
-        data ={
-            'member_status': guest.member_status,
-        }
+        # アクセスユーザーがゲストの場合
+        if current_user == guest.guest_id:
+            # 他に招待中のステータスがなければ招待フラグをFalseに
+            other_invites = Member.objects.filter(guest_id=guest.guest_id, member_status=1).exists()
+            if not other_invites:
+                current_user.invitation = False
+                current_user.save()
+                print("保存されたユーザー情報:", current_user)
+        # アクセスユーザーがリストオーナーの場合
+        elif current_user == list_instance.owner_id:
+            # 他に申請中のステータスがなければ申請フラグをFalseに
+            owner_lists = List.objects.filter(owner_id=current_user)
+            other_requests = Member.objects.filter(list_id__in=owner_lists, member_status=2).exists()
+            if not other_requests:
+                current_user.request = False
+                current_user.save()
+                print("保存されたユーザー情報:", current_user)
+        else:
+            return Response({'detail': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
+        
+        data ={'member_status': guest.member_status,}
         return Response(data, status=status.HTTP_200_OK)
+
+
+
+       
