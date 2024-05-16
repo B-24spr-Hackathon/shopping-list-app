@@ -38,6 +38,9 @@ class InviteView(APIView):
         guest = get_object_or_404(User, pk=user_id)
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
+        # 既存のMemberをチェック
+        if Member.objects.filter(list_id=list_instance, guest_id=guest).exists():
+            return Response({'detail': 'このゲストはこのリストにすでに参加済み、または招待・申請中です'}, status=status.HTTP_400_BAD_REQUEST)
         #Memberテーブルにデータ保存
         new_guest = Member(list_id=list_instance, guest_id=guest, authority=authority, member_status = 1)        
         new_guest.save()
