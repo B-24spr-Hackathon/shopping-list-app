@@ -36,7 +36,7 @@ class InviteView(APIView):
             return Response(guest_data, status=status.HTTP_200_OK)
         
         except Exception as e:
-            logger.error(f'Error in GET method: {e}')
+            logger.error(f'Error in GET method: {str(e)}')
             return Response({'detail': 'Error retrieving guest data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -85,5 +85,5 @@ class InviteView(APIView):
             return Response(data, status=status.HTTP_201_CREATED) 
         
         except Exception as e:
-            logger.error(f'Error in POST method: {e}')
+            logger.error(f'Error in POST method: {str(e)}')
             return Response({'detail': 'Error inviting guest'}, status=status.HTTP_400_BAD_REQUEST)
