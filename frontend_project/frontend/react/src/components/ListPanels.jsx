@@ -29,11 +29,13 @@ function ShoppingListPanel() {
     const dispatch = useDispatch();
     const [shoppingItems, setShoppingItems] = useState([]);
     const [nextShoppingDay, setNextShoppingDay] = useState([]);
+    const token = useSelector(state => state.token.token);
+
 
     //読み込み時にshoppingItemデータを取得
     useEffect(() => {
         const fetchShoppingList = async() => {
-            const response = await fetchShoppingListRequest(selectedList.list_id);
+            const response = await fetchShoppingListRequest(selectedList.list_id, token);
             console.log('data;',response.data);
             // dispatch(setShoppingItemsAllInfo(response.data));
             setShoppingItems(response.data.items);
@@ -46,9 +48,9 @@ function ShoppingListPanel() {
     //見送りボタン（買い物リストから外す）
     const handlePass = async(item) => {
         try {
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false, token);
             // dispatch(updateToList({ item_id: item.item_id, to_list: response.data.to_list }));
-            const response = await fetchShoppingListRequest(selectedList.list_id);
+            const response = await fetchShoppingListRequest(selectedList.list_id, token);
             setShoppingItems(response.data.items);
             setNextShoppingDay(response.data);
             // console.log(currentShoppingList.data);
@@ -60,15 +62,15 @@ function ShoppingListPanel() {
     //買ったボタン（買い物リストから外す・購入日を今日にする）
     const handleBought = async(item) => {
         try{
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", false, token);
             const today = new Date();
             const formattedDate = today.toISOString().slice(0, 10);
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "last_purchase_at", formattedDate);
-            const response = await fetchShoppingListRequest(selectedList.list_id);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "last_purchase_at", formattedDate, token);
+            const response = await fetchShoppingListRequest(selectedList.list_id, token);
             // dispatch(setShoppingItemsAllInfo(response.data));
             setShoppingItems(response.data.items);
             // setNextShoppingDay(response.data);
-            const response3 = await fetchItemsOfListRequest(selectedList.list_id);
+            const response3 = await fetchItemsOfListRequest(selectedList.list_id, token);
             // console.log("response3:",response3);
             // dispatch(setItemAllInfo(response3.data.items));
 
@@ -142,12 +144,14 @@ function ItemsListPanel() {
     const dispatch = useDispatch();
     const selectedList = useSelector(state => state.selectedList);
     const userSetRemind = useSelector(state => state.user.remind);
+    const token = useSelector(state => state.token.token);
+
 
     // const items = useSelector(state => state.items.items);
 
     const handleAddNewItem = async() => {
         try {
-            const newItem = await AddNewItem(selectedList.list_id);
+            const newItem = await AddNewItem(selectedList.list_id, token);
             // const response = await fetchItemsOfListRequest(selectedList.list_id);
             setItemListItems(newItem);
         } catch (err) {
@@ -157,9 +161,9 @@ function ItemsListPanel() {
     //読み込み時にitemデータを取得
     useEffect(() => {
         const fetchListAndItemsInfo = async() => {
-            const listsInfo = await fetchListInfoRequest(selectedList.list_id);
+            const listsInfo = await fetchListInfoRequest(selectedList.list_id, token);
             setListsInfo(listsInfo.data);
-            const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id);
+            const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
             setItemListItems(itemsInfo.data.items);
             console.log('listsinfo',listsInfo);
             console.log('itemsinfo', itemsInfo);
@@ -169,7 +173,7 @@ function ItemsListPanel() {
 
     //テキスト形式の項目の更新
     const updateItem = async(item, key, newValue) => {
-        const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, key, newValue);
+        const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, key, newValue, token);
         setItemListItems(prevItems => prevItems.map(prevItem =>
             prevItem.item_id === item.item_id ? { ...prevItem, [key]: newValue } : prevItem
         ));
@@ -210,7 +214,7 @@ function ItemsListPanel() {
     const changeManageTarget = async(item) => {
         const newManageTarget = !item.manage_target;
         try {
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "manage_target", newManageTarget);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "manage_target", newManageTarget, token);
             setItemListItems(prevItems => prevItems.map(prevItem => 
                 prevItem.item_id === item.item_id ? { ...prevItem, manage_target: newManageTarget } : prevItem
             ));
@@ -222,7 +226,7 @@ function ItemsListPanel() {
     const changeRemindByItem = async(item) => {
         const newRemindByItem = !item.remind_by_item;
         try {
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "remind_by_item", newRemindByItem);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "remind_by_item", newRemindByItem, token);
             setItemListItems(prevItems => prevItems.map(prevItem => 
                 prevItem.item_id === item.item_id ? { ...prevItem, remind_by_item: newRemindByItem } : prevItem
             ));
@@ -233,7 +237,7 @@ function ItemsListPanel() {
     //買い物リストに入れる
     const toShoppingLists = async(item) => {
         try {
-            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", true);
+            await updateItemInfoRequest(selectedList.list_id, item.item_id, "to_list", true, token);
             setItemListItems(prevItems => prevItems.map(prevItem => 
                 prevItem.item_id === item.item_id ? { ...prevItem, to_list: true } : prevItem
             ));
@@ -261,7 +265,7 @@ function ItemsListPanel() {
     // }
     const deleteItemtest = async(item) => {
         try {
-            const response = await deleteItemRequest(selectedList.list_id, item.item_id);
+            const response = await deleteItemRequest(selectedList.list_id, item.item_id, token);
             if (response.status === 200) {
                 setItemListItems(prevItems => prevItems.filter(prevItem => prevItem.item_id !== item.item_id));
             } else {
@@ -402,7 +406,7 @@ function ItemsListPanel() {
                     <input
                         type='checkbox'
                         checked={item.remind_by_item}
-                        onChange={ () => changeRemindByItem(item) } 
+                        onChange={ () => changeRemindByItem(item) }
                         disabled={!userSetRemind}/>
                 </td >
                 {/* 削除 */}
@@ -411,7 +415,7 @@ function ItemsListPanel() {
                 </td>
             </tr>
         </tbody>
-            
+
         </>
         )
     );

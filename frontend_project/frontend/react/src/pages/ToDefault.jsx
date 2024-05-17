@@ -10,9 +10,11 @@ const ToDefault = () => {
     const dispatch = useDispatch();
     const lists = useSelector(state => state.user.lists);
     const default_list = useSelector(state => state.user.default_list);
+    const token = useSelector(state => state.token.token);
+
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const response = await fetchUserInfoRequest();
+            const response = await fetchUserInfoRequest(token);
             dispatch(setUser(response.data.user));
             dispatch(setUser({lists:response.data.lists}));
             if(response.data.lists.length > 0){

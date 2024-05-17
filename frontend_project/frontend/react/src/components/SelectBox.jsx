@@ -7,20 +7,20 @@ import { setItemAllInfo } from "../reducers/itemSlice.jsx";
 import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice.jsx";
 
 
-function SelectList() {
+function SelectList({lists}) {
     const selectedList = useSelector(state => state.selectedList)
 
     const dispatch = useDispatch();
-    const [lists, setLists] = useState([]);
+    // const [lists, setLists] = useState([]);
 
-    useEffect(() => {
-        const fetchLists = async() => {
-            const response = await fetchUserInfoRequest();
-            setLists(response.data.lists);
-            console.log('res',response.data.lists);
-        };
-        fetchLists();
-    },[]);
+    // useEffect(() => {
+    //     const fetchLists = async() => {
+    //         const response = await fetchUserInfoRequest();
+    //         setLists(response.data.lists);
+    //         console.log('res',response.data.lists);
+    //     };
+    //     fetchLists();
+    // },[]);
 
     
     
@@ -29,13 +29,13 @@ function SelectList() {
         const selected = lists.find(list => list.list_id == event.target.value);
         dispatch(setSelectedList(selected));
         //選んだリストの情報を取得
-        const listInfo = await fetchListInfoRequest(event.target.value);
+        const listInfo = await fetchListInfoRequest(event.target.value, token);
         dispatch(setSelectedList(listInfo.data));
         //選んだリストの中のアイテムを取得
-        const itemsInfo = await fetchItemsOfListRequest(event.target.value);
+        const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
         // dispatch(setItemAllInfo(itemsInfo.data.items))
         //選んだリストの買い物リストを取得
-        const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
+        const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id, token);
         // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
 
     }
@@ -59,18 +59,18 @@ function SelectList() {
     );
 
 }
-function ForInviteSelectList({ onSelectChange }) {
+function ForInviteSelectList({ onSelectChange, lists }) {
     const [selectedListId, setSelectedListId] = useState('');
-    const [lists, setLists] = useState([]);
+    // const [lists, setLists] = useState([]);
 
-    useEffect(() => {
-        const fetchLists = async () => {
-            const response = await fetchUserInfoRequest();
-            setLists(response.data.lists);
-            console.log('res', response.data.lists);
-        };
-        fetchLists();
-    }, []);
+    // useEffect(() => {
+    //     const fetchLists = async () => {
+    //         const response = await fetchUserInfoRequest();
+    //         setLists(response.data.lists);
+    //         console.log('res', response.data.lists);
+    //     };
+    //     fetchLists();
+    // }, []);
 
     // リストセレクターでリストを変更したとき
     const handleSelectChange = async (event) => {

@@ -32,7 +32,7 @@ function MyLists({ lists, token }) {
         dispatch(setUser(newUserInfo.data.user));
         if (newUserInfo.data.lists.length > 0) {
             const lastIndex = newUserInfo.data.lists.length - 1;
-            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
+            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
             dispatch(setSelectedList(listInfo.data));
         } else {
             dispatch(setSelectedList(null));

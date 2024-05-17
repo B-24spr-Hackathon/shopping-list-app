@@ -18,7 +18,7 @@ import ShoppingList from "./pages/ShoppingList";
 import LineLoginForm from "./pages/LineLoginForm";
 import ToDefault from "./pages/ToDefault";
 import LineLoginMethod from "./utils/LineLoginMethod";
-import TestApp from "./pages/test";
+
 
 function App() {
   return (
@@ -36,7 +36,6 @@ function App() {
             <Route path="/lineloginform" element={<LineLoginForm />} />
             <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
-            <Route path="/test" element={<TestApp />} />
             
 
           </Routes>

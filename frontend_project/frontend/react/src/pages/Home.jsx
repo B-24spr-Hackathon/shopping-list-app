@@ -32,10 +32,11 @@ function Home() {
     const selectedList = useSelector(state => state.selectedList);
     const selectedListId = useSelector(state => state.selectedList.list_id);
     const handleAddNewList = AddNewList();
-    const handleAddNewItem = AddNewItem();
+
     const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
     const [lists, setLists] = useState([]);
+    const [message, setMessage] = useState("");
 
     
     //homeを読み込み時に実行
@@ -43,28 +44,34 @@ function Home() {
         const fetchUserInfo = async() => {
             //ユーザー情報取得
             const userInfo = await fetchUserInfoRequest(token);
-            // dispatch(setUser(userInfo.data.user));
+            console.log('homeEffect');
+            dispatch(setUser(userInfo.data.user));
             // dispatch(setUser({lists:userInfo.data.lists}));
             //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
             if (userInfo.data.lists.length == 0){
-                await handleAddNewList();
-            } else {
-                dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
+                setMessage("まだリストがありません");
+                // await handleAddNewList();
+            }else{
+                setLists(userInfo.data.lists);
+
+
             }
+            // else {
+            //     dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
+            // }
             //改めてユーザー情報取得
-            const newUserInfo = await fetchUserInfoRequest(token);
-            setLists(newUserInfo.data.lists);
-            const lastIndex = newUserInfo.data.lists.length - 1;
+            // const newUserInfo = await fetchUserInfoRequest(token);
+            // setLists(newUserInfo.data.lists);
+            // const lastIndex = newUserInfo.data.lists.length - 1;
             //selectedListのリスト情報を取得
-            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
-            dispatch(setSelectedList(listInfo.data));
+            // const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
+            // dispatch(setSelectedList(listInfo.data));
             //該当リスト内のitem情報を取得
             // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
             // dispatch(setItemAllInfo(itemsInfo.data.items));
             //該当リストの買い物リストを取得
             // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
             // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
-            console.log('token',token);
 
         };
         fetchUserInfo();
@@ -88,7 +95,7 @@ function Home() {
     // }
 
     const handleFetchShoppingList = async() => {
-        const response = await fetchShoppingListRequest(selectedListId)
+        const response = await fetchShoppingListRequest(selectedListId, token)
         console.log('fetchshopping:', response);
     }
 
@@ -98,7 +105,7 @@ function Home() {
             dispatch(setUser(newUserInfo.data.user));
             const lastIndex = newUserInfo.data.lists.length - 1;
             //selectedListのリスト情報を取得
-            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
+            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
             dispatch(setSelectedList(listInfo.data));
             //該当リスト内のitem情報を取得
             // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
@@ -159,12 +166,13 @@ function Home() {
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
-                    <MyLists lists={lists} />
+                    <MyLists lists={lists} token={token} />
+                    <p>{message}</p>
                     
                     
                     <AddBtn children="+" onClick={handleAddNewList} onChange={""} />
                     <TextInput type="text" placeholder="user_id" value={friendUserId} onChange={e => setFriendUserId(e.target.value)}/>
-                    <ForInviteSelectList onSelectChange={handleSelectChange} />
+                    <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
                     <p>検索した友達ユーザー名{friendUserInfo.user_name}</p>
                     <TestBtn onClick={handleSearchFriend} children='友達検索' />
                     <PermissionDropdown value={authority} onChange={handleAuthorityChange} />

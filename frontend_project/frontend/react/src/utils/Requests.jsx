@@ -12,9 +12,9 @@ export const apiEndpoint = {
     lineLogin: "api/line-login/",
     invite: "api/invite/",
 };
-// const token = useSelector(state => state.token.token);
 
-export const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials, token }) => {
+
+const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials, token }) => {
     try {
         const response = await axios({
             method: method,
@@ -60,6 +60,7 @@ export const loginRequest = async(email, password) => {
     });
     return response;
 }
+//新規登録のリクエスト
 export const signUpRequest = async(user_id, user_name, email, password) => {
     const response = await apiRequest({
         method: 'POST',
@@ -103,7 +104,7 @@ export const lineLoginRequest = async(line_id) => {
 }
 
 //新しい管理商品リストを作成するリクエスト
-export const addNewListRequest = async() => {
+export const addNewListRequest = async(token) => {
     const response = await apiRequest({
         method: 'POST',
         apiEndpoint: apiEndpoint.list,
@@ -112,6 +113,7 @@ export const addNewListRequest = async() => {
             shopping_day: 1,
         },
         withCredentials: true,
+        token: token,
     });
     return response;
 }
@@ -139,17 +141,18 @@ export const deleteListRequest = async( list_id, token ) => {
     return response;
 }
 //管理商品リストを取得するリクエスト
-export const fetchListInfoRequest = async( list_id ) => {
+export const fetchListInfoRequest = async( list_id, token ) => {
     const response = await apiRequest({
         method: 'GET',
         apiEndpoint: apiEndpoint.list + list_id + '/',
         withCredentials: true,
+        token: token,
     });
     return response;
 }
 
 //新しい商品を追加するリクエスト
-export const addNewItemRequest = async( list_id ) => {
+export const addNewItemRequest = async( list_id, token ) => {
     const response = await apiRequest({
         method: 'POST',
         apiEndpoint: apiEndpoint.items + list_id + '/',
@@ -158,20 +161,22 @@ export const addNewItemRequest = async( list_id ) => {
             item_name: "商品名を入力",
         },
         withCredentials: true,
+        token: token,
     });
     return response;
 }
 //リスト内のアイテムを取得するリクエスト
-export const fetchItemsOfListRequest = async( list_id ) => {
+export const fetchItemsOfListRequest = async( list_id, token ) => {
     const response = await apiRequest({
         method: 'GET',
         apiEndpoint: apiEndpoint.items + list_id + '/',
         withCredentials: true,
+        token: token,
     });
     return response;
 }
 //アイテムの情報を更新するリクエスト
-export const updateItemInfoRequest = async( list_id, item_id, key, newItemName  ) => {
+export const updateItemInfoRequest = async( list_id, item_id, key, newItemName, token  ) => {
     const response = await apiRequest({
         method: 'PATCH',
         apiEndpoint: apiEndpoint.items + list_id + "/" + item_id + "/",
@@ -179,24 +184,27 @@ export const updateItemInfoRequest = async( list_id, item_id, key, newItemName  
             [key]: newItemName
         },
         withCredentials: true,
+        token: token,
     });
     return response;
 }
 //アイテムを削除するリクエスト
-export const deleteItemRequest = async( list_id, item_id ) => {
+export const deleteItemRequest = async( list_id, item_id, token ) => {
     const response = await apiRequest({
         method: 'DELETE',
         apiEndpoint: apiEndpoint.items + list_id + "/" + item_id + "/",
         withCredentials: true,
+        token: token,
     });
     return response;
 }
 //お買い物リストを取得するリクエスト
-export const fetchShoppingListRequest = async( list_id ) => {
+export const fetchShoppingListRequest = async( list_id, token ) => {
     const response = await apiRequest({
         method: 'GET',
         apiEndpoint: apiEndpoint.shoppingList + list_id + "/",
         withCredentials: true,
+        token: token,
     });
     return response;
 }
