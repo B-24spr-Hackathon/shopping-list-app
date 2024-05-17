@@ -76,6 +76,14 @@ class EntryAcceptView(APIView):
         if current_user != list_instance.owner_id and current_user != guest.guest_id:
             return Response({'detail': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
+        # リストのオーナーは、member_status=2のデータのみ承認可能
+        if current_user == list_instance.owner_id and guest.member_status != 2:
+            return Response({'detail': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+
+        # リストのユーザーは、member_status=1のデータのみ承認可能
+        if current_user == guest.guest_id and guest.member_status != 1:
+            return Response({'detail': '自身が申請したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+
         # member_statusカラムの値を更新
         guest.member_status = 0
         guest.save()
