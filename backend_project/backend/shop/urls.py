@@ -26,7 +26,9 @@ urlpatterns = [
     # 招待/申請機能 拒否DELETE
     path('entry/decline/<member_id>/', entry.EntryDeclineView.as_view(), name="decline"),
     # 申請機能 GET
-    path('apply/<user_id>/', apply.ApplyView.as_view(), name="apply"),
+    path('apply/<user_id>/', apply.ApplyView.as_view(), name="apply-get"),
+    # 申請機能 POST
+    path('apply/', apply.ApplyView.as_view(), name="apply-post"),
 ]
 
 urlpatterns += [

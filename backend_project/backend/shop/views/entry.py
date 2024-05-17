@@ -86,7 +86,6 @@ class EntryAcceptView(APIView):
             if not other_invites:
                 current_user.invitation = False
                 current_user.save()
-                print("保存されたユーザー情報:", current_user)
         # アクセスユーザーがリストオーナーの場合
         elif current_user == list_instance.owner_id:
             # 他に申請中のステータスがなければ申請フラグをFalseに
@@ -95,7 +94,6 @@ class EntryAcceptView(APIView):
             if not other_requests:
                 current_user.request = False
                 current_user.save()
-                print("保存されたユーザー情報:", current_user)
         else:
             return Response({'detail': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
