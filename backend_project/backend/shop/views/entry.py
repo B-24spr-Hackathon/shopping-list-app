@@ -112,6 +112,10 @@ class EntryDeclineView(APIView):
         current_user: User = request.user
         # member_statusを取得
         member_status = guest.member_status
+        # ゲストユーザーを取得
+        guest_user = guest.guest_id
+        # オーナーユーザーを取得
+        owner_user = list_instance.owner_id
         # ユーザー名を取得
         user_name = guest.guest_id.user_name
         # ゲストを削除
@@ -121,16 +125,16 @@ class EntryDeclineView(APIView):
             # ゲストについて他に招待中のステータスがなければinvitationをFalseに
             other_invites = Member.objects.filter(guest_id=guest.guest_id, member_status=1).exists()
             if not other_invites:
-                current_user.invitation = False
-                current_user.save()
+                guest_user.invitation = False
+                guest_user.save()
         # member_status=2の場合、ゲストがアクセス時は申請中止、オーナーがアクセス時は申請拒否
         elif member_status == 2:
             # オーナーについて他に申請中のステータスがなければrequestをFalseに
             owner_lists = List.objects.filter(owner_id=current_user)
             other_requests = Member.objects.filter(list_id__in=owner_lists, member_status=2).exists()
             if not other_requests:
-                current_user.request = False
-                current_user.save()
+                owner_user.request = False
+                owner_user.save()
         else:
             return Response({'detail': '拒否または中止する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
                     
