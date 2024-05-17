@@ -7,6 +7,9 @@ from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import List
 from shop.authentication import CustomJWTAuthentication
 from shop.serializers.user import SignupSerializer, GetUpdateUserSerializer
+import logging
+
+logger = logging.getLogger("backend")
 
 
 """
@@ -28,9 +31,12 @@ class UserView(APIView):
         else:
             return  [IsAuthenticated()]
 
-
     # GETリクエストの処理（表示）
     def get(self, request):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+
         user = request.user
         response_serializer = GetUpdateUserSerializer(user)
         lists = List.objects.filter(owner_id=user.user_id).values("list_id", "list_name")
@@ -40,9 +46,11 @@ class UserView(APIView):
             "lists": response_lists
         }, status=status.HTTP_200_OK)
 
-
     # POSTリクエストの処理（登録）
     def post(self, request):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        logger.info(f"{request.data}")
+
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -51,25 +59,34 @@ class UserView(APIView):
                 "user": serializer.data,
                 "access": str(token)
             }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        logger.error(f"{serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # PATCHリクエストの処理（更新）
     def patch(self, request, *args, **kwargs):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        logger.info(f"{request.data}")
+
         user = request.user
         serializer = GetUpdateUserSerializer(user, data=request.data,
-                                       context={"request": request},
-                                       partial=True)
+                                             context={"request": request},
+                                             partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({
                 "user": serializer.data
             }, status=status.HTTP_200_OK)
+
+        logger.error(f"{serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
 
     # DELETEリクエストの処理（退会）
     def delete(self, request):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+
         user = request.user
         response_user = {
             "user_id": user.user_id,

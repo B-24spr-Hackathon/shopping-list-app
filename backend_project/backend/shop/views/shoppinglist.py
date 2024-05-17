@@ -1,14 +1,17 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from shop.models import Item, List, Member
 from shop.serializers.shoppinglist import ShoppingListSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from shop.authentication import CustomJWTAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from shop.permissions import IsOwnerOrGuest
 import calendar
 from datetime import date
+import logging
+
+logger = logging.getLogger("backend")
 
 
 # 買い物リスト表示(GET)
@@ -17,8 +20,18 @@ class ShoppingListView(APIView):
     permission_classes = [IsAuthenticated, IsOwnerOrGuest] 
 
     def get(self, request, list_id):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+
         # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
+        try:
+            list_instance = get_object_or_404(List, pk=list_id)
+        except Http404:
+            logger.error("リストが存在しない")
+            return Response({"error": "リストが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
+        
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         # リストに紐づくアイテムを取得
@@ -41,14 +54,14 @@ class ShoppingListView(APIView):
             'authority': authority,
             'items': serializer.data
         }
-        return Response(response_data)
-    
+        return Response(response_data, status=status.HTTP_200_OK)
 
     # 買い物予定日の計算
     def calculate_next_shopping_day(self, shopping_day):
         if shopping_day in [None, '', 'null'] :
+            logger.info("買い物日未設定")
             return "買い物日は設定されていません"
-    
+
         today = date.today()
         current_year = today.year
         current_month = today.month
@@ -59,6 +72,7 @@ class ShoppingListView(APIView):
         shopping_date_this_month = date(current_year, current_month, adjusted_day_this_month)
 
         if today <= shopping_date_this_month:
+            logger.info("今月の買い物日")
             return shopping_date_this_month
         else:
             next_month = current_month + 1 if current_month < 12 else 1
@@ -66,9 +80,5 @@ class ShoppingListView(APIView):
             _, last_day_next_month = calendar.monthrange(next_year, next_month)
             adjusted_day_next_month = min(shopping_day, last_day_next_month)
 
+            logger.info("来月の買い物日")
             return date(next_year, next_month, adjusted_day_next_month)
-        
-
-
-
-    

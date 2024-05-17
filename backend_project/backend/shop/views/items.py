@@ -1,21 +1,35 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from ..models import Item, List
 from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, ItemUpdateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from shop.authentication import CustomJWTAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from shop.permissions import IsOwnerOrGuestWithAuthority
+import logging
+
+logger = logging.getLogger("backend")
+
 
 class ItemCreateView(APIView):
     # JWT認証を要求、オーナーまたは編集権限を持つゲストのみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
     # アイテムリスト表示
-    def get(self, request, list_id):      
+    def get(self, request, list_id):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+
         # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
+        try:
+            list_instance = get_object_or_404(List, pk=list_id)
+        except Http404:
+            logger.error("リストが存在しない")
+            return Response({"error": "リストが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
+
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         # 取得したリストに紐づくアイテムを取得
@@ -27,41 +41,64 @@ class ItemCreateView(APIView):
             'list_name': list_instance.list_name,
             'items': serializer.data
         }
-        return Response(response_data)
+        return Response(response_data, status=status.HTTP_200_OK)
 
-    
     # アイテム新規作成
     def post(self, request, list_id):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        logger.info(f"{request.data}")
+
         # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
+        try:
+            list_instance = get_object_or_404(List, pk=list_id)
+        except Http404:
+            logger.error("リストが存在しない")
+            return Response({"error": "リストが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
+        
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         serializer = ItemCreateSerializer(data=request.data)
         # list_idを使ってListインスタンスを取得し、アイテムを保存
         if serializer.is_valid():
             serializer.save(list_id=list_instance)
-        # 作成、保存されたアイテムをシリアライズして返す
+            # 作成、保存されたアイテムをシリアライズして返す
             response_serializer = ItemResponseSerializer(serializer.instance)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         else:
+            logger.error(f"{serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ItemDetailView(APIView):
     # JWT認証を要求、オーナーまたは編集権限を持つゲストのみ許可
     permission_classes = [IsAuthenticated, IsOwnerOrGuestWithAuthority]
 
-    # アイテム更新            
+    # アイテム更新
     def patch(self, request, list_id, item_id):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        logger.info(f"{request.data}")
+
         # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
+        try:
+            list_instance = get_object_or_404(List, pk=list_id)
+        except Http404:
+            logger.error("リストが存在しない")
+            return Response({"error": "リストが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
+
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
 
         # アイテムのインスタンスを取得
-        item_instance = get_object_or_404(Item, pk=item_id)
+        try:
+            item_instance = get_object_or_404(Item, pk=item_id)
+        except Http404:
+            logger.error("アイテムが存在しない")
+            return Response({"error": "アイテムが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         serializer = ItemUpdateSerializer(item_instance, data=request.data, context={"request": request}, partial=True)
-    
+
         if serializer.is_valid():
             # データを更新して保存
             to_list = request.data.get('to_list', item_instance.to_list)
@@ -71,16 +108,32 @@ class ItemDetailView(APIView):
             # 更新されたフィールドのみをレスポンスとして返す
             return Response(update_fields, status=status.HTTP_200_OK)
         else:
+            logger.error(f"{serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # アイテム削除
     def delete(self, request, list_id, item_id):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+
         # リストを取得
-        list_instance = get_object_or_404(List, pk=list_id)
+        try:
+            list_instance = get_object_or_404(List, pk=list_id)
+        except Http404:
+            logger.error("リストが存在しない")
+            return Response({"error": "リストが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
+
         # パーミッションチェックを実行
         self.check_object_permissions(self.request, list_instance)
         # アイテムのインスタンスを取得
-        item_instance = get_object_or_404(Item, pk=item_id)
+        try:
+            item_instance = get_object_or_404(Item, pk=item_id)
+        except Http404:
+            logger.error("アイテムが存在しない")
+            return Response({"error": "アイテムが存在しません"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         response_serializer = ItemResponseSerializer(item_instance)
         serialized_data = response_serializer.data
@@ -88,6 +141,3 @@ class ItemDetailView(APIView):
         item_instance.delete()
         # 削除したアイテムのデータを表示する
         return Response(serialized_data, status=status.HTTP_200_OK)
-
-
-

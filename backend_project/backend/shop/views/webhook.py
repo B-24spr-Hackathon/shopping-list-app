@@ -2,10 +2,13 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import requests, jwt, base64, hashlib, hmac
+import requests, jwt, base64, hashlib, hmac, json
 from shop.models import User, List, Item
 from shop.serializers.user import GetUpdateUserSerializer
 from shop.serializers.webhook import ItemSerializer
+import logging
+
+logger = logging.getLogger("backend")
 
 
 # デフォルトの値を定義
@@ -21,6 +24,7 @@ headers = {
     "Authorization": f"Bearer {access_token}"
 }
 
+
 """
 LineWebhookView
 LINEのWebhookに対応するView
@@ -31,6 +35,12 @@ class LineWebhookView(APIView):
 
     # POSTリクエストで届くWebhookイベントの処理
     def post(self, request):
+        request_body = request.body
+        request_data = json.loads(request_body.decode("utf-8"))
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        logger.info(f"{request_data}")
+
+        logger.info("Webhook処理開始")
         # 署名の検証
         line_signature = request.headers.get("x-line-signature")
         body = request.body
@@ -38,11 +48,12 @@ class LineWebhookView(APIView):
                         body, hashlib.sha256).digest()
         signature = base64.b64decode(hash).decode("utf-8")
         if not hmac.compare_digest(signature, line_signature):
+            logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # リクエストボディからeventsを取得
-        events = request.data.get("events")
+        events = request_data.get("events")
 
         # 取得したeventsを1つずつ処理
         for event in events:
@@ -53,11 +64,13 @@ class LineWebhookView(APIView):
 
                 # 受取ったメッセージがtextの時の処理
                 if event["message"]["type"] == "text":
+                    # メッセージ文がJWTか確認
                     text = event["message"]["text"]
                     user_id = verify_jwt(text)
 
                     # メッセージがjwtの時の処理（line_id, line_statusをDBに保存）
-                    if user_id:
+                    if isinstance(user_id, str):
+                        logger.info(f"JWTの受信(user_id: {user_id})")
                         line_id = event["source"]["userId"]
                         user = User.objects.get(user_id=user_id)
                         serializer = GetUpdateUserSerializer(user,
@@ -65,6 +78,7 @@ class LineWebhookView(APIView):
 
                         # line_idをDBに保存出来た時の処理
                         if serializer.is_valid():
+                            logger.info("line_id, line_statusの保存成功")
                             serializer.save()
                             user_name = serializer.data["user_name"]
                             data = {
@@ -77,15 +91,18 @@ class LineWebhookView(APIView):
 
                             # リダイレクトURLの送信
                             response = requests.post(reply_url, headers=headers, json=data)
-                            if response.status_code != 200:
-                                print(f"連携の返信メッセージ送信エラー: {response.status_code}, {response.text}")
+                            if response.ok:
+                                logger.info("LINE連携通知成功")
+                            else:
+                                logger.error(f"LINE連携通知失敗: {response.text}")
 
                         # line_idをDBに保存できなかった時の処理
                         else:
-                            print(f"line_id保存エラー")
+                            logger.error("line_idの保存失敗")
 
                     # メッセージがjwt以外の時の処理
                     else:
+                        logger.info(f"JWT以外のtext受信(user_id: {user_id})")
                         data = {
                             "replyToken": reply_token,
                             "messages": {
@@ -96,11 +113,14 @@ class LineWebhookView(APIView):
 
                         # 対応していない旨のメッセージ送信
                         response = requests.post(reply_url, headers=headers, json=data)
-                        if response.status_code != 200:
-                            print(f"連携以外の返信メッセージ送信エラー: {response.status_code}, {response.text}")
+                        if response.ok:
+                            logger.info("定型文送信成功")
+                        else:
+                            logger.error(f"定型文送信失敗: {response.text}")
 
                 # text以外のメッセージに対する処理
                 else:
+                    logger.info("text以外の受信")
                     data = {
                         "replyToken": reply_token,
                         "messages": {
@@ -111,21 +131,26 @@ class LineWebhookView(APIView):
 
                     # 対応していない旨のメッセージ送信
                     response = requests.post(reply_url, headers=headers, json=data)
-                    if response.status_code != 200:
-                        print(f"text以外の返信メッセージ送信エラー: {response.status_code}, {response.text}")
+                    if response.ok:
+                        logger.info("定型文送信成功")
+                    else:
+                        logger.error(f"定型文送信失敗: {response.text}")
 
             # 友達登録解除の時の処理
             elif event["type"] == "unfollow":
                 line_id = event["source"]["userId"]
                 user = User.objects.get(line_id=line_id)
 
+                logger.info(f"友達登録解除の受信(user_id: {user.user_id})")
+
                 # usersテーブルのline_status, remindをfalseに変更
                 serializer = GetUpdateUserSerializer(user,
                     data={"line_status": False, "remind": False}, partial=True)
                 if serializer.is_valid():
+                    logger.info("remind, line_status更新成功")
                     serializer.save()
                 else:
-                    print("友達解除でのline_status保存エラー")
+                    logger.error("remind, line_status更新失敗")
 
                 # itemsテーブルの関係するitemのremind_by_itemをfalseに設定
                 lists = List.objects.filter(owner_id=user_id)
@@ -133,9 +158,10 @@ class LineWebhookView(APIView):
                 for item in items:
                     serializer = ItemSerializer(item, data={"remind_by_item": False}, partial=True)
                     if serializer.is_valid():
+                        logger.info("remind_by_itemの更新成功")
                         serializer.save()
                     else:
-                        print(f"友達解除でのremind_by_item保存エラー: {item.item_id}")
+                        logger.error(f"remind_by_itemの更新失敗: {response.text}")
 
             # 友達登録時の処理
             elif event["type"] == "follow":
@@ -143,14 +169,17 @@ class LineWebhookView(APIView):
                 line_id = event["source"]["userId"]
                 user = User.objects.get(line_id=line_id)
 
+                logger.info(f"友達登録の受信(user_id: {user.user_id})")
+
                 # usersテーブルのline_statusをtrueに変更
                 serializer = GetUpdateUserSerializer(
                     user, data={"line_status": True}, partial=True
                 )
                 if serializer.is_valid():
+                    logger.info("line_statusの更新成功")
                     serializer.save()
                 else:
-                    print("友達登録でのline_status保存エラー")
+                    logger.error("line_statusの更新失敗")
 
                 # メッセージの送信
                 data = {
@@ -162,14 +191,18 @@ class LineWebhookView(APIView):
                 }
 
                 response = requests.post(reply_url, headers=headers, json=data)
-                if response.status_code != 200:
-                    print(f"友達登録の返信メッセージ送信エラー: {response.status_code}, {response.text}")
+                if response.ok:
+                    logger.info("友達登録の返信成功")
+                else:
+                    logger.error(f"友達登録の返信失敗: {response.text}")
 
             # postback（ユーザーか通知に対して起こしたリアクション）の処理
             elif event["type"] == "postback":
                 reply_token = event["replyToken"]
                 line_id = event["source"]["userId"]
                 user = User.objects.get(line_id=line_id)
+
+                logger.info(f"postbackの受信(user_id: {user.user_id})")
 
                 data = event["postback"]["data"]
 
@@ -178,9 +211,10 @@ class LineWebhookView(APIView):
                     item = Item.objects.get(item_id=data)
                     serializer = ItemSerializer(item, data={"to_list": True}, partial=True)
                     if serializer.is_valid():
+                        logger.info("to_listの更新成功")
                         serializer.save()
                     else:
-                        print("アイテムのto_list保存エラー")
+                        logger.error("to_listの更新失敗")
 
                     # メッセージの送信
                     data = {
@@ -192,8 +226,10 @@ class LineWebhookView(APIView):
                     }
 
                     response = requests.post(reply_url, headers=headers, json=data)
-                    if response.status_code != 200:
-                        print(f"買い物リストに追加した時の返信メッセージ送信エラー: {response.status_code}, {response.text}")
+                    if response.ok:
+                        logger.info("買い物リスト追加通知の送信成功")
+                    else:
+                        logger.error(f"買い物リスト追加通知の送信失敗: {response.text}")
 
                 # アイテムを買い物リストに追加しない時の処理
                 else:
@@ -207,10 +243,12 @@ class LineWebhookView(APIView):
                     }
 
                     response = requests.post(reply_url, headers=headers, json=data)
-                    if response.status_code != 200:
-                        print(
-                            f"買い物リストに追加しなかった時の返信メッセージ送信エラー: {response.status_code}, {response.text}"
-                        )
+                    if response.ok:
+                        logger.info("追加しない通知の送信成功")
+                    else:
+                        logger.error(f"追加しない通知の送信失敗: {response.text}")
+
+        logger.info("Webhook処理終了")
 
         # eventsの処理が完了したらOKレスポンスを返す
         return Response(status=status.HTTP_200_OK)
