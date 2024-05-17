@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, DeleteListBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, searchFriendRequest } from "../utils/Requests";
+import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchFriendRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
 import { Title } from "../components/Title";
-import { SelectList } from "../components/SelectBox";
+import { ForInviteSelectList, SelectList } from "../components/SelectBox";
 import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
@@ -17,6 +17,8 @@ import { setItemAllInfo } from "../reducers/itemSlice";
 import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice";
 import TextInput from "../components/TextInput";
 import { EditableInput } from "../components/EditableDateInput";
+import PermissionDropdown from "../components/cmbSelectAuthority";
+import MyLists from "../components/MyLists";
 
 
 
@@ -25,7 +27,7 @@ function Home() {
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
-    const lists = useSelector(state => state.user.lists);
+    // const lists = useSelector(state => state.user.lists);
     const items = useSelector(state => state.items.items);
     const selectedList = useSelector(state => state.selectedList);
     const selectedListId = useSelector(state => state.selectedList.list_id);
@@ -33,6 +35,7 @@ function Home() {
     const handleAddNewItem = AddNewItem();
     const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
+    const [lists, setLists] = useState([]);
 
     
     //homeを読み込み時に実行
@@ -50,6 +53,7 @@ function Home() {
             }
             //改めてユーザー情報取得
             const newUserInfo = await fetchUserInfoRequest(token);
+            setLists(newUserInfo.data.lists);
             const lastIndex = newUserInfo.data.lists.length - 1;
             //selectedListのリスト情報を取得
             const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
@@ -111,16 +115,40 @@ function Home() {
     }
 
     const [friendUserId, setFriendUserId] =useState();
+    const [friendUserInfo, setFriendUserInfo] = useState({});
 
     const handleSearchFriend = async() => {
         try{
             const response = await searchFriendRequest(friendUserId, token);
-            console.log('friend',response);
+            setFriendUserInfo(response.data);
+            console.log('info',friendUserInfo);
 
         }catch{
             console.log(err.response.data);
         }
     }
+
+    const [authority, setAuthority] = useState("False");
+
+    const handleInviteFriendToList = async() => {
+        try {
+            const response = await inviteToListRequest( selectedList.list_id, friendUserInfo.user_id, authority, token);
+        }catch{
+            console.log(err.response.data);
+
+        }
+    }
+
+    const handleSelectChange = (listId) => {
+        setSelectedListId(listId);
+        console.log("Selected List ID:", listId);
+    }
+
+
+
+    const handleAuthorityChange = (e) => {
+        setAuthority(e.target.value);
+    };
 
     return (
         <>
@@ -131,16 +159,16 @@ function Home() {
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
-                    <SelectList />
+                    <MyLists lists={lists} />
                     
-                    <EditableInput 
-                        initialValue={selectedList.list_name}
-                        onSave={handleEditListName}
-                        />
-                    <DeleteListBtn children="削除" onClick={handleDeleteList} />
+                    
                     <AddBtn children="+" onClick={handleAddNewList} onChange={""} />
                     <TextInput type="text" placeholder="user_id" value={friendUserId} onChange={e => setFriendUserId(e.target.value)}/>
-                    <TestBtn onClick={handleSearchFriend} children='検索' />
+                    <ForInviteSelectList onSelectChange={handleSelectChange} />
+                    <p>検索した友達ユーザー名{friendUserInfo.user_name}</p>
+                    <TestBtn onClick={handleSearchFriend} children='友達検索' />
+                    <PermissionDropdown value={authority} onChange={handleAuthorityChange} />
+                    <TestBtn onClick={handleInviteFriendToList} children="招待"/>
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
 

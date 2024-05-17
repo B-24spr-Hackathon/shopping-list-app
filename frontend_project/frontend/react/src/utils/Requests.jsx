@@ -210,3 +210,18 @@ export const searchFriendRequest = async( user_id, token ) => {
     });
     return response;
 }
+//リストに招待するリクエスト
+export const inviteToListRequest = async( list_id, user_id, authority, token ) => {
+    const response = await apiRequest({
+        method: 'POST',
+        apiEndpoint: apiEndpoint.invite,
+        data: {
+            list_id: list_id,
+            user_id: user_id,
+            authority: authority
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
