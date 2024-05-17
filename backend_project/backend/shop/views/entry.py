@@ -70,7 +70,11 @@ class EntryAcceptView(APIView):
         # ゲスト、リスト、アクセスしているユーザーを取得
         guest = get_object_or_404(Member, pk=member_id)
         list_instance = guest.list_id
-        current_user: User = request.user    
+        current_user: User = request.user 
+
+        # リストのオーナーでもゲストでもない場合は403 Forbiddenを返す
+        if current_user != list_instance.owner_id and current_user != guest.guest_id:
+            return Response({'detail': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
         # member_statusカラムの値を更新
         guest.member_status = 0
@@ -94,8 +98,6 @@ class EntryAcceptView(APIView):
             if not other_requests:
                 current_user.request = False
                 current_user.save()
-        else:
-            return Response({'detail': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
         data ={'member_status': guest.member_status,}
         return Response(data, status=status.HTTP_200_OK)
@@ -110,6 +112,11 @@ class EntryDeclineView(APIView):
         guest = get_object_or_404(Member, pk=member_id)
         list_instance = guest.list_id
         current_user: User = request.user
+
+        # リストのオーナーでもゲストでもない場合は403 Forbiddenを返す
+        if current_user != list_instance.owner_id and current_user != guest.guest_id:
+            return Response({'detail': '拒否または中止する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
+        
         # member_statusを取得
         member_status = guest.member_status
         # ゲストユーザーを取得
@@ -135,8 +142,6 @@ class EntryDeclineView(APIView):
             if not other_requests:
                 owner_user.request = False
                 owner_user.save()
-        else:
-            return Response({'detail': '拒否または中止する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
                     
         # レスポンス用データ
         data = {
