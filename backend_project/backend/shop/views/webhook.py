@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -209,12 +210,13 @@ class LineWebhookView(APIView):
                 # アイテムを買い物リストに追加する時の処理
                 if type(data) == int:
                     item = Item.objects.get(item_id=data)
-                    serializer = ItemSerializer(item, data={"to_list": True}, partial=True)
+                    today = timezone.now().date()
+                    serializer = ItemSerializer(item, data={"to_list": True, "last_open_at": today}, partial=True)
                     if serializer.is_valid():
-                        logger.info("to_listの更新成功")
+                        logger.info("to_list, last_open_atの更新成功")
                         serializer.save()
                     else:
-                        logger.error("to_listの更新失敗")
+                        logger.error("to_list, last_open_atの更新失敗")
 
                     # メッセージの送信
                     data = {
