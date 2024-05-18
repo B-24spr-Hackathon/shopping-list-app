@@ -14,6 +14,8 @@ export const apiEndpoint = {
     invite: "api/invite/",
 };
 
+export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
+
 
 const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials, token }) => {
     try {

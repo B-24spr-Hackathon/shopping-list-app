@@ -7,7 +7,7 @@ import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
 import { setUser,clearUser } from "../reducers/userSlice";
-import { loginRequest } from "../utils/Requests";
+import { lineUrl, loginRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
 
 function Login() {
@@ -48,7 +48,7 @@ function Login() {
                 <Header />
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ログイン" />
-                    <LineBtn onClick={() => window.location.href='https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid'} children="LINEでログイン"/>
+                    <LineBtn onClick={() => window.location.href=lineUrl } children="LINEでログイン"/>
                     <Bar children="またはメールアドレスでログイン"/>
                     <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                     <TextInput  type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />

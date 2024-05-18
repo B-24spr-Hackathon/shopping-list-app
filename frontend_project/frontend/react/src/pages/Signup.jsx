@@ -7,7 +7,7 @@ import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from "../reducers/userSlice";
 import { useCookies } from 'react-cookie';
-import { signUpRequest } from "../utils/Requests";
+import { lineUrl, signUpRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
 
 function Signup() {
@@ -73,7 +73,7 @@ function Signup() {
                 <Header />
                 <div className="flex flex-col justify-center items-center overflow-auto mb-1">
                     <Title children="IDを登録" />
-                    <LineBtn onClick={() => window.location.href='https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid'} children="LINEでログイン"/>
+                    <LineBtn onClick={() => window.location.href=lineUrl } children="LINEでログイン"/>
                     <Bar children="またはメールアドレスで登録"/>
                         <TextInput  placeholder="ユーザーID" value={user_id} onChange={e => setUser_id(e.target.value)} />
                         <TextInput  placeholder="名前" value={user_name} onChange={e => setUser_name(e.target.value)} />
