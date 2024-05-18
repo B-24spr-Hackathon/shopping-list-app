@@ -103,7 +103,7 @@ def remind_batch():
             
             count_users += 1
 
-    logger.info(f"通知ユーザー数: {count_users}")
+    logger.info(f"開封通知ユーザー数: {count_users}")
     logger.info("開封確認バッチ処理の終了")
 
 
@@ -186,7 +186,7 @@ def shopping_batch():
 
         count_users += 1
 
-    logger.info(f"通知ユーザー数: {count_users}")
+    logger.info(f"買い物日通知ユーザー数: {count_users}")
     logger.info("買い物日通知バッチ処理の終了")
 
 
