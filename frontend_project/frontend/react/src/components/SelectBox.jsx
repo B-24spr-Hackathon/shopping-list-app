@@ -8,7 +8,8 @@ import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice.jsx";
 
 
 function SelectList({lists}) {
-    const selectedList = useSelector(state => state.selectedList)
+    const selectedList = useSelector(state => state.selectedList);
+    const token = useSelector(state => state.token.token);
 
     const dispatch = useDispatch();
     // const [lists, setLists] = useState([]);

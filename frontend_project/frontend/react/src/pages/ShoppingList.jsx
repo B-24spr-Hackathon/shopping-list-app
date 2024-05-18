@@ -42,7 +42,7 @@ function ShoppingList() {
 
                 <ShoppingListPanel />
                 </div>
-            <Footer />
+
         </>
 
     );

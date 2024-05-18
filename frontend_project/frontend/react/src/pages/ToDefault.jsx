@@ -19,8 +19,12 @@ const ToDefault = () => {
             dispatch(setUser({lists:response.data.lists}));
             if(response.data.lists.length > 0){
                 dispatch(setSelectedList(response.data.lists[response.data.lists.length -1]));
+            }else{
+                navigate('/home');
+                return;
             }
-
+            
+            
             if (default_list) {
                 navigate('/items');
             } else {

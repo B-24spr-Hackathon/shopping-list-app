@@ -86,7 +86,7 @@ function Signup() {
                         {passwordError && <p className="text-red-500">{passwordError}</p>} { }
                         {error && <p className="text-red-500">{error}</p>} { }
                 </div>
-                <Footer />
+
             </div>
         </>
 

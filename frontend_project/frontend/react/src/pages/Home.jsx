@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { AddBtn, DeleteListBtn, TestBtn } from "../components/Buttons";
+import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchFriendRequest } from "../utils/Requests";
+import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -19,6 +19,9 @@ import TextInput from "../components/TextInput";
 import { EditableInput } from "../components/EditableDateInput";
 import PermissionDropdown from "../components/cmbSelectAuthority";
 import MyLists from "../components/MyLists";
+import lineLink from "../utils/LineLink";
+import LineLinkBtn from "../utils/LineLink";
+import DropUserBtn from "../utils/DropUser";
 
 
 
@@ -27,6 +30,7 @@ function Home() {
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
+    const userLineRemind = useSelector(state => state.user.remind);
     // const lists = useSelector(state => state.user.lists);
     const items = useSelector(state => state.items.items);
     const selectedList = useSelector(state => state.selectedList);
@@ -37,6 +41,7 @@ function Home() {
     const token = useSelector(state => state.token.token);
     const [lists, setLists] = useState([]);
     const [message, setMessage] = useState("");
+    const [remind, setRemind] = useState(userLineRemind);
 
     
     //homeを読み込み時に実行
@@ -45,6 +50,7 @@ function Home() {
             //ユーザー情報取得
             const userInfo = await fetchUserInfoRequest(token);
             console.log('homeEffect');
+            console.log(remind);
             dispatch(setUser(userInfo.data.user));
             // dispatch(setUser({lists:userInfo.data.lists}));
             //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
@@ -151,6 +157,18 @@ function Home() {
         console.log("Selected List ID:", listId);
     }
 
+    const handleLineRemindChange = async() => {
+        const newLineRemind = !userLineRemind;
+        try {
+            const response = await updateUserInfoRequest('remind', newLineRemind, token);
+            dispatch(setUser({remind:response.data.user.remind}));
+            setRemind(response.data.user.remind);
+
+        }catch(err){
+            console.error('Failed to update manage target:', err);
+        }
+    }
+
 
 
     const handleAuthorityChange = (e) => {
@@ -179,9 +197,17 @@ function Home() {
                     <TestBtn onClick={handleInviteFriendToList} children="招待"/>
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
-
+                    <LineLinkBtn />
+                    <div>
+                        LINE通知ON or OFF
+                    <input
+                        type='checkbox'
+                        checked={remind}
+                        onChange={ () => handleLineRemindChange() }
+                        />
+                    </div>
+                    <DropUserBtn />
                 </div>
-                <Footer />
             </div>
 
         </>

@@ -56,7 +56,7 @@ function Login() {
                     <RegisterOrLogin children="新規登録はこちらから" onClick={ () => navigate('/signup')} />
                     {error && <p className="text-red-500">{error}</p>} { }
                 </div>
-                <Footer />
+
             </div>
         </>
 

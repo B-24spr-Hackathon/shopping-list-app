@@ -10,6 +10,7 @@ export const apiEndpoint = {
     shoppingList: "api/shopping-list/",
     lineFirst: "api/line/",
     lineLogin: "api/line-login/",
+    lineLink: 'api/line-link/',
     invite: "api/invite/",
 };
 
@@ -39,6 +40,29 @@ const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredent
 export const fetchUserInfoRequest = async(token) => {
     const response = await apiRequest({
         method: 'GET',
+        apiEndpoint: apiEndpoint.user,
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+};
+//ユーザー情報を更新するリクエスト
+export const updateUserInfoRequest = async( key, newValue, token  ) => {
+    const response = await apiRequest({
+        method: 'PATCH',
+        apiEndpoint: apiEndpoint.user,
+        data: {
+            [key]: newValue
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//退会のリクエスト
+export const dropUserRequest = async(token) => {
+    const response = await apiRequest({
+        method: 'DELETE',
         apiEndpoint: apiEndpoint.user,
         withCredentials: true,
         token: token,
@@ -99,6 +123,16 @@ export const lineLoginRequest = async(line_id) => {
                 line_id: line_id,
             },
         withCredentials: false,
+    });
+    return response;
+}
+//LINE連携
+export const lineLinkRequest = async(token) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.lineLink,
+        withCredentials: true,
+        toke: token,
     });
     return response;
 }
