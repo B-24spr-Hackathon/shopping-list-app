@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from ..models import Item, List
@@ -141,3 +142,17 @@ class ItemDetailView(APIView):
         item_instance.delete()
         # 削除したアイテムのデータを表示する
         return Response(serialized_data, status=status.HTTP_200_OK)
+
+
+def CheckCycle(cycle, last_open_at):
+    today = timezone.now().date()
+    # 今日-最終開封日の差をint型で取得
+    new_cycle = (today - last_open_at).days
+
+    # 消費頻度が設定よりも短い場合は新しい消費頻度を返す
+    if new_cycle < cycle:
+        return new_cycle
+
+    # 消費頻度が設定よりも長い場合はFalseを返す
+    else:
+        return False
