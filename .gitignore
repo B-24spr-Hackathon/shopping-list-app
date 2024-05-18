@@ -13,6 +13,5 @@ backend_project/backend/backend/__pycache__/settings.cpython-310.pyc
 # celery beatによって生成されるcelerybeat-scheduleファイルを管理対象外とする
 backend_project/backend/celerybeat-schedule
 
-# テスト用のファイルを管理対象外とする
-backend_project/backend/shop/tests.py
+# ログファイルを管理対象外とする
 backend_project/backend/logs/backend.log
