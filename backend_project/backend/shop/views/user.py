@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from shop.models import List
+from shop.models import List, Member
 from shop.authentication import CustomJWTAuthentication
 from shop.serializers.user import SignupSerializer, GetUpdateUserSerializer
 import logging
@@ -39,11 +39,31 @@ class UserView(APIView):
 
         user = request.user
         response_serializer = GetUpdateUserSerializer(user)
+
+        # user_idより所有するリストのlist_id, list_nameを取得
         lists = List.objects.filter(owner_id=user.user_id).values("list_id", "list_name")
-        response_lists = [{"list_id": i["list_id"], "list_name": i["list_name"]} for i in lists]
+        response_lists = [{
+            "list_id": i["list_id"],
+            "list_name": i["list_name"],
+            "is_owner": True,
+            "authority": True
+            } for i in lists]
+
+        # ゲストになっているリストを取得
+        members = Member.objects.filter(guest_id=user, member_status=0)
+        response_members = [{
+            "list_id": j.list_id.list_id,
+            "list_name": j.list_id.list_name,
+            "is_owner": False,
+            "authority": j.authority
+            } for j in members]
+        
+        # レスポンスデータを作成
+        response = response_lists + response_members
+
         return Response({
             "user": response_serializer.data,
-            "lists": response_lists
+            "lists": response
         }, status=status.HTTP_200_OK)
 
     # POSTリクエストの処理（登録）
