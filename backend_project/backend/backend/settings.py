@@ -20,8 +20,6 @@ from datetime import timedelta
 BACKEND_URL = "https://127.0.0.1:8000"
 FRONTEND_URL = "http://127.0.0.1:5173"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -33,11 +31,21 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = [f"{FRONTEND_URL}", "http://localhost:5173"]
-
 """
 デプロイ時に変更する項目（終点）
 """
+
+# 許可するリクエストURL（バックエンドのURL）
+ALLOWED_HOSTS = ["localhost",
+                 "127.0.0.1",
+                 "tech-talk-chat.net"]
+
+# CORS設定
+# 他オリジンのhttpリクエストにCookieを含めることを許可
+CORS_ALLOW_CREDENTIALS = True
+
+# アクセスを許可するドメイン
+CORS_ALLOWED_ORIGINS = [f"{FRONTEND_URL}", "http://localhost:5173"]
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -71,7 +79,7 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # デプロイ時に削除
-    'sslserver'
+    "sslserver"
 ]
 
 # AbstractUserを使うため追記
@@ -88,9 +96,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-
-CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'backend.urls'
 
