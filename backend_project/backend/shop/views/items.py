@@ -104,6 +104,17 @@ class ItemDetailView(APIView):
             # データを更新して保存
             to_list = request.data.get('to_list', item_instance.to_list)
             serializer.save(to_list=to_list)
+
+            # to_listが更新されたら消費頻度をチェックする
+            if to_list:
+                cycle = item_instance.consume_cycle
+                last_open_at = item_instance.last_open_at
+                new_cycle = CheckCycle(cycle, last_open_at)
+                # 頻度が短くなっていれば、消費サイクルを更新
+                if new_cycle is not False:
+                    item_instance.consume_cycle = new_cycle
+                    item_instance.save()
+
             # 更新されたフィールドのみ辞書として取得
             update_fields = {field: request.data[field] for field in request.data}
             # 更新されたフィールドのみをレスポンスとして返す
