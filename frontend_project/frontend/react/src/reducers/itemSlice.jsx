@@ -72,16 +72,24 @@ export const itemSlice = createSlice({
                 state.items[index].to_list = to_list;
             }
         },
-        clearItem: (state) => {
+        deleteItem: (state, action) => {
+            // const item_id = action.payload;  // アクションから item_id を受け取る
+            // state.items = state.items.filter(item => item.item_id !== item_id);
 
-        }
-    },
+            const itemId = action.payload;  // アクションから item_id を受け取る
+            const index = state.items.findIndex(item => item.item_id === itemId);
+            if (index !== -1) {
+                state.items.splice(index, 1);  // 配列から該当するアイテムを削除
+            }
+}
+        
+    }
 });
 
 export const
     {
         setItemAllInfo,
-        clearItem,
+        deleteItem,
         updateManageTarget,
         updateRemindByItem,
         updateItemName,
@@ -90,6 +98,6 @@ export const
         updateLastPurchaseAt,
         updateLastOpenAt,
         updateItemUrl,
-        updateToList
+        updateToList,
     } = itemSlice.actions;
 export default itemSlice.reducer;

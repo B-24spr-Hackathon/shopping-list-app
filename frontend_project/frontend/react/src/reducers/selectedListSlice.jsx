@@ -5,11 +5,16 @@ export const selectedListSlice = createSlice({
     initialState: {
         list_id: null,
         list_name: null,
+        shopping_day: null,
+        guests_info: [],
     },
     reducers: {
         setSelectedList: (state, action) => {
             return { ...state, ...action.payload };
         },
+        // setSelectedList: (state, action) => {
+        //     state.selectedList = action.payload;
+        // },
         clearSelectedList: (state) => {
             
             

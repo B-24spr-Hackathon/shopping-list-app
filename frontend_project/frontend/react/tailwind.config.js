@@ -2,6 +2,7 @@
 export default {
   content: [
     "./src/**/*.jsx",
+    "node_modules/preline/dist/*.jsx",
   ],
   theme: {
     extend: {
@@ -11,12 +12,15 @@ export default {
       colors: {
         'line-green': '#06C755',
         'base-orange': '#FFA800',
+        'base-orange-hover': '#FF7B00',
       },
       fontFamily:{
         'hel': 'Helvetica',
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('preline/plugin'),
+  ],
 }
 
