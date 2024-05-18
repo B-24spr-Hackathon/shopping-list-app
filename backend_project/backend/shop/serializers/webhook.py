@@ -9,5 +9,6 @@ itemの処理を担当するSerializer
 class ItemSerializer(serializers.Serializer):
     class Meta:
         model = Item
-        fields = ["item_id", "remind_by_item", "to_list", "last_open_at"]
+        fields = ["item_id", "remind_by_item", "to_list", "last_open_at",
+                  "consume_cycle"]
         read_only_fields = ["item_id"]

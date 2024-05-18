@@ -7,6 +7,7 @@ import requests, jwt, base64, hashlib, hmac, json
 from shop.models import User, List, Item
 from shop.serializers.user import GetUpdateUserSerializer
 from shop.serializers.webhook import ItemSerializer
+from shop.views.items import CheckCycle
 import logging
 
 logger = logging.getLogger("backend")
@@ -211,12 +212,30 @@ class LineWebhookView(APIView):
                 if type(data) == int:
                     item = Item.objects.get(item_id=data)
                     today = timezone.now().date()
-                    serializer = ItemSerializer(item, data={"to_list": True, "last_open_at": today}, partial=True)
+
+                    new_cycle = CheckCycle(item.consume_cycle, item.last_open_at)
+
+                    # 消費頻度の更新が必要な場合
+                    if new_cycle:
+                        serializer = ItemSerializer(
+                            item,
+                            data={"to_list": True, "last_open_at": today,
+                                  "consume_cycle": new_cycle},
+                            partial=True,
+                        )
+                    # 消費頻度の更新が不要な場合
+                    else:
+                        serializer = ItemSerializer(
+                            item,
+                            data={"to_list": True, "last_open_at": today},
+                            partial=True,
+                        )
+
                     if serializer.is_valid():
-                        logger.info("to_list, last_open_atの更新成功")
+                        logger.info(f"{item.item_id}の更新成功")
                         serializer.save()
                     else:
-                        logger.error("to_list, last_open_atの更新失敗")
+                        logger.error(f"{item.item_id}の更新失敗")
 
                     # メッセージの送信
                     data = {
