@@ -1,85 +1,213 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { AddBtn, TestBtn } from "../components/Buttons";
+import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
+import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
 import { Title } from "../components/Title";
-import { SelectList } from "../components/SelectBox";
+import { ForInviteSelectList, SelectList } from "../components/SelectBox";
 import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
 import AddNewItem from "../utils/AddNewItem";
+import { setItemAllInfo } from "../reducers/itemSlice";
+import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice";
+import TextInput from "../components/TextInput";
+import { EditableInput } from "../components/EditableDateInput";
+import PermissionDropdown from "../components/cmbSelectAuthority";
+import MyLists from "../components/MyLists";
+import lineLink from "../utils/LineLink";
+import LineLinkBtn from "../utils/LineLink";
+import DropUserBtn from "../utils/DropUser";
+
+
 
 function Home() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
     const user_name = useSelector((state) => state.user.user_name);
-    const lists = useSelector(state => state.user.lists);
+    const userLineRemind = useSelector(state => state.user.remind);
+    // const lists = useSelector(state => state.user.lists);
     const items = useSelector(state => state.items.items);
+    const selectedList = useSelector(state => state.selectedList);
     const selectedListId = useSelector(state => state.selectedList.list_id);
     const handleAddNewList = AddNewList();
-    const handleAddNewItem = AddNewItem();
-    const [cookies] = useCookies(['jwt_token']);
 
+    const [cookies] = useCookies(['jwt_token']);
+    const token = useSelector(state => state.token.token);
+    const [lists, setLists] = useState([]);
+    const [message, setMessage] = useState("");
+    const [remind, setRemind] = useState(userLineRemind);
+
+    
+    //homeを読み込み時に実行
     useEffect(() => {
         const fetchUserInfo = async() => {
-            const response = await fetchUserInfoRequest();
-            dispatch(setUser(response.data.user))
-            dispatch(setUser({lists:response.data.lists}));
-            console.log(lists,lists.length);
-            console.log(items,items.length);
-            if (lists.length == 0){
-                handleAddNewList();
-            } else {
-                dispatch(setSelectedList(lists[lists.length -1]));
+            //ユーザー情報取得
+            const userInfo = await fetchUserInfoRequest(token);
+            console.log('homeEffect');
+            console.log(remind);
+            dispatch(setUser(userInfo.data.user));
+            // dispatch(setUser({lists:userInfo.data.lists}));
+            //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
+            if (userInfo.data.lists.length == 0){
+                setMessage("まだリストがありません");
+                // await handleAddNewList();
+            }else{
+                setLists(userInfo.data.lists);
+
+
             }
+            // else {
+            //     dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
+            // }
+            //改めてユーザー情報取得
+            // const newUserInfo = await fetchUserInfoRequest(token);
+            // setLists(newUserInfo.data.lists);
+            // const lastIndex = newUserInfo.data.lists.length - 1;
+            //selectedListのリスト情報を取得
+            // const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
+            // dispatch(setSelectedList(listInfo.data));
+            //該当リスト内のitem情報を取得
+            // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
+            // dispatch(setItemAllInfo(itemsInfo.data.items));
+            //該当リストの買い物リストを取得
+            // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
+            // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
 
         };
         fetchUserInfo();
     }, []);
 
-    const handleFetchUserInfo = async() => {
-        try {
-            const response = await fetchUserInfoRequest();
-            console.log("fetch:",response);
-            dispatch(setUser(response.data.user));
-            dispatch(setUser({lists:response.data.lists}));
-            console.log('lists:',lists.length);
-            console.log('lists:',lists[0]);
+    // const handleFetchUserInfo = async() => {
+    //     try {
+    //         const response = await fetchUserInfoRequest();
+    //         console.log("fetch:",response);
+    //         dispatch(setUser(response.data.user));
+    //         dispatch(setUser({lists:response.data.lists}));
+    //         console.log('lists:',lists.length);
+    //         console.log('lists:',lists[0]);
 
-            return response;
-        }catch(err){
-            // console.log(err.response.data);
-            console.log("era-")
-            console.log(err.response);
-        };
-    }
+    //         return response;
+    //     }catch(err){
+    //         // console.log(err.response.data);
+    //         console.log("era-")
+    //         console.log(err.response);
+    //     };
+    // }
 
     const handleFetchShoppingList = async() => {
-        const response = await fetchShoppingListRequest(4)
+        const response = await fetchShoppingListRequest(selectedListId, token)
         console.log('fetchshopping:', response);
     }
+
+    const handleDeleteList = async() => {
+        const response = await deleteListRequest(selectedListId, token);
+        const newUserInfo = await fetchUserInfoRequest(token);
+            dispatch(setUser(newUserInfo.data.user));
+            const lastIndex = newUserInfo.data.lists.length - 1;
+            //selectedListのリスト情報を取得
+            const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
+            dispatch(setSelectedList(listInfo.data));
+            //該当リスト内のitem情報を取得
+            // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
+            // dispatch(setItemAllInfo(itemsInfo.data.items));
+            //該当リストの買い物リストを取得
+            // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
+            // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
+
+    }
+
+    const handleEditListName = async(newValue) => {
+        const response = await editListNameRequest(selectedList.list_id, newValue, token);
+        dispatch(setSelectedList({...selectedList, list_name:newValue}));
+    }
+
+    const [friendUserId, setFriendUserId] =useState();
+    const [friendUserInfo, setFriendUserInfo] = useState({});
+
+    const handleSearchFriend = async() => {
+        try{
+            const response = await searchFriendRequest(friendUserId, token);
+            setFriendUserInfo(response.data);
+            console.log('info',friendUserInfo);
+
+        }catch{
+            console.log(err.response.data);
+        }
+    }
+
+    const [authority, setAuthority] = useState("False");
+
+    const handleInviteFriendToList = async() => {
+        try {
+            const response = await inviteToListRequest( selectedList.list_id, friendUserInfo.user_id, authority, token);
+        }catch{
+            console.log(err.response.data);
+
+        }
+    }
+
+    const handleSelectChange = (listId) => {
+        setSelectedListId(listId);
+        console.log("Selected List ID:", listId);
+    }
+
+    const handleLineRemindChange = async() => {
+        const newLineRemind = !userLineRemind;
+        try {
+            const response = await updateUserInfoRequest('remind', newLineRemind, token);
+            dispatch(setUser({remind:response.data.user.remind}));
+            setRemind(response.data.user.remind);
+
+        }catch(err){
+            console.error('Failed to update manage target:', err);
+        }
+    }
+
+
+
+    const handleAuthorityChange = (e) => {
+        setAuthority(e.target.value);
+    };
 
     return (
         <>
             <div className="flex flex-col">
                 <Header />
-                <LogoutButton />
+                <div className="fixed right-2 mt-1 text-right">
+                    <LogoutButton />
+                </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
-                    <SelectList />
-                    <AddBtn children="+" onClick={handleAddNewList} />
+                    <MyLists lists={lists} token={token} />
+                    <p>{message}</p>
+                    
+                    
+                    <AddBtn children="+" onClick={handleAddNewList} onChange={""} />
+                    <TextInput type="text" placeholder="user_id" value={friendUserId} onChange={e => setFriendUserId(e.target.value)}/>
+                    <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
+                    <p>検索した友達ユーザー名{friendUserInfo.user_name}</p>
+                    <TestBtn onClick={handleSearchFriend} children='友達検索' />
+                    <PermissionDropdown value={authority} onChange={handleAuthorityChange} />
+                    <TestBtn onClick={handleInviteFriendToList} children="招待"/>
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
-                    <TestBtn onClick={handleFetchUserInfo} children="get" />
-                    <TestBtn children='test' onClick={handleFetchShoppingList}/>
+                    <LineLinkBtn />
+                    <div>
+                        LINE通知ON or OFF
+                    <input
+                        type='checkbox'
+                        checked={remind}
+                        onChange={ () => handleLineRemindChange() }
+                        />
+                    </div>
+                    <DropUserBtn />
                 </div>
-                <Footer />
             </div>
 
         </>

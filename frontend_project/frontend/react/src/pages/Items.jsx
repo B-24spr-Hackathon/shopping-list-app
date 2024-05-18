@@ -5,9 +5,9 @@ import TabMainMenu from "../components/TabMainMenu";
 import UserNameAndIcon from "../components/UserNameIcon";
 import TabItems from "../components/TabItems";
 import { AddBtn, TestBtn } from "../components/Buttons";
-import { addNewListRequest } from "../utils/Requests.jsx";
-import { useDispatch } from "react-redux";
-import { setItemAllInfo, clearItem } from "../reducers/itemSlice.jsx";
+import { addNewListRequest, fetchListInfoRequest, fetchUserInfoRequest } from "../utils/Requests.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { setItemAllInfo } from "../reducers/itemSlice.jsx";
 import { ItemsListPanel } from "../components/ListPanels.jsx";
 import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
@@ -15,42 +15,52 @@ import LogoutButton from "../components/Logout.jsx";
 
 
 
+
 function Items() {
 
     const dispatch = useDispatch();
-    // const items = 
+    const selectedList = useSelector(state => state.selectedList);
+    const [lists, setLists] = useState([]);
+    const [items, setItems] = useState([]);
+    const token = useSelector(state => state.token.token);
 
-    // useEffect(() => {
-    //     if()
-    // })
+   useEffect(() => {
+    const fetchListAndItemsInfo = async() =>{
+        const listsOfUser = await fetchUserInfoRequest(token);
+        console.log('itemsEffectUser');
+        setLists(listsOfUser.data.lists);
+        // const itemsOfList = await fetchListInfoRequest(selectedList.list_id);
+        // console.log('itemsEffectItemOfList',response);
+        // setItems(itemsOfList.data.items);
+    };
+    fetchListAndItemsInfo();
+   },[]);
 
 
-    const handleAddNewList = async() => {
-        try {
-            const data = await addNewListRequest();
-            console.log("newList",data.data);
-            // dispatch(setItem(data.data))
-        } catch(err) {
-        console.log(err.response.data);
-        };
-    }
+    
 
 
     return (
         <>
 
             <Header />
-            <LogoutButton />
+            <div className="fixed right-2 mt-1 text-right">
+                <LogoutButton />
+            </div>
             <UserNameAndIcon />
             <TabMainMenu />
-            <AddBtn children="+" onClick={handleAddNewList}/>
-            <SelectList />
+            <div className="">
 
-            <div className='flex justify-center mt-4'>
+                <SelectList lists={lists}/>
 
-            <ItemsListPanel />
+                <div className='flex justify-center '>
+
+                    <ItemsListPanel />
+                </div>
             </div>
-            <Footer />
+
+            <footer>aaa</footer>
+            {/* <Footer /> */}
 
 
         </>

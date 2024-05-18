@@ -1,56 +1,117 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { fetchItemsOfListRequest } from "../utils/Requests";
+import { fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { clearSelectedList, setSelectedList } from "../reducers/selectedListSlice";
-import { setItemAllInfo, clearItem } from "../reducers/itemSlice.jsx";
+import { setItemAllInfo } from "../reducers/itemSlice.jsx";
+import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice.jsx";
 
 
-function SelectList() {
-    const list = useSelector(state => state.user.lists);
-    const selectedList = useSelector(state => state.selectedList)
+function SelectList({lists}) {
+    const selectedList = useSelector(state => state.selectedList);
+    const token = useSelector(state => state.token.token);
+
     const dispatch = useDispatch();
+    // const [lists, setLists] = useState([]);
 
     // useEffect(() => {
-    //     if(list.length > 0) {
-    //         dispatch(setSelectedList({
-    //             list_id: list[0].list_id,
-    //             list_name: list[0].list_name
-    //         }));
-    //     } else {
-    //         dispatch(clearSelectedList());
-    //     }
-    // }, [list, dispatch]);
+    //     const fetchLists = async() => {
+    //         const response = await fetchUserInfoRequest();
+    //         setLists(response.data.lists);
+    //         console.log('res',response.data.lists);
+    //     };
+    //     fetchLists();
+    // },[]);
 
+    
+    
+    //リストセレクターでリストを変更したとき
     const handleSelectChange = async(event) => {
-        const selected = list.find(item => item.list_id == event.target.value);
-        dispatch(setSelectedList({
-            list_id: selected.list_id,
-            list_name: selected.list_name
-        }));
-        
-        const response = await fetchItemsOfListRequest(selected.list_id);
-        console.log(response.data.list_id);
-        console.log(response.data.items);
-        dispatch(setItemAllInfo(response.data.items))
+        const selected = lists.find(list => list.list_id == event.target.value);
+        dispatch(setSelectedList(selected));
+        //選んだリストの情報を取得
+        const listInfo = await fetchListInfoRequest(event.target.value, token);
+        dispatch(setSelectedList(listInfo.data));
+        //選んだリストの中のアイテムを取得
+        const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
+        // dispatch(setItemAllInfo(itemsInfo.data.items))
+        //選んだリストの買い物リストを取得
+        const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id, token);
+        // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
+
     }
 
     return (
         <>
-            <div>
-                <select 
-                    value={selectedList.list_id}
-                    onChange={handleSelectChange}>
-                    {list.map((item, index) => (
-                        <option key={index} value={item.list_id}>
-                            {item.list_name}{item.list_id}{index}
-                        </option>
+            <label for="hs-hidden-select" class="sr-only">Label</label>
+            <select
+                value={selectedList.list_id}
+                onChange={handleSelectChange}
+                id="hs-hidden-select"
+                class="py-3 px-4 pe-9 block w-auto border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+                {/* <option selected="">あなたのリスト</option> */}
+                {lists.map((list, index) => (
+                    <option key={index} value={list.list_id}>
+                            {list.list_id} {list.list_name}
+                    </option>
                     ))}
-                </select>
-            </div>
+            </select>
         </>
     );
 
 }
+function ForInviteSelectList({ onSelectChange, lists }) {
+    const [selectedListId, setSelectedListId] = useState('');
+    // const [lists, setLists] = useState([]);
 
-export { SelectList };
+    // useEffect(() => {
+    //     const fetchLists = async () => {
+    //         const response = await fetchUserInfoRequest();
+    //         setLists(response.data.lists);
+    //         console.log('res', response.data.lists);
+    //     };
+    //     fetchLists();
+    // }, []);
+
+    // リストセレクターでリストを変更したとき
+    const handleSelectChange = async (event) => {
+        const selectedId = event.target.value;
+        setSelectedListId(selectedId);
+        const selected = lists.find(list => list.list_id == selectedId);
+        if (onSelectChange) {
+            onSelectChange(selected.list_id);
+        }
+
+        // //選んだリストの情報を取得
+        // const listInfo = await fetchListInfoRequest(selectedId);
+        // // dispatch(setSelectedList(listInfo.data));
+        // //選んだリストの中のアイテムを取得
+        // const itemsInfo = await fetchItemsOfListRequest(selectedId);
+        // // dispatch(setItemAllInfo(itemsInfo.data.items))
+        // //選んだリストの買い物リストを取得
+        // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
+        // // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
+    }
+
+    return (
+        <>
+            <label htmlFor="hs-hidden-select" className="sr-only">Label</label>
+            <select
+                value={selectedListId}
+                onChange={handleSelectChange}
+                id="hs-hidden-select"
+                className="py-3 px-4 pe-9 block w-auto border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+                <option value="" disabled>招待するリストを選択</option>
+                {lists.map((list, index) => (
+                    <option key={index} value={list.list_id}>
+                        {list.list_id} {list.list_name}
+                    </option>
+                ))}
+            </select>
+        </>
+    );
+}
+
+export { SelectList, ForInviteSelectList };
+
+
