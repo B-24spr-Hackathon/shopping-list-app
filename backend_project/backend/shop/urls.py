@@ -30,7 +30,7 @@ urlpatterns = [
     # 申請機能 POST
     path('apply/', apply.ApplyView.as_view(), name="apply-post"),
     # 招待・申請状況確認 GET
-    path('entry/member_status/<user_id>/', entry.EntryAcceptView.as_view(), name='entry-status'),
+    path('member_status/', entry.EntryStatusView.as_view(), name='entry-status'),
 ]
 
 urlpatterns += [
