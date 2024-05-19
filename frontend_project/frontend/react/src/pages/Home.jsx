@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
+import { applyToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
 import { Title } from "../components/Title";
-import { ForInviteSelectList, SelectList } from "../components/SelectBox";
+import { ForApplySelectList, ForInviteSelectList, SelectList } from "../components/SelectBox";
 import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
@@ -22,6 +22,9 @@ import MyLists from "../components/MyLists";
 import lineLink from "../utils/LineLink";
 import LineLinkBtn from "../utils/LineLink";
 import DropUserBtn from "../utils/DropUser";
+import MyListInfo from "../components/MyListInfo";
+import Modal from "../components/Modal";
+import { setMember } from "../reducers/memberSlice";
 
 
 
@@ -42,6 +45,7 @@ function Home() {
     const [lists, setLists] = useState([]);
     const [message, setMessage] = useState("");
     const [remind, setRemind] = useState(userLineRemind);
+    const member = useSelector(state => state.member.member);
 
     
     //homeを読み込み時に実行
@@ -50,38 +54,23 @@ function Home() {
             //ユーザー情報取得
             const userInfo = await fetchUserInfoRequest(token);
             console.log('homeEffect');
-            console.log(remind);
             dispatch(setUser(userInfo.data.user));
-            // dispatch(setUser({lists:userInfo.data.lists}));
-            //リストがなければ、自動的にリストを一つ作成。あれば、最後のリストをselectedとする。
+            dispatch(setUser({lists:userInfo.data.lists}));
+            const member_statusInfo = await fetchMemberStatusInfoRequest(token);
+            dispatch(setMember(member_statusInfo.data));
+            // console.log('member:',member_statusInfo);
+            console.log('member:',member);
+            
             if (userInfo.data.lists.length == 0){
                 setMessage("まだリストがありません");
                 // await handleAddNewList();
             }else{
                 setLists(userInfo.data.lists);
-
-
+                await fetchListInfoRequest(selectedListId, token);
             }
-            // else {
-            //     dispatch(setSelectedList(userInfo.data.lists[userInfo.data.lists.length -1]));
-            // }
-            //改めてユーザー情報取得
-            // const newUserInfo = await fetchUserInfoRequest(token);
-            // setLists(newUserInfo.data.lists);
-            // const lastIndex = newUserInfo.data.lists.length - 1;
-            //selectedListのリスト情報を取得
-            // const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id);
-            // dispatch(setSelectedList(listInfo.data));
-            //該当リスト内のitem情報を取得
-            // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
-            // dispatch(setItemAllInfo(itemsInfo.data.items));
-            //該当リストの買い物リストを取得
-            // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
-            // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
-
         };
         fetchUserInfo();
-    }, []);
+    }, [selectedList]);
 
     // const handleFetchUserInfo = async() => {
     //     try {
@@ -127,34 +116,67 @@ function Home() {
         dispatch(setSelectedList({...selectedList, list_name:newValue}));
     }
 
-    const [friendUserId, setFriendUserId] =useState();
-    const [friendUserInfo, setFriendUserInfo] = useState({});
+    const [friendInviteUserId, setFriendInviteUserId] =useState();
+    const [friendApplyUserId, setFriendApplyUserId] = useState()
+    const [friendInviteUserInfo, setFriendInviteUserInfo] = useState({});
+    const [friendApplyUserInfo, setFriendApplyUserInfo] = useState({});
+    const [friendApplyUserLists, setFriendApplyUserLists] = useState([]);
 
-    const handleSearchFriend = async() => {
+    const handleSearchInviteFriend = async() => {
         try{
-            const response = await searchFriendRequest(friendUserId, token);
-            setFriendUserInfo(response.data);
-            console.log('info',friendUserInfo);
+            const response = await searchFriendRequest(friendInviteUserId, token);
+            setFriendInviteUserInfo(response.data);
+            console.log('info',friendInviteUserInfo);
+            console.log('lists',lists);
+
+        }catch{
+            console.log(err.response.data);
+        }
+    }
+    const handleSearchApplyFriend = async() => {
+        try{
+            const response = await searchApplyFriendRequest(friendApplyUserId, token);
+            setFriendApplyUserInfo(response.data);
+            setFriendApplyUserLists(response.data.lists);
+            console.log('friendApplyInfo',friendApplyUserInfo);
+            console.log('friendApplylists',friendApplyUserLists);
+
 
         }catch{
             console.log(err.response.data);
         }
     }
 
-    const [authority, setAuthority] = useState("False");
+    const [inviteAuthority, setInviteAuthority] = useState("False");
+    const [applyAuthority, setApplyAuthority] = useState("False");
 
     const handleInviteFriendToList = async() => {
         try {
-            const response = await inviteToListRequest( selectedList.list_id, friendUserInfo.user_id, authority, token);
+            const response = await inviteToListRequest( selectedInviteListId, friendInviteUserInfo.user_id, inviteAuthority, token);
         }catch{
             console.log(err.response.data);
 
         }
     }
+    const handleApplyFriendToList = async() => {
+        try {
+            const response = await applyToListRequest( selectedApplyListId, user_id, applyAuthority, token);
+        }catch{
+            console.log(err.response.data);
 
-    const handleSelectChange = (listId) => {
-        setSelectedListId(listId);
-        console.log("Selected List ID:", listId);
+        }
+    }
+    const [selectedInviteListId, setSelectedInviteListId] = useState();
+    const handleSelectChange = (inviteListId) => {
+        setSelectedInviteListId(inviteListId);
+        console.log("Selected List ID:", inviteListId);
+    }
+
+    const [selectedApplyListId, setSelectedApplyListId] = useState([]);
+
+    const handleApplyListSelectChange = (applyListId) => {
+        setSelectedApplyListId(applyListId);
+        console.log("Selected List ID:", applyListId);
     }
 
     const handleLineRemindChange = async() => {
@@ -171,8 +193,11 @@ function Home() {
 
 
 
-    const handleAuthorityChange = (e) => {
-        setAuthority(e.target.value);
+    const handleInviteAuthorityChange = (e) => {
+        setInviteAuthority(e.target.value);
+    };
+    const handleApplyAuthorityChange = (e) => {
+        setApplyAuthority(e.target.value);
     };
 
     return (
@@ -180,21 +205,38 @@ function Home() {
             <div className="flex flex-col">
                 <Header />
                 <div className="fixed right-2 mt-1 text-right">
+                    <Modal />
                     <LogoutButton />
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
                     <MyLists lists={lists} token={token} />
                     <p>{message}</p>
+
                     
                     
                     <AddBtn children="+" onClick={handleAddNewList} onChange={""} />
-                    <TextInput type="text" placeholder="user_id" value={friendUserId} onChange={e => setFriendUserId(e.target.value)}/>
+
+
+                    <TextInput type="text" placeholder="user_id" value={friendInviteUserId} onChange={e => setFriendInviteUserId(e.target.value)}/>
+                    <TestBtn onClick={handleSearchInviteFriend} children='招待したい友達' />
+                    <p>検索した友達ユーザー名{friendInviteUserInfo.user_name}</p>
                     <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
-                    <p>検索した友達ユーザー名{friendUserInfo.user_name}</p>
-                    <TestBtn onClick={handleSearchFriend} children='友達検索' />
-                    <PermissionDropdown value={authority} onChange={handleAuthorityChange} />
+                    <PermissionDropdown value={inviteAuthority} onChange={handleInviteAuthorityChange} />
                     <TestBtn onClick={handleInviteFriendToList} children="招待"/>
+                    <div>
+                        <br />
+                        <br />
+                        
+
+                    </div>
+                    <TextInput type="text" placeholder="user_id" value={friendApplyUserId} onChange={e => setFriendApplyUserId(e.target.value)}/>
+                    <TestBtn onClick={handleSearchApplyFriend} children='共有申請したい友達' />
+                    <p>検索した友達ユーザー名{friendApplyUserInfo.user_name}</p>
+                    <ForApplySelectList lists={friendApplyUserLists} onSelectChange={handleApplyListSelectChange} />
+                    <PermissionDropdown value={applyAuthority} onChange={handleApplyAuthorityChange} />
+                    <TestBtn onClick={handleApplyFriendToList} children="共有申請"/>
+                    <br />
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
                     <LineLinkBtn />

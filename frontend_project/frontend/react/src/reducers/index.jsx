@@ -5,6 +5,7 @@ import selectedListReducer from './selectedListSlice';
 import shoppingItemsReducer from './shoppingItemsSlice';
 import tokenReducer from './tokenSlice';
 import lineLinkReducer from './lineLinkSlice';
+import memberReducer from "./memberSlice";
 import { RESET_APP_STATE } from './actionTypes';
 
 const appReducer = combineReducers({
@@ -13,7 +14,8 @@ const appReducer = combineReducers({
     selectedList: selectedListReducer,
     shoppingItems: shoppingItemsReducer,
     token: tokenReducer,
-    lineLink: lineLinkReducer
+    lineLink: lineLinkReducer,
+    member: memberReducer,
 
 });
 

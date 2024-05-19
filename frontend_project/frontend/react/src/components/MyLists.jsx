@@ -18,6 +18,7 @@ function MyLists({ lists, token }) {
         setSelectedListId(listId);
         const selected = lists.find(list => list.list_id == listId);
         dispatch(setSelectedList(selected));
+        
         // navigate(`/list/${listId}`); // ページ遷移
     };
 
@@ -64,6 +65,7 @@ function MyLists({ lists, token }) {
                                 showEditButton={selectedListId === list.list_id} // 編集ボタンの表示条件
                             />
                         </label>
+                        <label>{list.is_owner ? 'Owner' : 'Member'}</label>
                         {selectedListId === list.list_id && (
                             <>
                                 <button onClick={() => handleDeleteList(list.list_id)} className="ml-2">
