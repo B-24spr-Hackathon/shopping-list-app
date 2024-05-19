@@ -8,6 +8,7 @@ from shop.models import List, Member, User
 from shop.authentication import CustomJWTAuthentication
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
+from rest_framework.response import Response
 import logging
 
 logger = logging.getLogger('backend')
@@ -99,6 +100,23 @@ class EntryView(APIView):
 class EntryAcceptView(APIView):
     # JWT認証を要求
     permission_classes = [IsAuthenticated] 
+
+    # 招待・承認一覧を表示 GET
+    def get(self, request, user_id):
+
+        user = request.user
+        members = Member.objects.filter(guest_id=user, member_status__in=[1, 2])
+
+        member_data = []
+        for member in members:
+            member_data.append({
+                'member_id': member.member_id,
+                'member_status': member.member_status,
+                'list_id': member.list_id.list_id,
+                'list_name': member.list_id.list_name,
+            })
+
+        return Response(member_data)
 
     def patch(self, request, member_id):
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
@@ -225,4 +243,8 @@ class EntryDeclineView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK) 
     
+  
+
     
+
+
