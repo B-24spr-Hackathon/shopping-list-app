@@ -35,7 +35,8 @@ class InviteViewTestCase(APITestCase):
         )
         list_instance.save()
         self.list_instance = list_instance
-
+        
+        self.url = reverse('invitee-post')
 
   # GETメソッドのテスト
 
@@ -220,4 +221,25 @@ class InviteViewTestCase(APITestCase):
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-        
+    #オーナー以外が招待を送信 403エラーが期待される
+    def test_post_without_permissions(self):
+        print("\n[[ InviteViewTestCase/test_post_without_permissions ]]")
+
+        token = self.guest_member_token
+        url = reverse('invitee-post')
+
+        data = {
+            'list_id': self.list_instance.list_id,
+            'user_id': 'guest',
+            'authority': True,
+        }
+        expected_response = {"detail":"アクセスする権限がありません"}
+        response = self.client.post(self.url, data, format='json', HTTP_COOKIE=f"jwt_token={str(self.guest_member_token)}")
+       
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
