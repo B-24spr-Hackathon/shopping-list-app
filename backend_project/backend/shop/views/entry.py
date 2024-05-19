@@ -239,6 +239,7 @@ class EntryStatusView(APIView):
         for member in members:
             member_data.append({
                 'member_id': member.member_id,
+                'guest_name': member.guest_id.user_name,
                 'member_status': member.member_status,
                 'list_id': member.list_id.list_id,
                 'list_name': member.list_id.list_name,
