@@ -123,10 +123,16 @@ class EntryAcceptView(APIView):
             logger.error('オーナーは申請しか承認できない')
             return Response({'error': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
 
-        # リストのユーザーは、member_status=1のデータのみ承認可能
-        if current_user == guest.guest_id and guest.member_status != 1:
-            logger.error('ゲストは招待しか承認できない')
-            return Response({'error': '自身が申請したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+        # リストのユーザー（ゲスト）は、自分が招待されている member_status=1 のデータのみ承認可能
+        if current_user == guest.guest_id:
+            # 自分以外のメンバーを承認しようとする場合
+            if guest.guest_id != current_user:
+                logger.error('ゲストは他のメンバーのステータスを承認できない')
+                return Response({'error': '他のメンバーのステータスを承認できません'}, status=status.HTTP_403_FORBIDDEN)
+            # member_status が 1 以外のものを承認しようとする場合
+            if guest.member_status != 1:
+                logger.error('ゲストは招待しか承認できない')
+                return Response({'error': '自身が申請したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
 
         # member_statusカラムの値を更新
         guest.member_status = 0
