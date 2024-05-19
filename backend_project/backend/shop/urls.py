@@ -29,6 +29,8 @@ urlpatterns = [
     path('apply/<user_id>/', apply.ApplyView.as_view(), name="apply-get"),
     # 申請機能 POST
     path('apply/', apply.ApplyView.as_view(), name="apply-post"),
+    # 招待・申請状況確認 GET
+    path('member_status/', entry.EntryStatusView.as_view(), name='entry-status'),
 ]
 
 urlpatterns += [

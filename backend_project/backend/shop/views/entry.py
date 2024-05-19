@@ -8,6 +8,7 @@ from shop.models import List, Member, User
 from shop.authentication import CustomJWTAuthentication
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
+from rest_framework.response import Response
 import logging
 
 logger = logging.getLogger('backend')
@@ -95,11 +96,10 @@ class EntryView(APIView):
 
 
 
-# 招待 申請承認機能　PATCH
+# 招待 申請承認機能　
 class EntryAcceptView(APIView):
-    # JWT認証を要求
-    permission_classes = [IsAuthenticated] 
-
+           
+    # 承認処理    
     def patch(self, request, member_id):
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request.data}")
@@ -160,8 +160,6 @@ class EntryAcceptView(APIView):
     
 # 招待 申請 拒否・中止機能　DELETE
 class EntryDeclineView(APIView):
-    # JWT認証を要求
-    permission_classes = [IsAuthenticated] 
 
     def delete(self, request, member_id):
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
@@ -225,4 +223,28 @@ class EntryDeclineView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK) 
     
+  
+# 招待・申請一覧を表示 GET
+class EntryStatusView(APIView):
+
+    def get(self, request):
+        logger.info(f"{request.method}:{request.build_absolute_uri()}")
+        if request.data:
+            logger.error(f"{request.data}")
+   
+        user = request.user
+        members = Member.objects.filter(guest_id=user, member_status__in=[1, 2])
+       
+        member_data = []
+        for member in members:
+            member_data.append({
+                'member_id': member.member_id,
+                'member_status': member.member_status,
+                'list_id': member.list_id.list_id,
+                'list_name': member.list_id.list_name,
+                'owner_name': member.list_id.owner_id.user_name,
+            })
+        return Response(member_data, status=status.HTTP_200_OK)
     
+
+
