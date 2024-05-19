@@ -104,7 +104,7 @@ class UserView(APIView):
             return Response({"error": "line_statusの更新はできません"},
                             status=status.HTTP_400_BAD_REQUEST)
         # remindをTrueにするリクエストでline_statusがFalseの場合はエラーを返す
-        elif request.data.get("remind") and request.user.line_status == False:
+        elif request.data.get("remind") == "True" and request.user.line_status == False:
             logger.error("友達追加していないユーザーの通知ONリクエスト")
             return Response({"error": "友達追加が必要です"},
                             status=status.HTTP_400_BAD_REQUEST)
