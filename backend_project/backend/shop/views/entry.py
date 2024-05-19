@@ -96,7 +96,7 @@ class EntryView(APIView):
 
 
 
-# 招待 申請承認機能　PATCH
+# 招待 申請承認機能　
 class EntryAcceptView(APIView):
     # JWT認証を要求
     permission_classes = [IsAuthenticated] 
@@ -118,6 +118,7 @@ class EntryAcceptView(APIView):
                     'member_status': member.member_status,
                     'list_id': member.list_id.list_id,
                     'list_name': member.list_id.list_name,
+                    'owner_name': member.list_id.owner_id.user_name,
                 })
             return Response(member_data, status=status.HTTP_200_OK)
 
