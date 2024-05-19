@@ -57,7 +57,7 @@ class UserView(APIView):
             "is_owner": False,
             "authority": j.authority
             } for j in members]
-        
+
         # レスポンスデータを作成
         response = response_lists + response_members
 
@@ -87,6 +87,27 @@ class UserView(APIView):
     def patch(self, request, *args, **kwargs):
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request.data}")
+
+        # line_idの更新リクエストの場合はエラーを返す
+        if request.data.get("line_id") is not None:
+            logger.error("line_idの更新リクエスト")
+            return Response({"error": "line_idの更新はできません"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        # user_idの更新リクエストの場合はエラーを返す
+        elif request.data.get("user_id") is not None:
+            logger.error("user_idの更新リクエスト")
+            return Response({"error": "user_idの更新はできません"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        # line_statusの更新リクエストの場合はエラーを返す
+        elif request.data.get("line_status") is not None:
+            logger.error("user_idの更新リクエスト")
+            return Response({"error": "line_statusの更新はできません"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        # remindをTrueにするリクエストでline_statusがFalseの場合はエラーを返す
+        elif request.data.get("remind") and request.user.line_status == False:
+            logger.error("友達追加していないユーザーの通知ONリクエスト")
+            return Response({"error": "友達追加が必要です"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         user = request.user
         serializer = GetUpdateUserSerializer(user, data=request.data,
