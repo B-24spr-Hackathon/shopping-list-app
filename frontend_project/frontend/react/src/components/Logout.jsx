@@ -17,7 +17,7 @@ function LogoutButton(  ) {
         dispatch(resetAppState());
 
         // ログイン画面など、任意の画面にリダイレクト
-        //navigate('/');
+        navigate('/');
     };
 
     return (

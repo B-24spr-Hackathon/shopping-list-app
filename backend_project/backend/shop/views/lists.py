@@ -61,14 +61,15 @@ class ListView(APIView):
 
         # ゲストの情報を取得
         guests_info = []
-        guests = Member.objects.filter(list_id=list_instance)
+        guests = Member.objects.filter(list_id=list_instance, member_status=0)
+        
         for guest in guests:
             guest_data = {
                 'guest_id' : guest.guest_id.user_id,
                 'member_id' : guest.member_id,
                 'user_name' : guest.guest_id.user_name,
                 'user_icon' : guest.guest_id.user_icon,
-                'member_status' : guest.member_status
+                'authority' : guest.authority,
             }
             guests_info.append(guest_data)
 
