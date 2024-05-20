@@ -9,6 +9,7 @@ from shop.authentication import CustomJWTAuthentication
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 from rest_framework.response import Response
+from django.db.models import Q
 import logging
 
 logger = logging.getLogger('backend')
@@ -118,15 +119,26 @@ class EntryAcceptView(APIView):
             logger.error('承認権限なし')
             return Response({'error': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
-        # リストのオーナーは、member_status=2のデータのみ承認可能
-        if current_user == list_instance.owner_id and guest.member_status != 2:
-            logger.error('オーナーは申請しか承認できない')
-            return Response({'error': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+        # リストのオーナーは、所有するリストのmember_status=2のデータのみ承認可能
+        if current_user == list_instance.owner_id:
+            # オーナーが他のリストの申請を承認しようとした場合
+            if guest.list_id != list_instance:
+                logger.error('他のリストの申請を承認しようとしています')
+                return Response({'error': '他のリストの申請を承認できません'}, status=status.HTTP_403_FORBIDDEN)
+            if guest.member_status != 2:
+                logger.error('オーナーは申請しか承認できない')
+                return Response({'error': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
 
-        # リストのユーザーは、member_status=1のデータのみ承認可能
-        if current_user == guest.guest_id and guest.member_status != 1:
-            logger.error('ゲストは招待しか承認できない')
-            return Response({'error': '自身が申請したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+        # リストのユーザー（ゲスト）は、自分が招待されている member_status=1 のデータのみ承認可能
+        if current_user == guest.guest_id:
+            # 自分以外のメンバーを承認しようとする場合
+            if guest.guest_id != current_user:
+                logger.error('ゲストは他のメンバーのステータスを承認できない')
+                return Response({'error': '他のメンバーのステータスを承認できません'}, status=status.HTTP_403_FORBIDDEN)
+            # member_status が 1 以外のものを承認しようとする場合
+            if guest.member_status != 1:
+                logger.error('ゲストは招待しか承認できない')
+                return Response({'error': '自身が申請したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
 
         # member_statusカラムの値を更新
         guest.member_status = 0
@@ -233,10 +245,16 @@ class EntryStatusView(APIView):
             logger.error(f"{request.data}")
    
         user = request.user
-        members = Member.objects.filter(guest_id=user, member_status__in=[1, 2])
-       
+
+        # アクセスユーザーが所有するリストのIDを取得
+        owned_list_ids = List.objects.filter(owner_id=user).values_list('list_id', flat=True)
+        # ユーザーが関連するすべてのMembersレコードを取得
+        all_members = Member.objects.filter(Q(guest_id=user) | Q(list_id__in=owned_list_ids))
+        
         member_data = []
-        for member in members:
+
+        for member  in all_members:
+            is_owner = member.list_id.list_id in owned_list_ids
             member_data.append({
                 'member_id': member.member_id,
                 'guest_name': member.guest_id.user_name,
@@ -244,8 +262,6 @@ class EntryStatusView(APIView):
                 'list_id': member.list_id.list_id,
                 'list_name': member.list_id.list_name,
                 'owner_name': member.list_id.owner_id.user_name,
+                'is_owner': is_owner,
             })
         return Response(member_data, status=status.HTTP_200_OK)
-    
-
-

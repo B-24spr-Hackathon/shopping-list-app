@@ -3,13 +3,13 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import AccessToken
 from shop.models import User, List, Member
+from shop.serializers.apply import OwnListsSerializer
 
-
-class InviteViewTestCase(APITestCase):
+class ApplyViewTestCase(APITestCase):
     # テスト用データのセットアップ
     def setUp(self):
         
-        # リストオーナー
+      # リストオーナー
         list_owner = User.objects.create(
             user_id='owner',
             user_name='owner',
@@ -19,7 +19,7 @@ class InviteViewTestCase(APITestCase):
         list_owner.save()
         self.list_owner_token = AccessToken.for_user(list_owner)
 
-        # 招待者
+        # 申請者
         guest_member = User.objects.create(
             user_id='guest',
             user_name='guest',
@@ -29,51 +29,53 @@ class InviteViewTestCase(APITestCase):
         guest_member.save()
         self.guest_member_token = AccessToken.for_user(guest_member)
 
+
         list_instance = List.objects.create(
             owner_id=list_owner,
             list_name='test-list',
         )
         list_instance.save()
         self.list_instance = list_instance
-        
-        self.url = reverse('invitee-post')
 
-  # GETメソッドのテスト
+    # GETメソッドのテスト           
 
-    # listオーナーが有効なuser_idを送信 200が期待される
-    def test_get_invite_valid_user_id(self):
-        print("\n[[ InviteViewTestCase/test_get_invite_valid_user_id ]]")
-        
-        token = self.list_owner_token
-        url = reverse('find-invitee-get', kwargs={'user_id': 'guest'})
+    # 申請者が有効なuser_idを送信 200が期待される
+    def test_get_apply_valid_user_id(self):
+        print("\n[[ InviteViewTestCase/test_get_apply_valid_user_id ]]")
+
+        user_id = 'owner'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
         headers = {
             "Cookie": f"jwt_token={str(token)}"
-        }        
+        }   
+        expected_response_data = OwnListsSerializer([self.list_instance], many=True).data
         expected_response = {
-            'user_id':'guest',
-            'user_name':'guest',
+            'user_id': 'owner',
+            'user_name': 'owner',
             'user_icon': None,
+            'lists': expected_response_data
         }
         response = self.client.get(url, headers=headers, format='json')
 
-        # HTTPステータスコードの確認
         print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # レスポンスデータの確認
         print('[Result]: ', response.data)
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-    # リストオーナーが無効なuser_idを送信 404エラーが期待される 
-    def test_get_invite_invalid_user_id(self):
-        print("\n[[ InviteViewTestCase/test_get_invite_invalid_user_id ]]")
-        
-        token = self.list_owner_token
-        url = reverse('find-invitee-get', kwargs={'user_id': 'invalid_user'})      
+
+    # 申請者が無効なuser_idを送信 404エラーが期待される 
+    def test_get_apply_invalid_user_id(self):
+        print("\n[[ InviteViewTestCase/test_get_apply_invalid_user_id ]]")
+
+        user_id = 'invalid_user'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
 
         headers = {
-          "Cookie": f"jwt_token={str(token)}"
-        }
+            "Cookie": f"jwt_token={str(token)}"
+        }  
         response = self.client.get(url, headers=headers, format='json')
 
         # HTTPステータスコードの確認
@@ -84,17 +86,18 @@ class InviteViewTestCase(APITestCase):
         print('[Expect]: ', {"error": "ユーザーが存在しません"})
         self.assertEqual(response.data, {"error": "ユーザーが存在しません"})
 
-
   #POSTメソッドのテスト
 
-    # リストオーナーが有効なlist_id,user_idを送信 200が期待される
+    # 申請者が有効なlist_id,user_idを送信 200が期待される
+    def test_post_apply_valid_list_id_and_user_id(self):
+        print("\n[[ InviteViewTestCase/test_post_apply_valid_list_id_and_user_id ]]")
 
-    def test_post_invite_valid_list_id_and_user_id(self):
-        print("\n[[ InviteViewTestCase/test_post_invite_valid_list_id_and_user_id ]]")
-
-        token = self.list_owner_token
-        url = reverse('invitee-post')
-
+        user_id = 'owner'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        } 
         data = {
             'list_id': self.list_instance.list_id,
             'user_id': 'guest',
@@ -107,7 +110,7 @@ class InviteViewTestCase(APITestCase):
             "user_name": "guest",
             "user_icon": None,
             "authority": True,
-            "member_status": 1,
+            "member_status": 2,
         }
         response = self.client.post(url, data, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
 
@@ -119,13 +122,16 @@ class InviteViewTestCase(APITestCase):
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-    # リストオーナーが無効なlist_idを送信 404エラーが期待される 
-    def test_post_invite_invalid_list_id(self):
-        print("\n[[ InviteViewTestCase/test_post_invite_invalid_list_id ]]")
+    # 申請者が無効なlist_idを送信 404エラーが期待される
+    def test_post_apply_invalid_list_id(self):
+        print("\n[[ InviteViewTestCase/test_post_apply_invalid_list_id ]]")
 
-        token = self.list_owner_token
-        url = reverse('invitee-post')
-
+        user_id = 'owner'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
         data = {
             'list_id': 999,
             'user_id': 'guest',
@@ -142,13 +148,16 @@ class InviteViewTestCase(APITestCase):
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-    # リストオーナーが無効なuser_idを送信 404エラーが期待される
-    def test_post_invite_invalid_user_id(self):
-        print("\n[[ InviteViewTestCase/test_post_invite_invalid_user_id ]]")
+    # 申請者が無効なuser_idを送信 404エラーが期待される
+    def test_post_apply_invalid_user_id(self):
+        print("\n[[ InviteViewTestCase/test_post_apply_invalid_user_id ]]")
 
-        token = self.list_owner_token
-        url = reverse('invitee-post')
-
+        user_id = 'owner'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
         data = {
             'list_id': self.list_instance.list_id,
             'user_id': 'invalid_user',
@@ -163,11 +172,11 @@ class InviteViewTestCase(APITestCase):
         # レスポンスデータの確認
         print('[Result]: ', response.data)
         print('[Expect]: ', expected_response)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, expected_response)    
 
-    # リストオーナーがすでに参加済みまたは招待・申請中のゲストに送信 400エラーが期待される
-    def test_post_invite_already_member(self):
-        print("\n[[ InviteViewTestCase/test_post_invite_already_member ]]")
+    # 申請者がすでに参加済みまたは招待・申請中のリストのリストに送信 400エラーが期待される
+    def test_post_apply_already_member(self):
+        print("\n[[ InviteViewTestCase/test_post_apply_already_member ]]")
         
         member = Member.objects.create(
             list_id=self.list_instance,
@@ -177,15 +186,18 @@ class InviteViewTestCase(APITestCase):
         )
         member.save()
 
-        token = self.list_owner_token
-        url = reverse('invitee-post')
-
+        user_id = 'owner'  
+        url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+        token = self.guest_member_token
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
         data = {
             'list_id': self.list_instance.list_id,
             'user_id': 'guest',  
             'authority': True,
         }       
-        expected_response = {"error": "このゲストはこのリストにすでに参加済み、または招待・申請中です"}
+        expected_response = {"error": "あなたはこのリストにすでに参加済み、または招待・申請中です"}
 
         response = self.client.post(url, data, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
 
@@ -197,49 +209,30 @@ class InviteViewTestCase(APITestCase):
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-    # リストオーナーが自分宛てに招待を送信 400エラーが期待される
-    def test_post_invite_owner_self(self):
-        print("\n[[ InviteViewTestCase/test_post_invite_owner_self ]]")
+    # オーナーが自分のリストに申請送信　400エラーが期待される
+    def test_post_apply_owner_self(self):
+      print("\n[[ InviteViewTestCase/test_post_apply_owner_self ]]")
 
-        token = self.list_owner_token
-        url = reverse('invitee-post')
+      user_id = 'owner'  
+      url = f'/api/apply/{user_id}/' # url取得がうまくいかないため直接指定
+      token = self.list_owner_token
+      headers = {
+          "Cookie": f"jwt_token={str(token)}"
+      }
 
-        data = {
-            'list_id': self.list_instance.list_id,
-            'user_id': 'owner', 
-            'authority': False,
-        }     
-        expected_response = {"error": "オーナー自身を招待できません"}
+      data = {
+          'list_id': self.list_instance.list_id,
+          'user_id': 'owner', 
+          'authority': False,
+      }     
+      expected_response = {"error": "オーナ自身のリストには申請できません"}
 
-        response = self.client.post(url, data, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+      response = self.client.post(url, data, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
 
-        # HTTPステータスコードの確認
-        print('[Result]: ', response.status_code, '==', status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        # レスポンスデータの確認
-        print('[Result]: ', response.data)
-        print('[Expect]: ', expected_response)
-        self.assertEqual(response.data, expected_response)
-
-    # オーナー以外が招待を送信 403エラーが期待される
-    def test_post_without_permissions(self):
-        print("\n[[ InviteViewTestCase/test_post_without_permissions ]]")
-
-        token = self.guest_member_token
-        url = reverse('invitee-post')
-
-        data = {
-            'list_id': self.list_instance.list_id,
-            'user_id': 'guest',
-            'authority': True,
-        }
-        expected_response = {"detail":"アクセスする権限がありません"}
-        response = self.client.post(self.url, data, format='json', HTTP_COOKIE=f"jwt_token={str(self.guest_member_token)}")
-       
-        # HTTPステータスコードの確認
-        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        # レスポンスデータの確認
-        print('[Result]: ', response.data)
-        print('[Expect]: ', expected_response)
-        self.assertEqual(response.data, expected_response)
+      # HTTPステータスコードの確認
+      print('[Result]: ', response.status_code, '==', status.HTTP_400_BAD_REQUEST)
+      self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+      # レスポンスデータの確認
+      print('[Result]: ', response.data)
+      print('[Expect]: ', expected_response)
+      self.assertEqual(response.data, expected_response)
