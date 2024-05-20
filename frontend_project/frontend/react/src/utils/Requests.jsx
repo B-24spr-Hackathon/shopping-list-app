@@ -16,6 +16,7 @@ export const apiEndpoint = {
     member_status: "api/member_status/",
     entry: "api/entry/",
     accept: "api/entry/accept/",
+    decline: "api/entry/decline/",
 };
 
 export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
@@ -313,7 +314,7 @@ export const applyToListRequest = async( list_id, user_id, authority, token ) =>
     });
     return response;
 }
-//リストの共有を申請するリクエスト
+//リストの共有を許可するリクエスト(招待も申請も共通)
 export const approveToListRequest = async( member_id, token ) => {
     const response = await apiRequest({
         method: 'PATCH',
@@ -326,3 +327,37 @@ export const approveToListRequest = async( member_id, token ) => {
     });
     return response;
 }
+//自分からのリストの招待、申請、友達からの申請を拒否するリクエスト
+export const declineToListRequest = async( member_id, token ) => {
+    const response = await apiRequest({
+        method: 'DELETE',
+        apiEndpoint: apiEndpoint.decline + member_id + '/',
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//共有リストの権限変更（招待・申請共通）
+export const changeEditAuthJoinedListRequest = async( member_id, authority, token ) => {
+    const response = await apiRequest({
+        method: 'PATCH',
+        apiEndpoint: apiEndpoint.entry + member_id + '/',
+        data: {
+            authority: authority,
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//共有リストの共有解除（招待・申請共通）
+export const removeJoinedListRequest = async( member_id, token ) => {
+    const response = await apiRequest({
+        method: 'DELETE',
+        apiEndpoint: apiEndpoint.entry + member_id + '/',
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+
