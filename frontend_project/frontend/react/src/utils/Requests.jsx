@@ -12,8 +12,10 @@ export const apiEndpoint = {
     lineLogin: "api/line-login/",
     lineLink: 'api/line-link/',
     invite: "api/invite/",
-    apply: "/api/apply/",
+    apply: "api/apply/",
     member_status: "api/member_status/",
+    entry: "api/entry/",
+    accept: "api/entry/accept/",
 };
 
 export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
@@ -305,6 +307,19 @@ export const applyToListRequest = async( list_id, user_id, authority, token ) =>
             list_id: list_id,
             user_id: user_id,
             authority: authority
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//リストの共有を申請するリクエスト
+export const approveToListRequest = async( member_id, token ) => {
+    const response = await apiRequest({
+        method: 'PATCH',
+        apiEndpoint: apiEndpoint.accept + member_id + '/',
+        data: {
+            member_status: 0,
         },
         withCredentials: true,
         token: token,

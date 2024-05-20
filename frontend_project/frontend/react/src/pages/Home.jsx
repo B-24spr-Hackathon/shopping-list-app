@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { applyToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
+import { applyToListRequest, approveToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -23,8 +23,9 @@ import lineLink from "../utils/LineLink";
 import LineLinkBtn from "../utils/LineLink";
 import DropUserBtn from "../utils/DropUser";
 import MyListInfo from "../components/MyListInfo";
-import Modal from "../components/Modal";
+
 import { setMember } from "../reducers/memberSlice";
+import MemberStatusModal from "../components/MemberStatusModal";
 
 
 
@@ -46,6 +47,7 @@ function Home() {
     const [message, setMessage] = useState("");
     const [remind, setRemind] = useState(userLineRemind);
     const member = useSelector(state => state.member.member);
+    const [memberInfo, setMemberInfo] = useState([]);
 
     
     //homeを読み込み時に実行
@@ -57,9 +59,12 @@ function Home() {
             dispatch(setUser(userInfo.data.user));
             dispatch(setUser({lists:userInfo.data.lists}));
             const member_statusInfo = await fetchMemberStatusInfoRequest(token);
+            console.log('status',member_statusInfo);
             dispatch(setMember(member_statusInfo.data));
-            // console.log('member:',member_statusInfo);
+            setMemberInfo(member_statusInfo.data);
+
             console.log('member:',member);
+            console.log('memberInfo:',memberInfo);
             
             if (userInfo.data.lists.length == 0){
                 setMessage("まだリストがありません");
@@ -72,22 +77,6 @@ function Home() {
         fetchUserInfo();
     }, [selectedList]);
 
-    // const handleFetchUserInfo = async() => {
-    //     try {
-    //         const response = await fetchUserInfoRequest();
-    //         console.log("fetch:",response);
-    //         dispatch(setUser(response.data.user));
-    //         dispatch(setUser({lists:response.data.lists}));
-    //         console.log('lists:',lists.length);
-    //         console.log('lists:',lists[0]);
-
-    //         return response;
-    //     }catch(err){
-    //         // console.log(err.response.data);
-    //         console.log("era-")
-    //         console.log(err.response);
-    //     };
-    // }
 
     const handleFetchShoppingList = async() => {
         const response = await fetchShoppingListRequest(selectedListId, token)
@@ -200,12 +189,17 @@ function Home() {
         setApplyAuthority(e.target.value);
     };
 
+    const handleApproveToList = async(member_id) => {
+        const response = await approveToListRequest(member_id, token);
+        console.log('承認？',response);
+    }
+
     return (
         <>
             <div className="flex flex-col">
                 <Header />
                 <div className="fixed right-2 mt-1 text-right">
-                    <Modal />
+                    <MemberStatusModal member={memberInfo} onApprove={handleApproveToList} />
                     <LogoutButton />
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
