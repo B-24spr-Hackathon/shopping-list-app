@@ -36,8 +36,6 @@ class ApplyViewTestCase(APITestCase):
         )
         list_instance.save()
         self.list_instance = list_instance
-        
-        self.url = reverse('apply-get', kwargs={'user_id': 'owner'})  
 
     # GETメソッドのテスト           
 

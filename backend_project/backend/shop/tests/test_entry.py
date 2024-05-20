@@ -250,3 +250,244 @@ class EntryViewTestCase(APITestCase):
         print('[Result]: ', response.data)
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response) 
+
+        
+# 招待 申請承認機能
+class EntryAcceptViewTestCase(APITestCase):
+    def setUp(self):
+        # リストオーナー
+        self.list_owner = User.objects.create(
+            user_id='owner',
+            user_name='owner',
+            email='owner@sample.com',
+            password='owner'
+        )
+        self.list_owner_token = AccessToken.for_user(self.list_owner)
+
+        # リストインスタンス
+        self.list_instance = List.objects.create(
+            owner_id=self.list_owner,
+            list_name='test-list',
+        )
+
+        # ゲスト
+        self.guest_member = User.objects.create(
+            user_id='guest',
+            user_name='guest',
+            email='guest@sample.com',
+            password='guest'
+        )
+        self.guest_member_token = AccessToken.for_user(self.guest_member)
+
+        # 他のユーザー
+        self.other_user = User.objects.create(
+            user_id='other',
+            user_name='other',
+            email='other@sample.com',
+            password='other'
+        )
+        self.other_user_token = AccessToken.for_user(self.other_user)
+
+        # member_status=2 のメンバー作成
+        self.member_status_2 = Member.objects.create(
+            list_id=self.list_instance,
+            guest_id=self.guest_member,
+            member_status=2,
+            authority=False,
+        )
+
+        # member_status=1 のメンバー作成
+        self.member_status_1 = Member.objects.create(
+            list_id=self.list_instance,
+            guest_id=self.guest_member,
+            member_status=1,
+            authority=False,
+        )
+
+        # member_status=0 のメンバー作成
+        self.member_status_0 = Member.objects.create(
+            list_id=self.list_instance,
+            guest_id=self.guest_member,
+            member_status=0,
+            authority=False,
+        )
+
+    # オーナーが有効な member_status=2 のメンバー承認。200を期待
+    def test_owner_accept_valid_member_status_2(self):
+        print("\n[[ EntryAcceptViewTestCase/test_owner_accept_valid_member_status_2 ]]")
+
+        url = f'/api/entry/accept/{self.member_status_2.pk}/'
+        token = self.list_owner_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'member_status': 0
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストが自分に来ている招待を正しく承認。 200を期待
+    def test_guest_accept_valid_member_status_1_self(self):
+        print("\n[[ EntryAcceptViewTestCase/test_guest_accept_valid_member_status_1_self ]]")
+
+        url = f'/api/entry/accept/{self.member_status_1.pk}/'
+        token = self.guest_member_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'member_status': 0
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # 存在しないmember_idに対する承認。404を期待
+    def test_accept_nonexistent_member(self):
+        print("\n[[ EntryAcceptViewTestCase/test_accept_nonexistent_member ]]")
+
+        url = f'/api/entry/accept/9999/'
+        token = self.list_owner_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'error': 'ゲストが存在しません'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # オーナーでもゲストでもないユーザが承認。403を期待
+    def test_accept_without_permission(self):
+        print("\n[[ EntryAcceptViewTestCase/test_accept_without_permission ]]")
+
+        url = f'/api/entry/accept/{self.member_status_2.pk}/'
+        token = self.other_user_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'error': '承認する権限がありません'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # オーナーが自分が所有していないリストの申請を承認。403を期待
+    def test_owner_accept_request_from_other_list(self):
+        print("\n[[ EntryAcceptViewTestCase/test_owner_accept_request_from_other_list ]]")
+
+        # 他のリストのオーナー
+        other_list_owner = User.objects.create(
+            user_id='other_owner',
+            user_name='other_owner',
+            email='other_owner@sample.com',
+            password='other_owner'
+        )
+        # 他のリストインスタンス
+        other_list_instance = List.objects.create(
+            owner_id=other_list_owner,
+            list_name='other-test-list',
+        )
+        # 他のリストの member_status=2 のメンバー作成
+        other_member_status_2 = Member.objects.create(
+            list_id=other_list_instance,
+            guest_id=self.guest_member,
+            member_status=2,
+            authority=False,
+        )
+        url = f'/api/entry/accept/{other_member_status_2.pk}/'
+        token = self.list_owner_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'error': '承認する権限がありません'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # オーナーがmember_status=1を承認。400を期待
+    def test_owner_accept_invalid_member_status(self):
+        print("\n[[ EntryAcceptViewTestCase/test_owner_accept_invalid_member_status ]]")
+
+        url = f'/api/entry/accept/{self.member_status_1.pk}/'
+        token = self.list_owner_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'error': '自身が招待したものは自身で承認できません'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)       
+        
+    # ゲストがmember_status=1 の他メンバーを承認。403を期待
+    def test_guest_accept_valid_member_status_1(self):
+        print("\n[[ EntryAcceptViewTestCase/test_guest_accept_valid_member_status_1 ]]")
+
+        other_member = Member.objects.create(
+            list_id=self.list_instance,
+            guest_id=self.other_user,
+            member_status=1,
+            authority=False,
+        )
+        url = f'/api/entry/accept/{other_member.pk}/'
+        token = self.guest_member_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+        
+        expected_response = {
+            'error': '承認する権限がありません'
+            }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)  
+
+    # ゲストが自分の申請を承認。403を期待
+    def test_guest_accept_invalid_member_status(self):
+        print("\n[[ EntryAcceptViewTestCase/test_guest_accept_invalid_member_status ]]")
+
+        url = f'/api/entry/accept/{self.member_status_2.pk}/'
+        token = self.guest_member_token
+        response = self.client.patch(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {
+            'error': '自身が申請したものは自身で承認できません'
+            }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)  
+
+
+
