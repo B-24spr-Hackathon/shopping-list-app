@@ -487,7 +487,203 @@ class EntryAcceptViewTestCase(APITestCase):
         # レスポンスデータの確認
         print('[Result]: ', response.data)
         print('[Expect]: ', expected_response)
-        self.assertEqual(response.data, expected_response)  
+        self.assertEqual(response.data, expected_response) 
+
+# 招待 申請 拒否・中止機能　DELETE
+class EntryDeclineViewTestCase(APITestCase):
+    # テスト用データのセットアップ
+    def setUp(self):  
+        # リストオーナー
+        list_owner = User.objects.create(
+            user_id='owner',
+            user_name='owner',
+            email='owner@sample,com',
+            password='owner'
+        )
+        list_owner.save()
+        self.list_owner_token = AccessToken.for_user(list_owner)
+
+        # リストインスタンス
+        list_instance = List.objects.create(
+            owner_id=list_owner,
+            list_name='test-list',
+        )
+        list_instance.save()
+        self.list_instance = list_instance
+
+        # ゲスト
+        guest_member = User.objects.create(
+            user_id='guest',
+            user_name='guest',
+            email='guest@sample,com',
+            password='guest'
+        )
+        guest_member.save()
+        self.guest_member_token = AccessToken.for_user(guest_member)
+
+        # 別のユーザー（ゲストでもオーナーでもない）
+        another_user = User.objects.create(
+            user_id='another',
+            user_name='another',
+            email='another@sample.com',
+            password='another'
+        )
+        another_user.save()
+        self.another_user_token = AccessToken.for_user(another_user)
+
+        # Member作成
+        member = Member.objects.create(
+            list_id=self.list_instance,
+            guest_id=guest_member,
+            member_status=1,
+            authority=False,
+        )
+        self.member = member
+        self.member_id = member.pk  
+
+    # オーナーが招待を中止 200が期待される
+    def test_owner_cancel_invite(self):
+        print("\n[[ EntryDeclineViewTestCase/test_owner_cancel_invite ]]")
+
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.list_owner_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'user_name': 'guest'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # オーナーが申請を拒否 200が期待される
+    def test_owner_decline_request(self):
+        print("\n[[ EntryDeclineViewTestCase/test_owner_decline_request ]]")
+
+        # member_statusを2に変更
+        self.member.member_status = 2
+        self.member.save()
+        
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.list_owner_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'user_name': 'guest'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストが招待を拒否200が期待される
+    def test_guest_decline_invite(self):
+        print("\n[[ EntryDeclineViewTestCase/test_guest_decline_invite ]]")
+
+        # member_statusを1に変更
+        self.member.member_status = 1
+        self.member.save()
+        
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.guest_member_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'user_name': 'guest'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+# ゲストが申請を中止 200が期待される
+    def test_guest_cancel_request(self):
+        print("\n[[ EntryDeclineViewTestCase/test_guest_decline_invite ]]")
+
+        # member_statusを2に変更
+        self.member.member_status = 2
+        self.member.save()
+        
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.guest_member_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'user_name': 'guest'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストが存在しない 404エラーが期待される
+    def test_guest_not_found(self):
+        print("\n[[ EntryDeclineViewTestCase/test_guest_not_found ]]")
+
+        non_exist_member_id = 99999
+
+        url = f'/api/entry/decline/{non_exist_member_id}/'
+        token = self.list_owner_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {"error": "ゲストが存在しません"
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストでもユーザーでもないものがアクセス403{'error': '拒否または中止する権限がありません'}
+    def test_nonguest_or_nonowner_access_denied(self):
+        print("\n[[ EntryDeclineViewTestCase/test_nonguest_or_nonowner_access_denied ]]")
+
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.another_user_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'error': '拒否または中止する権限がありません'}
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストが参加済み 400エラーが期待される
+    def test_guest_already_participated(self):
+        print("\n[[ EntryDeclineViewTestCase/test_guest_already_participated ]]")
+
+        # member_statusを0に変更
+        self.member.member_status = 0
+        self.member.save()
+        
+        url = f'/api/entry/decline/{self.member_id}/'
+        token = self.list_owner_token
+        response = self.client.delete(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+
+        expected_response = {'error': '参加済みのゲストの削除はここからはできません'
+        }
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
 
 
 
+    
