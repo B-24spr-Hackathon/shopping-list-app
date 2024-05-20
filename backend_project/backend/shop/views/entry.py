@@ -118,10 +118,15 @@ class EntryAcceptView(APIView):
             logger.error('承認権限なし')
             return Response({'error': '承認する権限がありません'}, status=status.HTTP_403_FORBIDDEN)
         
-        # リストのオーナーは、member_status=2のデータのみ承認可能
-        if current_user == list_instance.owner_id and guest.member_status != 2:
-            logger.error('オーナーは申請しか承認できない')
-            return Response({'error': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
+        # リストのオーナーは、所有するリストのmember_status=2のデータのみ承認可能
+        if current_user == list_instance.owner_id:
+            # オーナーが他のリストの申請を承認しようとした場合
+            if guest.list_id != list_instance:
+                logger.error('他のリストの申請を承認しようとしています')
+                return Response({'error': '他のリストの申請を承認できません'}, status=status.HTTP_403_FORBIDDEN)
+            if guest.member_status != 2:
+                logger.error('オーナーは申請しか承認できない')
+                return Response({'error': '自身が招待したものは自身で承認できません'}, status=status.HTTP_403_FORBIDDEN)
 
         # リストのユーザー（ゲスト）は、自分が招待されている member_status=1 のデータのみ承認可能
         if current_user == guest.guest_id:
