@@ -12,6 +12,10 @@ export const apiEndpoint = {
     lineLogin: "api/line-login/",
     lineLink: 'api/line-link/',
     invite: "api/invite/",
+    apply: "api/apply/",
+    member_status: "api/member_status/",
+    entry: "api/entry/",
+    accept: "api/entry/accept/",
 };
 
 export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
@@ -48,6 +52,18 @@ export const fetchUserInfoRequest = async(token) => {
     });
     return response;
 };
+//共有の招待・申請状況を取得するリクエスト
+export const fetchMemberStatusInfoRequest = async(token) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.member_status,
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+};
+
+
 //ユーザー情報を更新するリクエスト
 export const updateUserInfoRequest = async( key, newValue, token  ) => {
     const response = await apiRequest({
@@ -263,6 +279,47 @@ export const inviteToListRequest = async( list_id, user_id, authority, token ) =
             list_id: list_id,
             user_id: user_id,
             authority: authority
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+
+//共有申請時にユーザー検索するリクエスト
+export const searchApplyFriendRequest = async( user_id, token ) => {
+    const response = await apiRequest({
+        method: 'GET',
+        apiEndpoint: apiEndpoint.apply + user_id + "/",
+        withCredentials: true,
+        token: token,
+    });
+    console.log("");
+    return response;
+}
+
+//リストの共有を申請するリクエスト
+export const applyToListRequest = async( list_id, user_id, authority, token ) => {
+    const response = await apiRequest({
+        method: 'POST',
+        apiEndpoint: apiEndpoint.apply,
+        data: {
+            list_id: list_id,
+            user_id: user_id,
+            authority: authority
+        },
+        withCredentials: true,
+        token: token,
+    });
+    return response;
+}
+//リストの共有を申請するリクエスト
+export const approveToListRequest = async( member_id, token ) => {
+    const response = await apiRequest({
+        method: 'PATCH',
+        apiEndpoint: apiEndpoint.accept + member_id + '/',
+        data: {
+            member_status: 0,
         },
         withCredentials: true,
         token: token,
