@@ -26,6 +26,8 @@ import MyListInfo from "../components/MyListInfo";
 
 import { setMember } from "../reducers/memberSlice";
 import MemberStatusModal from "../components/MemberStatusModal";
+import SelectMyList from "../components/SelectMyList";
+import MyListInfoModal from "../components/MyListInfoModal";
 
 
 
@@ -44,6 +46,7 @@ function Home() {
     const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
     const [lists, setLists] = useState([]);
+    const [list, setList] = useState();
     const [message, setMessage] = useState("");
     const [remind, setRemind] = useState(userLineRemind);
     const member = useSelector(state => state.member.member);
@@ -62,16 +65,26 @@ function Home() {
             console.log('status',member_statusInfo);
             dispatch(setMember(member_statusInfo.data));
             setMemberInfo(member_statusInfo.data);
-
+            if (selectedList) {
+                const response = await fetchListInfoRequest(selectedListId, token);
+                setList(response.data);
+                console.log('何で', response);
+                console.log('どうして', list);
+            }
+            
             console.log('member:',member);
             console.log('memberInfo:',memberInfo);
+            // console.log(list.guests_info);
             
             if (userInfo.data.lists.length == 0){
                 setMessage("まだリストがありません");
                 // await handleAddNewList();
             }else{
                 setLists(userInfo.data.lists);
-                await fetchListInfoRequest(selectedListId, token);
+                const listInfo = await fetchListInfoRequest(selectedListId, token);
+                setList(listInfo.data);
+                console.log('list:', listInfo.data);
+
             }
         };
         fetchUserInfo();
@@ -209,8 +222,15 @@ function Home() {
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
-                    <MyLists lists={lists} token={token} />
+                    {/* <MyLists lists={lists} token={token} /> */}
+                    <SelectMyList lists={lists}/>
                     <p>{message}</p>
+                    <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
+                    <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
+                    <MyListInfoModal list={list}/>
+                    {list ? list.list_name : 'No data available'}
+                    
+
 
                     
                     
@@ -236,8 +256,6 @@ function Home() {
                     <PermissionDropdown value={applyAuthority} onChange={handleApplyAuthorityChange} />
                     <TestBtn onClick={handleApplyFriendToList} children="共有申請"/>
                     <br />
-                    <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
-                    <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
                     <LineLinkBtn />
                     <div>
                         LINE通知ON or OFF
