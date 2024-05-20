@@ -11,6 +11,7 @@ import { setItemAllInfo } from "../reducers/itemSlice.jsx";
 import { ItemsListPanel } from "../components/ListPanels.jsx";
 import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -23,6 +24,7 @@ function Items() {
     const [lists, setLists] = useState([]);
     const [items, setItems] = useState([]);
     const token = useSelector(state => state.token.token);
+    const navigate = useNavigate();
 
    useEffect(() => {
     const fetchListAndItemsInfo = async() =>{
@@ -36,7 +38,9 @@ function Items() {
     fetchListAndItemsInfo();
    },[]);
 
-
+   const handleToHome = () => {
+    navigate('/home');
+   }
     
 
 
@@ -46,6 +50,7 @@ function Items() {
             <Header />
             <div className="fixed right-2 mt-1 text-right">
                 <LogoutButton />
+                <TestBtn children='homeへ' onClick={handleToHome}/>
             </div>
             <UserNameAndIcon />
             <TabMainMenu />

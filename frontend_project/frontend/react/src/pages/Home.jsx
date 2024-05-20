@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { applyToListRequest, approveToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
+import { applyToListRequest, approveToListRequest, declineToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -191,7 +191,12 @@ function Home() {
 
     const handleApproveToList = async(member_id) => {
         const response = await approveToListRequest(member_id, token);
-        console.log('承認？',response);
+        console.log('承認',response);
+    }
+
+    const handleDeclineToList = async(member_id) => {
+        const response = await declineToListRequest(member_id, token);
+        console.log('拒否OR中止',response);
     }
 
     return (
@@ -199,7 +204,7 @@ function Home() {
             <div className="flex flex-col">
                 <Header />
                 <div className="fixed right-2 mt-1 text-right">
-                    <MemberStatusModal member={memberInfo} onApprove={handleApproveToList} />
+                    <MemberStatusModal member={memberInfo} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
                     <LogoutButton />
                 </div>
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
