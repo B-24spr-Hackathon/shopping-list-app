@@ -9,6 +9,7 @@ from shop.authentication import CustomJWTAuthentication
 from django.shortcuts import get_object_or_404
 from shop.permissions import IsOwner
 from rest_framework.response import Response
+from django.db.models import Q
 import logging
 
 logger = logging.getLogger('backend')
@@ -244,10 +245,16 @@ class EntryStatusView(APIView):
             logger.error(f"{request.data}")
    
         user = request.user
-        members = Member.objects.filter(guest_id=user, member_status__in=[1, 2])
-       
+
+        # アクセスユーザーが所有するリストのIDを取得
+        owned_list_ids = List.objects.filter(owner_id=user).values_list('list_id', flat=True)
+        # ユーザーが関連するすべてのMembersレコードを取得
+        all_members = Member.objects.filter(Q(guest_id=user) | Q(list_id__in=owned_list_ids))
+        
         member_data = []
-        for member in members:
+
+        for member  in all_members:
+            is_owner = member.list_id.list_id in owned_list_ids
             member_data.append({
                 'member_id': member.member_id,
                 'guest_name': member.guest_id.user_name,
@@ -255,8 +262,6 @@ class EntryStatusView(APIView):
                 'list_id': member.list_id.list_id,
                 'list_name': member.list_id.list_name,
                 'owner_name': member.list_id.owner_id.user_name,
+                'is_owner': is_owner,
             })
         return Response(member_data, status=status.HTTP_200_OK)
-    
-
-
