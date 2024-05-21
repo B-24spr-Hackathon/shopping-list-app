@@ -61,7 +61,7 @@ function Home() {
                 setMessage('まだリストがありません');
             }else{
                 //あればリストの0番目をselectedListして、そのリスト情報を取得
-                dispatch(setSelectedList(userInfo.data.lists[0]));
+                // dispatch(setSelectedList(userInfo.data.lists[0]));
                 const response = await fetchListInfoRequest(selectedListId, token);
                 setList(response.data);
                 setGuest_info(response.data.guest_info);
@@ -73,10 +73,11 @@ function Home() {
             dispatch(setMember(member_statusInfo.data));
             setMemberInfo(member_statusInfo.data);
             console.log('info',member)
+            // window.location.reload();
 
         };
         fetchUserInfo();
-    }, []);
+    }, [selectedListId]);
 
 
     const handleFetchShoppingList = async() => {
@@ -200,7 +201,7 @@ function Home() {
         <>
             <div className="flex flex-col">
                 <Header />
-                <div className="fixed right-2 mt-1">
+                <div className="fixed right-2 mt-1 z-40">
                     <MemberStatusModal member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
                     <LogoutButton />
                 </div>

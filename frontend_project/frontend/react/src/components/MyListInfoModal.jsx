@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { PermissionDropdownForMyListModal } from "./cmbSelectAuthority";
-import { changeEditAuthJoinedListRequest, editListInfoRequest, fetchListInfoRequest } from "../utils/Requests";
+import { changeEditAuthJoinedListRequest, deleteListRequest, editListInfoRequest, fetchListInfoRequest, fetchUserInfoRequest } from "../utils/Requests";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import { EditableInput } from "./EditableDateInput";
+import { setUser } from "../reducers/userSlice";
 
 function MyListInfoModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +35,12 @@ function MyListInfoModal() {
         const response1 = await fetchListInfoRequest(list.list_id, token);
         dispatch(setSelectedList(response1.data));
     }
-    
+    const handleDeleteList = async(list_id) => {
+        await deleteListRequest(list_id, token);
+        const response = await fetchUserInfoRequest(token);
+        dispatch(setUser(response.data));
+        handleClose();
+    }
 
     return (
         <>
@@ -106,11 +112,8 @@ function MyListInfoModal() {
                                 )}
                             </div>
                             <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
-                                <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800" onClick={handleClose}>
-                                    Close
-                                </button>
-                                <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                    Save changes
+                                <button type="button" onClick={() => handleDeleteList(list.list_id)} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800">
+                                    削除する
                                 </button>
                             </div>
                         </div>

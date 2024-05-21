@@ -3,8 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setSelectedList } from '../reducers/selectedListSlice';
 import { fetchListInfoRequest, fetchItemsOfListRequest, fetchShoppingListRequest } from '../utils/Requests'; // 必要なAPI関数をインポートしてください
 
-function SelectMyList({ lists }) {
+function SelectMyList() {
     const selectedList = useSelector(state => state.selectedList);
+    const lists = useSelector(state => state.user.lists)
     const token = useSelector(state => state.token.token);
     const dispatch = useDispatch();
 
