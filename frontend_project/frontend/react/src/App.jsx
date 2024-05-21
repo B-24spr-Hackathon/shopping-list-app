@@ -19,6 +19,7 @@ import LineLoginForm from "./pages/LineLoginForm";
 import ToDefault from "./pages/ToDefault";
 import LineLoginMethod from "./utils/LineLoginMethod";
 import LineLinkForm from "./pages/LineLinkForm";
+import CombinedScreen from "./pages/Combined";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
             <Route path="/linelinkform" element={<LineLinkForm/>} />
+            <Route path="/comb" element={<CombinedScreen/>} />
             
 
           </Routes>

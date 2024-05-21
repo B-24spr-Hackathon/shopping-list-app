@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { TestBtn } from './Buttons';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 function MemberStatusModal({ member, onApprove, onDecline }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -21,10 +24,10 @@ function MemberStatusModal({ member, onApprove, onDecline }) {
         <>
             <button
                 type="button"
-                className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                className=" text-3xl w-auto font-semibold rounded-lg  bg-gray-600 text-white hover:bg-gray-700 disabled:opacity-50 disabled:pointer-events-none"
                 onClick={handleOpen}
             >
-                共有
+                <FontAwesomeIcon icon={faUsers} />
             </button>
 
             {isOpen && (
