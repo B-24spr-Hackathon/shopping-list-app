@@ -686,7 +686,7 @@ class EntryDeclineViewTestCase(APITestCase):
 
 # 招待・申請一覧を表示 GET
 class EntryMemberStatusViewTestCase(APITestCase):
-
+    
     def setUp(self):
         
         # リストオーナー
@@ -768,44 +768,82 @@ class EntryMemberStatusViewTestCase(APITestCase):
 
     # ゲストとしてリクエスト 200が期待される
     def test_get_entry_status_as_guest(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_as_guest ]]")
 
         url = f'/api/member_status/'
         token = self.guest_user_token
         response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
 
         expected_response = [
             {
-                'member_id': member.member_id,
-                'guest_name': guest_user.user_name,
-                'member_status': member.member_status,
-                'list_id': list_instance.list_id,
-                'list_name': list_instance.list_name,
-                'owner_name': owner_user.user_name,
+                'member_id': self.member.member_id,
+                'guest_name': self.guest_member.user_name,
+                'member_status': self.member.member_status,
+                'list_id': self.list_instance.list_id,
+                'list_name': self.list_instance.list_name,
+                'owner_name': self.list_owner.user_name,
                 'is_owner': False,
             }
         ]
+        response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
-    # ゲストでもオーナーでもないユーザーがリクエストを行い、関連するメンバーが存在しないことを確認します。
+    # ゲストでもオーナーでもないユーザーがリクエスト、空のレスポンスを期待
     def test_get_entry_status_as_another_user(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_as_another_user ]]")
 
         url = f'/api/member_status/'
         token = self.another_user_token
         response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
 
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(response.data, [])
+        expected_response = []
 
-    # 認証されていないユーザーがアクセスしようとした場合、401エラーが返されることを確認します。
+        response = response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # 認証されていないユーザーがアクセス　401エラーが期待される
     def test_get_entry_status_unauthenticated(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_unauthenticated ]]")
 
-        url = f'/api/member_status/'        
-        response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str()}")
+        url = f'/api/member_status/'   
+        invalid_token = "invalid_token_value"
+        response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(invalid_token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(invalid_token)}"
+        }
     
-        response = self.client.get(url)
+        expected_response =  {'detail': 'トークンが無効です'}
+
+        response = response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+        
 
 
 
