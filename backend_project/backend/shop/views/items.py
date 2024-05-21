@@ -112,7 +112,7 @@ class ItemDetailView(APIView):
             # to_listがfalseからtrueに更新されたらlast_open_atを更新する
             if to_list == True and previous_to_list == False:
                 item_instance.last_open_at = date.today()
-                list_instance.save()
+                item_instance.save()
 
                 # 頻度が短くなっていれば、消費サイクルを更新
                 cycle = item_instance.consume_cycle
