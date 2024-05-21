@@ -11,13 +11,6 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-    # emailがDBに登録されているか確認
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            return value
-        else:
-            raise serializers.ValidationError("メールアドレスが登録されていません")
-
     # 受取ったemailとpasswordでユーザー認証
     def validate(self, data):
         email = data.get("email")
