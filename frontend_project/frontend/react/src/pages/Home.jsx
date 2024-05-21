@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { AddBtn, DeleteListBtn, LineBtn, TestBtn } from "../components/Buttons";
+import { AddBtn, DeleteListBtn, LineBtn, OrangeBtn, TestBtn } from "../components/Buttons";
 import { useSelector } from 'react-redux';
 import { useCookies } from 'react-cookie';
-import { applyToListRequest, approveToListRequest, declineToListRequest, deleteItemRequest, deleteListRequest, editListNameRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
+import { applyToListRequest, approveToListRequest, declineToListRequest, deleteItemRequest, deleteListRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { useDispatch } from "react-redux";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
@@ -12,18 +12,10 @@ import { ForApplySelectList, ForInviteSelectList, SelectList } from "../componen
 import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
-import AddNewItem from "../utils/AddNewItem";
-import { setItemAllInfo } from "../reducers/itemSlice";
-import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice";
-import TextInput from "../components/TextInput";
-import { EditableInput } from "../components/EditableDateInput";
+import { TextInput, TextInput2 } from "../components/TextInput";
 import { PermissionDropdown } from "../components/cmbSelectAuthority";
-import MyLists from "../components/MyLists";
-import lineLink from "../utils/LineLink";
 import LineLinkBtn from "../utils/LineLink";
 import DropUserBtn from "../utils/DropUser";
-import MyListInfo from "../components/MyListInfo";
-
 import { setMember } from "../reducers/memberSlice";
 import MemberStatusModal from "../components/MemberStatusModal";
 import SelectMyList from "../components/SelectMyList";
@@ -73,13 +65,14 @@ function Home() {
                 const response = await fetchListInfoRequest(selectedListId, token);
                 setList(response.data);
                 setGuest_info(response.data.guest_info);
-                setLists(userInfo.data.lists);
+
             }
             //招待・申請状況を取得
             const member_statusInfo = await fetchMemberStatusInfoRequest(token);
 
             dispatch(setMember(member_statusInfo.data));
             setMemberInfo(member_statusInfo.data);
+            console.log('info',member)
 
         };
         fetchUserInfo();
@@ -102,10 +95,10 @@ function Home() {
 
     }
 
-    const handleEditListName = async(newValue) => {
-        const response = await editListNameRequest(selectedList.list_id, newValue, token);
-        dispatch(setSelectedList({...selectedList, list_name:newValue}));
-    }
+    // const handleEditListName = async(newValue) => {
+    //     const response = await editListNameRequest(selectedList.list_id, newValue, token);
+    //     dispatch(setSelectedList({...selectedList, list_name:newValue}));
+    // }
 
     const [friendInviteUserId, setFriendInviteUserId] =useState();
     const [friendApplyUserId, setFriendApplyUserId] = useState()
@@ -144,6 +137,8 @@ function Home() {
     const handleInviteFriendToList = async() => {
         try {
             const response = await inviteToListRequest( selectedInviteListId, friendInviteUserInfo.user_id, inviteAuthority, token);
+            const response1 = await fetchUserInfoRequest(token);
+            dispatch(setUser(response1));
         }catch{
             console.log(err.response.data);
 
@@ -203,48 +198,60 @@ function Home() {
 
     return (
         <>
-            <div className="">
+            <div className="flex flex-col">
                 <Header />
-                <div className="fixed right-2 mt-1 text-right">
-                    <MemberStatusModal member={memberInfo} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
+                <div className="fixed right-2 mt-1">
+                    <MemberStatusModal member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
                     <LogoutButton />
                 </div>
-                <div className=" justify-center flex-grow items-center overflow-auto">
+                <div className="my-16">
                     <Title children="ようこそ" />
-                    {/* <MyLists lists={lists} token={token} /> */}
-                    <SelectMyList lists={lists}/>
-                    <p>{message}</p>
-                    <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
-                    <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
-                    <MyListInfoModal list={selectedList} guest_info={guest_info}/>
-                    {/* {guest_info[0].user_name} */}
-
-                    
-
-
-                    
-                    
-                    <AddBtn children="+" onClick={handleAddNewList} onChange={""} />
-
-
-                    <TextInput type="text" placeholder="user_id" value={friendInviteUserId} onChange={e => setFriendInviteUserId(e.target.value)}/>
-                    <TestBtn onClick={handleSearchInviteFriend} children='招待したい友達' />
-                    <p>検索した友達ユーザー名{friendInviteUserInfo.user_name}</p>
-                    <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
-                    <PermissionDropdown value={inviteAuthority} onChange={handleInviteAuthorityChange} />
-                    <TestBtn onClick={handleInviteFriendToList} children="招待"/>
-                    <div>
-                        <br />
-                        <br />
-                        
+                </div>
+                    <div className="flex justify-center w-full items-center">
+                    <div className="">
+                        <SelectMyList lists={lists}/>
+                    </div>
+                    <div className="ml-4">
+                        <MyListInfoModal list={selectedList} guest_info={guest_info}/>
 
                     </div>
-                    <TextInput type="text" placeholder="user_id" value={friendApplyUserId} onChange={e => setFriendApplyUserId(e.target.value)}/>
-                    <TestBtn onClick={handleSearchApplyFriend} children='共有申請したい友達' />
-                    <p>検索した友達ユーザー名{friendApplyUserInfo.user_name}</p>
-                    <ForApplySelectList lists={friendApplyUserLists} onSelectChange={handleApplyListSelectChange} />
-                    <PermissionDropdown value={applyAuthority} onChange={handleApplyAuthorityChange} />
-                    <TestBtn onClick={handleApplyFriendToList} children="共有申請"/>
+                    </div>
+                    <p>{message}</p>
+                    <div className="flex justify-center">
+                        <div className="mx-1">
+                           <OrangeBtn onClick={ () => navigate('/items')} children="リストの商品を管理する"/>
+                        </div>
+                        <div className="mx-1">
+                          <OrangeBtn onClick={ () => navigate('/shoppinglist')} children="お買い物リストを見る"/>
+                        </div>
+
+                    </div>
+                        <button onClick={handleAddNewList}>＋新しいリストを作成する</button>
+                    
+
+
+                    
+                    
+                    <div className="flex justify-center">
+
+                    <div className="flex flex-col w-1/2 p-8">
+                        <TextInput2 type="text" placeholder="user_id" value={friendInviteUserId} onChange={e => setFriendInviteUserId(e.target.value)}/>
+                        <TestBtn onClick={handleSearchInviteFriend} children='招待したい友達' />
+                        <p>検索した友達ユーザー名{friendInviteUserInfo.user_name}</p>
+                        <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
+                        <PermissionDropdown value={inviteAuthority} onChange={handleInviteAuthorityChange} />
+                        <TestBtn onClick={handleInviteFriendToList} children="招待"/>
+
+                    </div>
+                    <div className="flex flex-col w-1/2 p-8">
+                        <TextInput2 type="text" placeholder="user_id" value={friendApplyUserId} onChange={e => setFriendApplyUserId(e.target.value)}/>
+                        <TestBtn onClick={handleSearchApplyFriend} children='共有申請したい友達' />
+                        <p>検索した友達ユーザー名{friendApplyUserInfo.user_name}</p>
+                        <ForApplySelectList lists={friendApplyUserLists} onSelectChange={handleApplyListSelectChange} />
+                        <PermissionDropdown value={applyAuthority} onChange={handleApplyAuthorityChange} />
+                        <TestBtn onClick={handleApplyFriendToList} children="共有申請"/>
+                    </div>
+                    </div>
                     <br />
                     <LineLinkBtn />
                     <div>
@@ -257,7 +264,7 @@ function Home() {
                     </div>
                     <DropUserBtn />
                 </div>
-            </div>
+
 
         </>
 

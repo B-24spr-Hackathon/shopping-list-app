@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { EditableInputWithButton } from "./EditableDateInput";
 import { setSelectedList } from "../reducers/selectedListSlice";
-import { editListNameRequest, deleteListRequest, fetchUserInfoRequest, fetchListInfoRequest } from "../utils/Requests";
+import { deleteListRequest, fetchUserInfoRequest, fetchListInfoRequest } from "../utils/Requests";
 import { setUser } from "../reducers/userSlice";
 import { useNavigate } from 'react-router-dom';
 

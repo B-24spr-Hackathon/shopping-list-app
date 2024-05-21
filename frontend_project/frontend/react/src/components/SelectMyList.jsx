@@ -16,22 +16,14 @@ function SelectMyList({ lists }) {
         // 選んだリストの情報を取得
         const listInfo = await fetchListInfoRequest(listId, token);
         dispatch(setSelectedList(listInfo.data));
-
-        // 選んだリストの中のアイテムを取得
-        // const itemsInfo = await fetchItemsOfListRequest(listId, token);
-        // dispatch(setItemAllInfo(itemsInfo.data.items));
-        
-        // 選んだリストの買い物リストを取得
-        // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id, token);
-        // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
     };
 
     return (
-        <div className="m-1 hs-dropdown [--trigger:hover] relative inline-flex w-full">
+        <div className="m-1 hs-dropdown [--trigger:hover] relative inline-flex w-48 z-0">
             <button
                 id="hs-dropdown-hover-event"
                 type="button"
-                className="hs-dropdown-toggle w-full py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
+                className="hs-dropdown-toggle w-full py-3 px-4 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800"
             >
                 {selectedList.list_id ? selectedList.list_name : '選択して下さい'}
                 <svg

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from "../components/HeaderImg";
-import TextInput from "../components/TextInput";
+import { TextInput } from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';

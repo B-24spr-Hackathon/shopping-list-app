@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { PermissionDropdownForMyListModal } from "./cmbSelectAuthority";
-import { changeEditAuthJoinedListRequest, fetchListInfoRequest } from "../utils/Requests";
+import { changeEditAuthJoinedListRequest, editListInfoRequest, fetchListInfoRequest } from "../utils/Requests";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedList } from "../reducers/selectedListSlice";
+import { EditableInput } from "./EditableDateInput";
 
 function MyListInfoModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -28,10 +29,17 @@ function MyListInfoModal() {
         console.log(`Response: ${response}`); // デバッグ用に追加
     };
 
+    const handleUpdateListInfo = async(list_id, key, newValue) => {
+        const response = await editListInfoRequest(list_id, key, newValue, token);
+        const response1 = await fetchListInfoRequest(list.list_id, token);
+        dispatch(setSelectedList(response1.data));
+    }
+    
+
     return (
         <>
             <button type="button" className="disabled:opacity-50 disabled:pointer-events-none" onClick={handleOpen}>
-                <FontAwesomeIcon icon={faCircleInfo} style={{ color: 'rgba(185, 50, 0, 1)' }} />
+                <FontAwesomeIcon icon={faCircleInfo} style={{ color: 'rgba(30, 144, 255,1)' }} size="2x" />
             </button>
 
             {isOpen && (
@@ -55,10 +63,29 @@ function MyListInfoModal() {
                             </div>
                             <div className="p-4 overflow-y-auto">
                                 <p className="mt-1 text-gray-800 dark:text-neutral-400">
-                                    リスト名：{list ? list.list_name : 'No data available'}
+                                    リスト名：
+                                    {list ? (
+                                        <EditableInput
+                                            initialValue={list.list_name}
+                                            onSave={newValue => handleUpdateListInfo(list.list_id, "list_name", newValue)}
+                                        />
+                                    ) : (
+                                        'No data available'
+                                    )}
+
                                 </p>
                                 <p className="mt-1 text-gray-800 dark:text-neutral-400">
-                                    買い物日：{list ? list.shopping_day : 'No data available'}
+                                    買い物日：毎月　
+                                    {list ? (
+                                        <EditableInput
+                                            className="text-center w-16"
+                                            initialValue={list.shopping_day}
+                                            onSave={newValue => handleUpdateListInfo(list.list_id, "shopping_day", newValue)}
+                                        />
+                                    ) : (
+                                        'No data available'
+                                    )}
+                                    日
                                 </p>
                                 <p className="mt-1 text-gray-800 dark:text-neutral-400">共有しているユーザー：</p>
                                 {list && list.guests_info ? (
