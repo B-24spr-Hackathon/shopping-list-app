@@ -14,25 +14,25 @@ const ToDefault = () => {
 
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const response = await fetchUserInfoRequest(token);
-            dispatch(setUser(response.data.user));
-            dispatch(setUser({lists:response.data.lists}));
-            if(response.data.lists.length > 0){
-                dispatch(setSelectedList(response.data.lists[response.data.lists.length -1]));
-            }else{
-                navigate('/home');
-                return;
+            try {
+                const userInfo = await fetchUserInfoRequest(token);
+                dispatch(setUser(userInfo.data));
+                if (userInfo.data.lists.length === 0) {
+                    navigate('/home');
+                } else {
+                    if (default_list) {
+                        navigate('/items');
+                    } else {
+                        navigate('/shoppinglist');
+                    }
+                }
+            } catch (err) {
+                console.log(err);
             }
-            
-            
-            if (default_list) {
-                navigate('/items');
-            } else {
-                navigate('/shoppinglist');
-            }
-        }
+        };
+
         fetchUserInfo();
-    }, [navigate]);
+    }, [dispatch, navigate, token, default_list]);
 
     return null;
 };
