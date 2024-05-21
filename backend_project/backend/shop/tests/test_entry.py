@@ -806,7 +806,7 @@ class EntryMemberStatusViewTestCase(APITestCase):
     
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-'''
+
 
 
 
