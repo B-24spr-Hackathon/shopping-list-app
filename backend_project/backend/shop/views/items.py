@@ -102,14 +102,15 @@ class ItemDetailView(APIView):
         serializer = ItemUpdateSerializer(item_instance, data=request.data, context={"request": request}, partial=True)
 
         if serializer.is_valid():
-            # 更新前の最新開封日を保存
+            # 更新前の直近開封日とto_listを保存
             previous_last_open_at = item_instance.last_open_at
+            previous_to_list = item_instance.to_list
             # データを更新して保存
             to_list = request.data.get('to_list', item_instance.to_list)
             serializer.save(to_list=to_list)
 
-            # to_listがtrueに更新されたらlast_open_dayを更新する
-            if to_list == True:
+            # to_listがfalseからtrueに更新されたらlast_open_dayを更新する
+            if to_list == True and previous_to_list == False:
                 item_instance.last_open_at = date.today()
                 list_instance.save()
 
