@@ -68,10 +68,11 @@ function MyListInfoModal() {
                                 </button>
                             </div>
                             <div className="p-4 overflow-y-auto">
-                                <p className="mt-1 text-gray-800 dark:text-neutral-400">
+                                <p className="mt-1 text-gray-500 dark:text-neutral-400">
                                     リスト名：
                                     {list ? (
                                         <EditableInput
+                                            className="text-gray-800"
                                             initialValue={list.list_name}
                                             onSave={newValue => handleUpdateListInfo(list.list_id, "list_name", newValue)}
                                         />
@@ -80,11 +81,11 @@ function MyListInfoModal() {
                                     )}
 
                                 </p>
-                                <p className="mt-1 text-gray-800 dark:text-neutral-400">
+                                <p className="mt-1 text-gray-500 dark:text-neutral-400">
                                     買い物日：毎月　
                                     {list ? (
                                         <EditableInput
-                                            className="text-center w-16"
+                                            className="text-center w-16 text-gray-800"
                                             initialValue={list.shopping_day}
                                             onSave={newValue => handleUpdateListInfo(list.list_id, "shopping_day", newValue)}
                                         />
@@ -93,7 +94,7 @@ function MyListInfoModal() {
                                     )}
                                     日
                                 </p>
-                                <p className="mt-1 text-gray-800 dark:text-neutral-400">共有しているユーザー：</p>
+                                <p className="mx-1 mt-4 pt-2 text-gray-500 dark:text-neutral-400 text-center border-t">共有しているユーザー</p>
                                 {list && list.guests_info ? (
                                     list.guests_info.length > 0 ? (
                                         list.guests_info.map((guest, index) => (
@@ -111,9 +112,9 @@ function MyListInfoModal() {
                                     <p className="ml-4 text-gray-800 dark:text-neutral-400">No data available</p>
                                 )}
                             </div>
-                            <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
-                                <button type="button" onClick={() => handleDeleteList(list.list_id)} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800">
-                                    削除する
+                            <div className="flex justify-center items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
+                                <button type="button" onClick={() => handleDeleteList(list.list_id)} className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-red-600 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800">
+                                    このリストを削除する
                                 </button>
                             </div>
                         </div>
