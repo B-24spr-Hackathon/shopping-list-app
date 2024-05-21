@@ -17,7 +17,7 @@ import { setItemAllInfo } from "../reducers/itemSlice";
 import { setShoppingItemsAllInfo } from "../reducers/shoppingItemsSlice";
 import TextInput from "../components/TextInput";
 import { EditableInput } from "../components/EditableDateInput";
-import PermissionDropdown from "../components/cmbSelectAuthority";
+import { PermissionDropdown } from "../components/cmbSelectAuthority";
 import MyLists from "../components/MyLists";
 import lineLink from "../utils/LineLink";
 import LineLinkBtn from "../utils/LineLink";
@@ -45,8 +45,10 @@ function Home() {
 
     const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
-    const [lists, setLists] = useState([]);
+    // const [lists, setLists] = useState([]);
     const [list, setList] = useState();
+    const lists = useSelector(state => state.user.lists);
+    const [guest_info, setGuest_info] = useState([]);
     const [message, setMessage] = useState("");
     const [remind, setRemind] = useState(userLineRemind);
     const member = useSelector(state => state.member.member);
@@ -59,36 +61,29 @@ function Home() {
             //ユーザー情報取得
             const userInfo = await fetchUserInfoRequest(token);
             console.log('homeEffect');
-            dispatch(setUser(userInfo.data.user));
-            dispatch(setUser({lists:userInfo.data.lists}));
-            const member_statusInfo = await fetchMemberStatusInfoRequest(token);
-            console.log('status',member_statusInfo);
-            dispatch(setMember(member_statusInfo.data));
-            setMemberInfo(member_statusInfo.data);
-            if (selectedList) {
+            //ユーザー情報をdispatch
+            dispatch(setUser(userInfo.data));
+            // dispatch(setUser({lists:userInfo.data.lists}));
+            //リストがなければ、表示。
+            if(userInfo.data.lists.length == 0){
+                setMessage('まだリストがありません');
+            }else{
+                //あればリストの0番目をselectedListして、そのリスト情報を取得
+                dispatch(setSelectedList(userInfo.data.lists[0]));
                 const response = await fetchListInfoRequest(selectedListId, token);
                 setList(response.data);
-                console.log('何で', response);
-                console.log('どうして', list);
-            }
-            
-            console.log('member:',member);
-            console.log('memberInfo:',memberInfo);
-            // console.log(list.guests_info);
-            
-            if (userInfo.data.lists.length == 0){
-                setMessage("まだリストがありません");
-                // await handleAddNewList();
-            }else{
+                setGuest_info(response.data.guest_info);
                 setLists(userInfo.data.lists);
-                const listInfo = await fetchListInfoRequest(selectedListId, token);
-                setList(listInfo.data);
-                console.log('list:', listInfo.data);
-
             }
+            //招待・申請状況を取得
+            const member_statusInfo = await fetchMemberStatusInfoRequest(token);
+
+            dispatch(setMember(member_statusInfo.data));
+            setMemberInfo(member_statusInfo.data);
+
         };
         fetchUserInfo();
-    }, [selectedList]);
+    }, []);
 
 
     const handleFetchShoppingList = async() => {
@@ -104,12 +99,6 @@ function Home() {
             //selectedListのリスト情報を取得
             const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
             dispatch(setSelectedList(listInfo.data));
-            //該当リスト内のitem情報を取得
-            // const itemsInfo = await fetchItemsOfListRequest(listInfo.data.list_id);
-            // dispatch(setItemAllInfo(itemsInfo.data.items));
-            //該当リストの買い物リストを取得
-            // const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id);
-            // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
 
     }
 
@@ -214,21 +203,22 @@ function Home() {
 
     return (
         <>
-            <div className="flex flex-col">
+            <div className="">
                 <Header />
                 <div className="fixed right-2 mt-1 text-right">
                     <MemberStatusModal member={memberInfo} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
                     <LogoutButton />
                 </div>
-                <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
+                <div className=" justify-center flex-grow items-center overflow-auto">
                     <Title children="ようこそ" />
                     {/* <MyLists lists={lists} token={token} /> */}
                     <SelectMyList lists={lists}/>
                     <p>{message}</p>
                     <TestBtn onClick={ () => navigate('/items')} children="itemsへ"/>
                     <TestBtn onClick={ () => navigate('/shoppinglist')} children="listへ"/>
-                    <MyListInfoModal list={list}/>
-                    {list ? list.list_name : 'No data available'}
+                    <MyListInfoModal list={selectedList} guest_info={guest_info}/>
+                    {/* {guest_info[0].user_name} */}
+
                     
 
 

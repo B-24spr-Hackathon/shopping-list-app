@@ -32,7 +32,8 @@ function Login() {
             dispatch(setUser(response.data.user));
             dispatch(setToken(token));
             //リダイレクト
-            navigate('/todefault');
+            // navigate('/todefault');
+            navigate('/home');
         }catch(err){
             console.log(err.response.data);
             setError("入力した情報で登録されていません。")
