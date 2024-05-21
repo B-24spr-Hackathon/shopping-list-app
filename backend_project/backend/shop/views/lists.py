@@ -28,13 +28,16 @@ class ListView(APIView):
 
         serializer = ListCreateUpdateSerializer(data=request.data)
 
+        
+
         if serializer.is_valid():
             serializer.save(owner_id=request.user)
             response_serializer = ListResponseSerializer(serializer.instance)
 
-            # Userモデルのhave_listをTrueにする
-            request.user.have_list = True
-            request.user.save()
+            # Userモデルのhave_listをTrueにするのは、POST前のhave_listがFalseだった時のみ
+            if not request.user.have_list:
+                request.user.have_list = True
+                request.user.save()
 
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         else:
