@@ -20,6 +20,7 @@ import MemberStatusModal from "../components/MemberStatusModal";
 import SelectMyList from "../components/SelectMyList";
 import MyListInfoModal from "../components/MyListInfoModal";
 import UserNameAndIcon from "../components/UserNameIcon";
+import SimpleSelectBox from "../components/SimpleReactSelect";
 
 
 function Home() {
@@ -199,7 +200,7 @@ function Home() {
                 <p>{message}</p>
                 <div className="flex justify-center ">
                     <div className="my-4">
-                        <OrangeBtn onClick={() => navigate('/comb')} children="選んだリストを見る" />
+                        <OrangeBtn onClick={() => navigate('/items')} children="選んだリストを見る" />
                     </div>
                     {/* <div className="mx-1">
                         <OrangeBtn onClick={() => navigate('/comb')} children="お買い物リストを見る" />

@@ -7,6 +7,7 @@ import { ItemsListPanel, ShoppingListPanel } from "../components/ListPanels.jsx"
 import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
 import { useNavigate } from "react-router-dom";
+import SettingUserInfo from "../components/SettigUserInfo.jsx";
 
 function CombinedScreen() {
     const dispatch = useDispatch();
@@ -34,9 +35,6 @@ function CombinedScreen() {
             <div className="fixed right-2 mt-1 text-right">
                 <LogoutButton />
                 <TestBtn children='homeへ' onClick={handleToHome} />
-            </div>
-            <div className="my-16">
-                <h1 className="text-center text-2xl font-bold">ようこそ</h1>
             </div>
             <div className="flex justify-center w-full items-center">
                 <div className="">
@@ -81,13 +79,12 @@ function CombinedScreen() {
                 {selectedTab === 'settings' && (
                     <div className="flex justify-center">
                         <div className='w-11/12'>
-                            <h2 className="text-center text-xl font-bold">設定画面</h2>
-                            {/* 設定画面の内容をここに追加 */}
+                            <SettingUserInfo />
                         </div>
                     </div>
                 )}
             </div>
-            <Footer />
+
         </>
     );
 }

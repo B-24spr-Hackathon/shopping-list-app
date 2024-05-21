@@ -9,6 +9,8 @@ import AddNewItem from '../utils/AddNewItem';
 import { setShoppingItemsAllInfo } from '../reducers/shoppingItemsSlice';
 import { EditableDateInput, EditableInput } from './EditableDateInput';
 import { TrashBtn } from './trashicon';
+import reactSelect from "react-select";
+import SimpleSelectBox from './SimpleReactSelect';
 
 
 function ListFieldTitle({ title }) {
@@ -350,9 +352,13 @@ function ItemsListPanel() {
                 </td>
                 {/*カテゴリカラー*/}
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <CategoryColorSelector
+                    {/* <CategoryColorSelector
                         color={item.color}
                         onChange={(e) => updateItem(item, 'color', e.target.value)}
+                    /> */}
+                    <SimpleSelectBox
+                        color={item.color}
+                        onChange={(selectedOption) => updateItem(item, 'color', selectedOption.value)}
                     />
                 </td>
                 {/*商品名*/}
