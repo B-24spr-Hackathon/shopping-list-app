@@ -153,7 +153,7 @@ function ForApplySelectList({ onSelectChange, lists }) {
                 onChange={handleSelectChange}
                 id="hs-hidden-select"
                 className="py-3 px-4 pe-9 block w-auto border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                <option value="" disabled>招待するリストを選択</option>
+                <option value="" disabled>申請するリストを選択</option>
                 {lists.map((list, index) => (
                     <option key={index} value={list.list_id}>
                         {list.list_id} {list.list_name}

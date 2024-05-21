@@ -171,12 +171,12 @@ export const addNewListRequest = async(token) => {
     return response;
 }
 //リスト名を編集するリクエスト
-export const editListNameRequest = async( list_id, newValue, token ) => {
+export const editListInfoRequest = async( list_id, key, newValue, token ) => {
     const response = await apiRequest({
         method: 'PATCH',
         apiEndpoint: apiEndpoint.list + list_id + '/',
         data: {
-            list_name: newValue,
+            [key]: newValue,
         },
         withCredentials: true,
         token: token,

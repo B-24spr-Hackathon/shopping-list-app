@@ -8,5 +8,13 @@ function PermissionDropdown({ value, onChange }) {
         </select>
     );
 }
+function PermissionDropdownForMyListModal({ value, onChange }) {
+    return (
+        <select value={value} onChange={onChange}>
+            <option value="true">編集可</option>
+            <option value="false">閲覧のみ</option>
+        </select>
+    );
+}
 
-export default PermissionDropdown;
+export { PermissionDropdown, PermissionDropdownForMyListModal };

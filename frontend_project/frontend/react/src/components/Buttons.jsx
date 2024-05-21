@@ -28,5 +28,9 @@ function BoughtOrPassBtn({ onClick, children, disabled }) {
 function DeleteListBtn({ onClick, children }) {
     return <button className="h-8 w-1/2 rounded-full text-white bg-base-orange border" onClick={onClick} >{children}</button>
 }
-
-export { CertifyBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn, ToShoppingListBtn, BoughtOrPassBtn, DeleteListBtn }
+function OrangeBtn({ onClick, children }){
+    return <button type="button" onClick={onClick} class="py-3 px-4 w-60 justify-center inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-yellow-500 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:hover:bg-neutral-800">
+            {children}
+            </button>
+}
+export { CertifyBtn,OrangeBtn, LineBtn, TestBtn, ShoppingBtn, AddBtn, ToShoppingListBtn, BoughtOrPassBtn, DeleteListBtn }

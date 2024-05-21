@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from "../components/HeaderImg";
-import TextInput from "../components/TextInput";
+import { TextInput } from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
@@ -32,7 +32,8 @@ function Login() {
             dispatch(setUser(response.data.user));
             dispatch(setToken(token));
             //リダイレクト
-            navigate('/todefault');
+            // navigate('/todefault');
+            navigate('/home');
         }catch(err){
             console.log(err.response.data);
             setError("入力した情報で登録されていません。")
