@@ -6,7 +6,7 @@ import { useCookies } from 'react-cookie';
 import { applyToListRequest, approveToListRequest, declineToListRequest, deleteItemRequest, deleteListRequest, fetchItemsOfListRequest, fetchListInfoRequest, fetchMemberStatusInfoRequest, fetchShoppingListRequest, fetchUserInfoRequest, inviteToListRequest, searchApplyFriendRequest, searchFriendRequest, updateUserInfoRequest } from "../utils/Requests";
 import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
-import { Title } from "../components/Title";
+import { Bar, Title } from "../components/Title";
 import { ForApplySelectList, ForInviteSelectList, SelectList } from "../components/SelectBox";
 import AddNewList from "../utils/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
@@ -19,47 +19,42 @@ import { setMember } from "../reducers/memberSlice";
 import MemberStatusModal from "../components/MemberStatusModal";
 import SelectMyList from "../components/SelectMyList";
 import MyListInfoModal from "../components/MyListInfoModal";
+import UserNameAndIcon from "../components/UserNameIcon";
+import SimpleSelectBox from "../components/SimpleReactSelect";
+import HamburgerMenu from "../components/HumbergerMenu";
+
 
 function Home() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
-    const user_name = useSelector((state) => state.user.user_name);
     const userLineRemind = useSelector(state => state.user.remind);
-    const items = useSelector(state => state.items.items);
     const selectedList = useSelector(state => state.selectedList);
     const selectedListId = useSelector(state => state.selectedList.list_id);
     const handleAddNewList = AddNewList();
-    const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
-    const [list, setList] = useState();
     const lists = useSelector(state => state.user.lists);
     const [guest_info, setGuest_info] = useState([]);
     const [message, setMessage] = useState("");
-    const [remind, setRemind] = useState(userLineRemind);
     const member = useSelector(state => state.member.member);
     const [memberInfo, setMemberInfo] = useState([]);
     const [selectedTab, setSelectedTab] = useState('invite'); // タブの状態を管理
 
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const userInfo = await fetchUserInfoRequest(token);
-            dispatch(setUser(userInfo.data));
-            if (userInfo.data.lists.length == 0) {
+
+            if (lists.length == 0) {
                 setMessage('まだリストがありません');
             } else {
-                dispatch(setSelectedList(userInfo.data.lists[0]))
-                const response = await fetchListInfoRequest(selectedListId, token);
-                setList(response.data);
-                setGuest_info(response.data.guest_info);
+
+                //dispatch(setSelectedList(userInfo.data.lists[0]))
+                // const response = await fetchListInfoRequest(selectedListId, token);
+                // setList(response.data);
+                // setGuest_info(response.data.guest_info);
             }
-            const member_statusInfo = await fetchMemberStatusInfoRequest(token);
-            dispatch(setMember(member_statusInfo.data));
-            setMemberInfo(member_statusInfo.data);
-            console.log('info', member);
         };
         fetchUserInfo();
-    }, [selectedListId]);
+    }, []);
 
     const handleFetchShoppingList = async () => {
         const response = await fetchShoppingListRequest(selectedListId, token);
@@ -166,56 +161,67 @@ function Home() {
         <>
             <div className="flex flex-col">
                 <Header />
-                <div className="fixed right-2 mt-1 z-40">
-                    <MemberStatusModal member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
-                    <LogoutButton />
+                <div className="mt-3">
+                    <UserNameAndIcon />
                 </div>
-                <div className="my-16">
-                    <Title children="ようこそ" />
-                </div>
-                <div className="flex justify-center w-full items-center">
+                <div className="fixed flex right-2 mt-1 mr-4 z-40">
                     <div className="">
-                        <SelectMyList lists={lists} />
+                        <HamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/>
                     </div>
+                </div>
+                <div className="flex justify-center my-2">
+
+                    <img className="w-52 h-40 object-cover rounded-full" src="/kaimotto.jpeg"/>
+                </div>
+                <div className="text-center text-lg mt-2 mb-8 font-sans">
+                    <Bar children='もっと上手にまとめ買い！無駄なく、もれなく、買いもっと！' />
+                </div>
+                <div className="flex mb-2 justify-center w-full items-center">
+                    <div className="w-1/2 max-w-64">
+                        <SelectList lists={lists} />
+                    </div>
+                    {/* リスト情報モーダル */}
                     <div className="ml-4">
                         <MyListInfoModal list={selectedList} guest_info={guest_info} />
                     </div>
                 </div>
-                <p>{message}</p>
-                <div className="flex justify-center">
-                    <div className="mx-1">
-                        <OrangeBtn onClick={() => navigate('/items')} children="リストの商品を管理する" />
+                    <div className="flex justify-center">
+                        {message}
                     </div>
-                    <div className="mx-1">
-                        <OrangeBtn onClick={() => navigate('/shoppinglist')} children="お買い物リストを見る" />
+                    <button className="text-sm mb-1" onClick={handleAddNewList}>＋新しいリストを作成する</button>
+                <div className="flex justify-center ">
+                    <div className="my-4">
+                        <OrangeBtn onClick={() => navigate('/items')} children="選んだリストを見る" />
                     </div>
+                    {/* <div className="mx-1">
+                        <OrangeBtn onClick={() => navigate('/comb')} children="お買い物リストを見る" />
+                    </div> */}
                 </div>
-                <button onClick={handleAddNewList}>＋新しいリストを作成する</button>
                 <div className="flex justify-center">
-                    <div className="flex flex-col w-1/2 p-8">
-                        <button onClick={() => setSelectedTab('invite')} className={`py-2 px-4 ${selectedTab === 'invite' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>友達を招待</button>
-                        <button onClick={() => setSelectedTab('apply')} className={`py-2 px-4 ${selectedTab === 'apply' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>共有申請</button>
+                    <div className="flex flex-col w-auto p-4">
+                        <button onClick={() => setSelectedTab('invite')} className={`py-2 px-4 rounded-t-lg border ${selectedTab === 'invite' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>友達を招待</button>
+                        <button onClick={() => setSelectedTab('apply')} className={`py-2 px-4 rounded-b-lg ${selectedTab === 'apply' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>共有を申請</button>
                     </div>
                 </div>
                 {selectedTab === 'invite' && (
                     <div className="flex justify-center">
-                        <div className="flex flex-col w-1/2 p-8">
-                            <div>
-                                <TextInput2 type="text" placeholder="user_id" value={friendInviteUserId} onChange={e => setFriendInviteUserId(e.target.value)} />
+                        <div className="flex flex-col w-1/2 p-8 ">
+                            <div className="flex justify-center w-full mb-2">
+                                <TextInput2 type="text" placeholder="ユーザーID" value={friendInviteUserId} onChange={e => setFriendInviteUserId(e.target.value)} />
                             </div>
-                            <div>
-                                <TestBtn onClick={handleSearchInviteFriend} children='招待したい友達' />
+                            <div className="flex justify-center w-full mb-2">
+                                <TestBtn onClick={handleSearchInviteFriend} children='友達検索' />
                             </div>
-                            <div>
-                                <p>検索した友達ユーザー名{friendInviteUserInfo.user_name}</p>
+                            <div className="flex justify-center w-full mb-2">
+                                検索結果：{friendInviteUserInfo.user_name}
                             </div>
-                            <div>
+                            <div className="flex justify-center w-full mb-2">
                                 <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />
                             </div>
-                            <div>
+                            <div className="flex justify-center w-full mb-2">
                                 <PermissionDropdown value={inviteAuthority} onChange={handleInviteAuthorityChange} />
                             </div>
-                            <div>
+                            <div className="flex justify-center w-full mb-2">
                                 <TestBtn onClick={handleInviteFriendToList} children="招待" />
                             </div>
                         </div>
@@ -223,24 +229,24 @@ function Home() {
                 )}
                 {selectedTab === 'apply' && (
                     <div className="flex justify-center">
-                        <div className="flex flex-col w-1/2 p-8">
-                            <div>
-                                <TextInput2 type="text" placeholder="user_id" value={friendApplyUserId} onChange={e => setFriendApplyUserId(e.target.value)} />
+                        <div className="flex flex-col justify-center w-1/2 p-8 ">
+                            <div className="flex justify-center w-full mb-2">
+                                <TextInput2 type="text" placeholder="ユーザーID" value={friendApplyUserId} onChange={e => setFriendApplyUserId(e.target.value)} />
                             </div>
-                            <div>
-                                <TestBtn onClick={handleSearchApplyFriend} children='共有申請したい友達' />
+                            <div className="flex justify-center w-full mb-2">
+                                <TestBtn onClick={handleSearchApplyFriend} children='友達検索' />
                             </div>
-                            <div>
-                                <p>検索した友達ユーザー名{friendApplyUserInfo.user_name}</p>
+                            <div className="flex justify-center w-full mb-2">
+                                <p>検索結果：{friendApplyUserInfo.user_name}</p>
                             </div>
-                            <div>
+                            <div className="flex justify-center w-full mb-2">
                                 <ForApplySelectList lists={friendApplyUserLists} onSelectChange={handleApplyListSelectChange} />
                             </div>
-                            <div>
+                            <div className="flex justify-center w-full mb-2">
                                 <PermissionDropdown value={applyAuthority} onChange={handleApplyAuthorityChange} />
                             </div>
-                            <div>
-                                <TestBtn onClick={handleApplyFriendToList} children="共有申請" />
+                            <div className="flex justify-center w-full mb-2">
+                                <TestBtn onClick={handleApplyFriendToList} children="申請" />
                             </div>
                         </div>
                     </div>

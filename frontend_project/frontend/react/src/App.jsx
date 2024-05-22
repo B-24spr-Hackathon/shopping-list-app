@@ -19,6 +19,8 @@ import LineLoginForm from "./pages/LineLoginForm";
 import ToDefault from "./pages/ToDefault";
 import LineLoginMethod from "./utils/LineLoginMethod";
 import LineLinkForm from "./pages/LineLinkForm";
+import CombinedScreen from "./pages/Combined";
+import LoginNew from "./pages/LoginNew";
 
 
 function App() {
@@ -27,8 +29,8 @@ function App() {
       <AuthProvider>
         <div>
           <Routes>
-            <Route exact path="/" element={<Login />} />
-            <Route path="/items" element={<Items />} />
+            <Route exact path="/" element={<LoginNew />} />
+            <Route path="/itemspre" element={<Items />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/shoppinglist" element={<ShoppingList />} />
             <Route path="/setting" element={<Setting />} />
@@ -38,6 +40,9 @@ function App() {
             <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
             <Route path="/linelinkform" element={<LineLinkForm/>} />
+            <Route path="/items" element={<CombinedScreen/>} />
+            <Route path="/old" element={<Login/>} />
+
             
 
           </Routes>

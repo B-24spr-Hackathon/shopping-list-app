@@ -9,6 +9,10 @@ import AddNewItem from '../utils/AddNewItem';
 import { setShoppingItemsAllInfo } from '../reducers/shoppingItemsSlice';
 import { EditableDateInput, EditableInput } from './EditableDateInput';
 import { TrashBtn } from './trashicon';
+import reactSelect from "react-select";
+import SimpleSelectBox from './SimpleReactSelect';
+import { options } from './SimpleReactSelect';
+import { setSelectedList } from '../reducers/selectedListSlice';
 
 
 function ListFieldTitle({ title }) {
@@ -79,57 +83,77 @@ function ShoppingListPanel() {
         }
     }
 
+    // カテゴリカラーアイコンを取得する関数
+    const getColorIcon = (colorValue) => {
+        const option = options.find(option => option.value == colorValue);
+        return option ? option.label : null;
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `　${date.getMonth() + 1}月${date.getDate()}日`;
+    };
+
     const shoppingItemsHeader = (
         <thead>
-            <tr className='text-center'>
-                <th colSpan="4">次の買い物予定日：{nextShoppingDay.next_shopping_day}</th>
+            <tr>
+                <th colspan="4" scope="col" class="px-2 py-2 text-center text-lg font-medium text-gray-500 uppercase dark:text-neutral-500">
+                    買い物予定日：{formatDate(nextShoppingDay.next_shopping_day)}</th>
             </tr>
         </thead>
     )
 
     const shoppingItemsData = shoppingItems.map((item, index) => (
+        <>
+        <tbody class="divide-y divide-gray-200 dark:divide-neutral-70">
 
-        <tr className="text-center border-b" key={index}>
-            <td>
-                {item.color}
-            </td>
-            <td>
-                {item.item_name}
-            </td>
-            <td>
-                <BoughtOrPassBtn
-                    onClick={ () => handleBought(item) }
-                    children="買った"
-                    disabled={!item.to_list}
-                    />
-            </td>
-            <td>
-                <BoughtOrPassBtn
-                    onClick={ () => handlePass(item) }
-                    children="見送る"
-                    disabled={!item.to_list}
-                    />
-            </td>
-        </tr>
+            <tr key={index}>
+                <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    {getColorIcon(item.color)}
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-start text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
+                    {item.item_name}
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                    <BoughtOrPassBtn
+                        onClick={ () => handleBought(item) }
+                        children="買った"
+                        disabled={!item.to_list}
+                        />
+                </td>
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                    <BoughtOrPassBtn
+                        onClick={ () => handlePass(item) }
+                        children="見送る"
+                        disabled={!item.to_list}
+                        />
+                </td>
+            </tr>
+        </tbody>
+
+        </>
                 )
     );
 
     const shoppingListFieldPanel = (
-        <div className='list-field'>
-            <table className='table-fixed w-full'>
-                { shoppingItemsHeader }
-                <tbody>
-                    {shoppingItemsData}
-                </tbody>
-            </table>
+        <div class="flex flex-col w-full">
+            <div class="-m-1.5 overflow-x-auto overflow-y-auto  mx-auto max-w-128">
+                <div class="p-1.5 min-w-full inline-block align-middle">
+                    <div class="overflow-hidden border rounded-lg">
+                        <table class="text-center min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                            { shoppingItemsHeader }
 
+                            {shoppingItemsData}
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 
     return(
         <>
-            <div className='list-field-container'>
-                <ListFieldTitle title={selectedList.list_name} />
+            <div className='flex justify-center flex-col'>
                 { shoppingListFieldPanel }
             </div>
         </>
@@ -161,15 +185,21 @@ function ItemsListPanel() {
     //読み込み時にitemデータを取得
     useEffect(() => {
         const fetchListAndItemsInfo = async() => {
-            const listsInfo = await fetchListInfoRequest(selectedList.list_id, token);
-            setListsInfo(listsInfo.data);
-            const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
-            setItemListItems(itemsInfo.data.items);
-            console.log('listsinfo',listsInfo);
-            console.log('itemsinfo', itemsInfo);
+            if(selectedList.is_owner){
+                const listsInfo = await fetchListInfoRequest(selectedList.list_id, token);
+                dispatch(setSelectedList(listsInfo.data));
+                setListsInfo(listsInfo.data);
+                if(selectedList.authority){
+                    const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
+                    setItemListItems(itemsInfo.data.items);
+                }
+            } else if(selectedList.authority){
+                const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
+                setItemListItems(itemsInfo.data.items);
+            }
         };
         fetchListAndItemsInfo();
-    }, [selectedList]);
+    }, []);
 
     //テキスト形式の項目の更新
     const updateItem = async(item, key, newValue) => {
@@ -178,38 +208,7 @@ function ItemsListPanel() {
             prevItem.item_id === item.item_id ? { ...prevItem, [key]: newValue } : prevItem
         ));
     };
-        
-        
-        // if (key === 'item_name') {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'item_name', newValue);
-        //     // setItemListItems({})
-        //     // dispatch(updateItemName({ item_id: item.item_id, item_name: response.data.item_name }));
-        // }
-        // if (key === "color") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'color', newValue);
-        //     dispatch(updateColor({ item_id: item.item_id, color: response.data.color }));
-        // }
-        // if (key === "consume_cycle") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'consume_cycle', newValue);
-        //     dispatch(updateConsumeCycle({ item_id: item.item_id, consume_cycle: response.data.consume_cycle }));
-        // }
-        // if (key === "last_purchase_at") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_purchase_at', newValue);
-        //     dispatch(updateLastPurchaseAt({ item_id: item.item_id, last_purchase_at: response.data.last_purchase_at }));
-        // }
-        // if (key === "last_open_at") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'last_open_at', newValue);
-        //     dispatch(updateLastOpenAt({ item_id: item.item_id, last_open_at: response.data.last_open_at }));
-        // }
-        // if (key === "item_url") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'item_url', newValue);
-        //     dispatch(updateItemUrl({ item_id: item.item_id, item_url: response.data.item_url }));
-        // }
-        // if (key === "to_list") {
-        //     const response = await updateItemInfoRequest(selectedList.list_id, item.item_id, 'to_list', newValue);
-        //     dispatch(updateToList({ item_id: item.item_id, to_list: response.data.to_list }));
-        // }
-    // };
+
     //管理対象を切り替える
     const changeManageTarget = async(item) => {
         const newManageTarget = !item.manage_target;
@@ -245,24 +244,7 @@ function ItemsListPanel() {
             console.error('Failed to update manage target:', err);
         }
     }
-    //item削除
-
-    //     const response = await deleteItemRequest(selectedList.list_id, item.item_id);
-    //     // dispatch(deleteItem(item.item_id));
-    //     // const updateItems = itemListItems.filter(listItem => listItem.item_id !== item.item_id);
-    //     setItemListItems(itemListItems.filter((listItem,i) => i !== index));
-    //     console.log(item.item_id);
-    //     console.log(itemListItems);
-    // };
-    //     try {
-    //         const response = await deleteItemRequest(selectedList.list_id, item.item_id);
-    //         dispatch(deleteItem(item.item_id))
-    //         const response1 = await fetchItemsOfListRequest(selectedList.list_id);
-    //         dispatch(setItemAllInfo(response1.data.items));
-    //     }catch(err){
-    //         console.error('Failed to update manage target:', err);
-    //     }
-    // }
+    
     const deleteItemtest = async(item) => {
         try {
             const response = await deleteItemRequest(selectedList.list_id, item.item_id, token);
@@ -276,29 +258,6 @@ function ItemsListPanel() {
         }
     }
 
-
-
-    //     try {
-    //             const response = await deleteItemRequest(selectedList.list_id, item.item_id);
-    //             dispatch(clearItem(item.item_id))
-    //         }catch(err){
-    //             console.error('Failed to update manage target:', err);
-    //         }
-    //     }
-    //         const response = await deleteItemRequest(selectedList.list_id, item.item_id);
-    //         if (response.status === 200) {
-    //             dispatch(deleteItem(item.item_id));
-    //             console.log('Item deleted successfully');
-    //         } else {
-    //             console.error('Failed to delete item');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting item:', error);
-    //     }
-    // };
-    // const test = () => {
-    //     console.log(itemListItems);
-    // }
 
     //カテゴリカラーのselect
     const CategoryColorSelector = ({ color, onChange }) => {
@@ -324,39 +283,43 @@ function ItemsListPanel() {
     const itemsHeader = (
         <thead>
             <tr>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">管理する</th>
-              <th colspan="2" scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">商品名</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">消費サイクル</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">直近の開封び</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">リンク</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">最終購入日</th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">  </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">通知する</th>
+              <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">管理する</th>
+              <th colspan="2" scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">商品名</th>
+              <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">消費サイクル</th>
+              <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">直近開封日</th>
+              <th scope="col" class="px-2 py-2 text-center w-16 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">リンク</th>
+              <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">最終購入日</th>
+              <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">  </th>
+              <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">通知する</th>
             </tr>
           </thead>
     );
 
     const itemsData = itemListItems.map((item) => (
         <>
-        <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+        <tbody class="divide-y divide-gray-200 dark:divide-neutral-70">
 
             <tr key={item.item_id}>
                 {/*管理対象*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <input
                         type="checkbox"
                         checked={item.manage_target}
                         onChange={() => changeManageTarget(item)}  />
                 </td>
                 {/*カテゴリカラー*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <CategoryColorSelector
+                <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    {/* <CategoryColorSelector
                         color={item.color}
                         onChange={(e) => updateItem(item, 'color', e.target.value)}
+                    /> */}
+                    <SimpleSelectBox
+                        color={item.color}
+                        onChange={(selectedOption) => updateItem(item, 'color', selectedOption.value)}
                     />
                 </td>
                 {/*商品名*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
                     <EditableInput
                         className='w-full '
                         initialValue={item.item_name}
@@ -364,7 +327,7 @@ function ItemsListPanel() {
                         />
                 </td>
                 {/*消費サイクル*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <EditableInput
                         className='w-full text-center'
                         initialValue={item.consume_cycle}
@@ -372,14 +335,14 @@ function ItemsListPanel() {
                         />
                 </td>
                 {/*直近の開封日*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <EditableDateInput
                     initialValue={item.last_open_at}
                     onSave={newValue => updateItem(item, 'last_open_at', newValue)}
                         />
                 </td>
                 {/*リンク*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <EditableInput
                         className='w-full text-center'
                         initialValue={item.item_url}
@@ -387,22 +350,22 @@ function ItemsListPanel() {
                         />
                 </td>
                 {/*最終購入日*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <EditableDateInput
                         initialValue={item.last_purchase_at}
                         onSave={newValue => updateItem(item, 'last_purchase_at', newValue)}
                         />
                 </td>
                 {/*リスト追加ボタン*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
                     <ToShoppingListBtn
                         onClick={ () => toShoppingLists(item) }
-                        children="追加する"
+                        children="追加"
                         disabled={item.to_list}
                     />
                 </td>
                 {/*通知対象*/}
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                     <input
                         type='checkbox'
                         checked={item.remind_by_item}
@@ -410,7 +373,7 @@ function ItemsListPanel() {
                         disabled={!userSetRemind}/>
                 </td >
                 {/* 削除 */}
-                <td class='px-6 py-4'>
+                <td class='px-2 py-2'>
                     <TrashBtn onClick={ () => deleteItemtest(item)} />
                 </td>
             </tr>
@@ -425,8 +388,8 @@ function ItemsListPanel() {
     const itemsListFieldPanel = (
         // <div className='list-field'>
         //     <table className="table-fixed w-full">
-        <div class="flex flex-col w-[90%]">
-            <div class="-m-1.5 overflow-x-auto overflow-y-auto  mx-auto">
+        <div class="flex flex-col w-full">
+            <div class="-m-1.5 overflow-x-auto overflow-y-auto  mx-auto max-w-128">
                 <div class="p-1.5 min-w-full inline-block align-middle">
                     <div class="overflow-hidden border rounded-lg">
                         <table class="text-center min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
@@ -444,9 +407,18 @@ function ItemsListPanel() {
     
     return (
         <>
+        <div className='flex justify-center flex-col'>
 
-        <AddBtn children="+" onClick={handleAddNewItem} />
-                { itemsListFieldPanel }
+            { itemsListFieldPanel }
+            <div className='flex justify-center mt-2 '>
+                <button type='button' className='' onClick={handleAddNewItem}>
+                    {/* <AddBtn children="+" onClick={handleAddNewItem} /> */}
+                    +商品を追加する
+                </button>
+
+            </div>
+        </div>
+
 
 
         </>

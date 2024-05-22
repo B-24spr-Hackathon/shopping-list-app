@@ -3,6 +3,8 @@ import { useCookies } from 'react-cookie';
 import { useDispatch } from 'react-redux';
 import { resetAppState } from '../reducers/actionCreator';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 function LogoutButton(  ) {
     const [cookies, setCookie, removeCookie] = useCookies(['jwt_token']);
@@ -21,9 +23,11 @@ function LogoutButton(  ) {
     };
 
     return (
-        <button onClick={handleLogout} type="button" class=" text-center py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-500 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800">
+        <>
+        <button onClick={handleLogout} type="button" className='flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"'>
             ログアウト
         </button>
+        </>
 
     );
 }

@@ -10,8 +10,7 @@ import { useCookies } from 'react-cookie';
 import { lineUrl, signUpRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
 
-function Signup() {
-    //状態管理
+function Signup({ toggleForm }) {
     const [user_id, setUser_id] = useState("");
     const [user_name, setUser_name] = useState("");
     const [email, setEmail] = useState("");
@@ -23,8 +22,6 @@ function Signup() {
     const dispatch = useDispatch();
     const [cookies, setCookie] = useCookies(['jwt_token']);
     const navigate = useNavigate();
-
-    //リアルタイムバリデーション
 
     useEffect(() => {
         validateEmail(email);
@@ -47,53 +44,42 @@ function Signup() {
         }
     };
 
-    //ユーザー新規登録関数
-    const handleSignup = async() => {
+    const handleSignup = async () => {
         if (passwordError || emailError) return;
         if (!user_id || !user_name || !email || !password1 || !password2) return;
         try {
             const response = await signUpRequest(user_id, user_name, email, password1);
-             // JWTトークンをクッキーに保存する
-            const token = response.data.access; // レスポンスからトークンを取得;
-            setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
-            //レスポンスでユーザー情報を受け取ってstoreに保存
-            dispatch(setUser( response.data.user ));
+            const token = response.data.access;
+            setCookie('jwt_token', token, { path: '/', maxAge: 100000, sameSite: "none", secure: true });
+            dispatch(setUser(response.data.user));
             dispatch(setToken(token));
-            //リダイレクト
             navigate('/home');
-
         } catch (err) {
             setError("他のユーザーが使用中のユーザーIDです");
-            console.error('error;',err);
+            console.error('error;', err);
         }
     };
+
     return (
-        <>
-            <div className="flex flex-col items-center">
-                <Header />
-                <div className="flex flex-col justify-center items-center overflow-auto mb-1">
-                    <Title children="IDを登録" />
-                    <LineBtn onClick={() => window.location.href=lineUrl } children="LINEでログイン"/>
-                    <Bar children="またはメールアドレスで登録"/>
-                        <TextInput  placeholder="ユーザーID" value={user_id} onChange={e => setUser_id(e.target.value)} />
-                        <TextInput  placeholder="名前" value={user_name} onChange={e => setUser_name(e.target.value)} />
-                        <TextInput  type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
-                        <TextInput  type="password" placeholder="パスワード" value={password1} onChange={e => setPassword1(e.target.value)} />
-                        <TextInput  type="password" placeholder="パスワード(確認)" value={password2} onChange={e => setPassword2(e.target.value)} />
-                        <CertifyBtn onClick={handleSignup} children="登録する"/>
-                        <RegisterOrLogin children="すでにお持ちのアカウントでログインする" onClick={ () => navigate('/')} />
-                        {emailError && <p className="text-red-500">{emailError}</p>} { }
-                        {passwordError && <p className="text-red-500">{passwordError}</p>} { }
-                        {error && <p className="text-red-500">{error}</p>} { }
-                </div>
-
+        <div className="flex flex-col items-center">
+            <Header />
+            <div className="flex flex-col justify-center items-center overflow-auto mb-1">
+                <Title children="IDを登録" />
+                <LineBtn onClick={() => window.location.href = lineUrl} children="LINEでログイン" />
+                <Bar children="またはメールアドレスで登録" />
+                <TextInput placeholder="ユーザーID" value={user_id} onChange={e => setUser_id(e.target.value)} />
+                <TextInput placeholder="名前" value={user_name} onChange={e => setUser_name(e.target.value)} />
+                <TextInput type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
+                <TextInput type="password" placeholder="パスワード" value={password1} onChange={e => setPassword1(e.target.value)} />
+                <TextInput type="password" placeholder="パスワード(確認)" value={password2} onChange={e => setPassword2(e.target.value)} />
+                <CertifyBtn onClick={handleSignup} children="登録する" />
+                <RegisterOrLogin children="すでにお持ちのアカウントでログインする" onClick={toggleForm} />
+                {emailError && <p className="text-red-500">{emailError}</p>}
+                {passwordError && <p className="text-red-500">{passwordError}</p>}
+                {error && <p className="text-red-500">{error}</p>}
             </div>
-        </>
-
-        
-
+        </div>
     );
 }
-
 
 export default Signup;

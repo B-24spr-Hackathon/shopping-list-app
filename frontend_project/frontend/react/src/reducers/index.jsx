@@ -22,7 +22,10 @@ const appReducer = combineReducers({
 const rootReducer = (state, action) => {
     //初期化
     if (action.type === RESET_APP_STATE) {
+        const { selectedList } = state; // 現在のselectedListの状態を取得
         state = undefined;
+        state = appReducer(state, action); // 他の部分を初期化
+        state.selectedList = selectedList; // selectedListの状態を復元
     }
     return appReducer(state, action);
 };

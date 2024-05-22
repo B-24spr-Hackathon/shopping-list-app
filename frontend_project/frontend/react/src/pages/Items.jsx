@@ -53,12 +53,13 @@ function Items() {
                 <TestBtn children='homeへ' onClick={handleToHome}/>
             </div>
             <UserNameAndIcon />
-            <TabMainMenu />
+            {/* <TabMainMenu /> */}
+                <div>sss</div>
             <div className="">
 
                 <SelectList lists={lists}/>
 
-                <div className='flex justify-center '>
+                <div className='flex justify-center'>
 
                     <ItemsListPanel />
                 </div>
