@@ -64,7 +64,7 @@ function SettingUserInfo() {
             </div>
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">メールアドレス</label>
-                <EditableInput initialValue={userInfo.email} onSave={(newValue => handleUpdateUserInfo('email',newValue))} className="text-xl mt-2 text-center" />
+                <EditableInput initialValue={userInfo.email} onSave={(newValue => handleUpdateUserInfo('email',newValue))} className="w-full text-lg mt-2 text-center" />
             </div>
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">最初に開く画面</label>
