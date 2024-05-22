@@ -8,6 +8,10 @@ import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
 import { useNavigate } from "react-router-dom";
 import SettingUserInfo from "../components/SettigUserInfo.jsx";
+import UserNameAndIcon from "../components/UserNameIcon.jsx";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import ToHomeButton from "../components/ToHome.jsx";
 
 function CombinedScreen() {
     const dispatch = useDispatch();
@@ -16,6 +20,7 @@ function CombinedScreen() {
     const token = useSelector(state => state.token.token);
     const navigate = useNavigate();
     const [selectedTab, setSelectedTab] = useState('items'); // タブの状態を管理
+    const userInfo = useSelector(state => state.user);
 
     useEffect(() => {
         const fetchListAndItemsInfo = async () => {
@@ -31,35 +36,44 @@ function CombinedScreen() {
 
     return (
         <>
-            <Header />
-            <div className="fixed right-2 mt-1 text-right">
-                <LogoutButton />
-                <TestBtn children='homeへ' onClick={handleToHome} />
-            </div>
-            <div className="flex justify-center w-full items-center">
-                <div className="">
-                    <SelectList lists={lists} />
+            <div className="flex flex-col">
+                <Header />
+                <div className="mt-3">
+                        <UserNameAndIcon />
                 </div>
-            </div>
-            <div className="flex justify-center mt-8">
+                <div className="fixed flex right-2 mt-2 mr-4 z-40">
+                    <ToHomeButton userInfo={userInfo} handleToHome={handleToHome} />
+                    {/* <button onClick={handleToHome}>
+                        <FontAwesomeIcon icon={faHouse}  style={{color: "#075ef2",fontSize:'32px'}} />
+                    </button>
+                    <button onClick={handleToHome}>
+                        <FontAwesomeIcon icon={faHouseCircleExclamation} style={{color: "#ff6524",fontSize:'32px'}} />
+                    </button> */}
+                </div>
+            <div className="flex justify-center mt-20">
                 <button
                     className={`px-4 py-2 text-sm font-semibold ${selectedTab === 'items' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
                     onClick={() => setSelectedTab('items')}
-                >
+                    >
                     管理商品
                 </button>
                 <button
                     className={`px-4 py-2 text-sm font-semibold ml-4 ${selectedTab === 'shopping' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
                     onClick={() => setSelectedTab('shopping')}
-                >
+                    >
                     お買い物リスト
                 </button>
                 <button
                     className={`px-4 py-2 text-sm font-semibold ml-4 ${selectedTab === 'settings' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
                     onClick={() => setSelectedTab('settings')}
-                >
+                    >
                     設定
                 </button>
+            </div>
+            <div className="flex justify-center w-full items-center mt-8">
+                <div className="">
+                    <SelectList lists={lists} />
+                </div>
             </div>
             <div className="mt-4">
                 {selectedTab === 'items' && (
@@ -85,6 +99,7 @@ function CombinedScreen() {
                 )}
             </div>
 
+                </div>
         </>
     );
 }

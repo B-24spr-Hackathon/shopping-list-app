@@ -7,7 +7,7 @@ import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
 import { useDispatch } from 'react-redux';
 import { setUser, clearUser } from "../reducers/userSlice";
-import { lineUrl, loginRequest } from "../utils/Requests";
+import { fetchUserInfoRequest, lineUrl, loginRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
 
 function Login({ toggleForm }) {
@@ -22,11 +22,12 @@ function Login({ toggleForm }) {
         try {
             const response = await loginRequest(email, password);
             console.log("login:", response);
+            //tokenをstateとブラウザに保存
             const token = response.data.access;
             setCookie('jwt_token', token, { path: '/', maxAge: 100000, sameSite: "none", secure: true });
-            dispatch(setUser(response.data.user));
             dispatch(setToken(token));
-            navigate('/home');
+            navigate('/todefault');
+
         } catch (err) {
             console.log(err.response.data);
             setError("入力した情報で登録されていません。");

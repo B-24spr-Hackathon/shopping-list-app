@@ -21,45 +21,37 @@ import SelectMyList from "../components/SelectMyList";
 import MyListInfoModal from "../components/MyListInfoModal";
 import UserNameAndIcon from "../components/UserNameIcon";
 import SimpleSelectBox from "../components/SimpleReactSelect";
+import HamburgerMenu from "../components/HumbergerMenu";
 
 
 function Home() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const user_id = useSelector((state) => state.user.user_id);
-    const user_name = useSelector((state) => state.user.user_name);
     const userLineRemind = useSelector(state => state.user.remind);
-    const items = useSelector(state => state.items.items);
     const selectedList = useSelector(state => state.selectedList);
     const selectedListId = useSelector(state => state.selectedList.list_id);
     const handleAddNewList = AddNewList();
-    const [cookies] = useCookies(['jwt_token']);
     const token = useSelector(state => state.token.token);
-    const [list, setList] = useState();
     const lists = useSelector(state => state.user.lists);
     const [guest_info, setGuest_info] = useState([]);
     const [message, setMessage] = useState("");
-    const [remind, setRemind] = useState(userLineRemind);
     const member = useSelector(state => state.member.member);
     const [memberInfo, setMemberInfo] = useState([]);
     const [selectedTab, setSelectedTab] = useState('invite'); // タブの状態を管理
 
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const userInfo = await fetchUserInfoRequest(token);
-            dispatch(setUser(userInfo.data));
-            if (userInfo.data.lists.length == 0) {
+
+            if (lists.length == 0) {
                 setMessage('まだリストがありません');
             } else {
-                dispatch(setSelectedList(userInfo.data.lists[0]))
-                const response = await fetchListInfoRequest(selectedListId, token);
-                setList(response.data);
-                setGuest_info(response.data.guest_info);
+
+                //dispatch(setSelectedList(userInfo.data.lists[0]))
+                // const response = await fetchListInfoRequest(selectedListId, token);
+                // setList(response.data);
+                // setGuest_info(response.data.guest_info);
             }
-            const member_statusInfo = await fetchMemberStatusInfoRequest(token);
-            dispatch(setMember(member_statusInfo.data));
-            setMemberInfo(member_statusInfo.data);
-            console.log('info', member);
         };
         fetchUserInfo();
     }, []);
@@ -172,12 +164,9 @@ function Home() {
                 <div className="mt-3">
                     <UserNameAndIcon />
                 </div>
-                <div className="fixed flex right-2 mt-1 mr-8 z-40">
-                    <div className="mr-4">
-                        <MemberStatusModal member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList} />
-                    </div>
-                    <div>
-                        <LogoutButton />
+                <div className="fixed flex right-2 mt-1 mr-4 z-40">
+                    <div className="">
+                        <HamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/>
                     </div>
                 </div>
                 <div className="flex justify-center my-2">
@@ -189,15 +178,17 @@ function Home() {
                 </div>
                 <div className="flex mb-2 justify-center w-full items-center">
                     <div className="w-1/2 max-w-64">
-                        {/* <SelectMyList lists={lists} /> */}
                         <SelectList lists={lists} />
                     </div>
+                    {/* リスト情報モーダル */}
                     <div className="ml-4">
                         <MyListInfoModal list={selectedList} guest_info={guest_info} />
                     </div>
                 </div>
+                    <div className="flex justify-center">
+                        {message}
+                    </div>
                     <button className="text-sm mb-1" onClick={handleAddNewList}>＋新しいリストを作成する</button>
-                <p>{message}</p>
                 <div className="flex justify-center ">
                     <div className="my-4">
                         <OrangeBtn onClick={() => navigate('/items')} children="選んだリストを見る" />

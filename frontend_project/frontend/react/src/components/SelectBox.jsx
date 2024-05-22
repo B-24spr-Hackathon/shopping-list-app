@@ -29,14 +29,17 @@ function SelectList({lists}) {
     const handleSelectChange = async(event) => {
         const selected = lists.find(list => list.list_id == event.target.value);
         dispatch(setSelectedList(selected));
-        //選んだリストの情報を取得
-        const listInfo = await fetchListInfoRequest(event.target.value, token);
-        dispatch(setSelectedList(listInfo.data));
-        //選んだリストの中のアイテムを取得
-        const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
-        // dispatch(setItemAllInfo(itemsInfo.data.items))
+        if(selectedList.is_owner){
+            //選んだリストの情報を取得
+            const listInfo = await fetchListInfoRequest(event.target.value, token);
+            dispatch(setSelectedList(listInfo.data));
+        }else if (selectedList.authority){
+            //選んだリストの中のアイテムを取得
+            const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
+            // dispatch(setItemAllInfo(itemsInfo.data.items))
+        }
         //選んだリストの買い物リストを取得
-        const shoppingListInfo = await fetchShoppingListRequest(listInfo.data.list_id, token);
+        const shoppingListInfo = await fetchShoppingListRequest(selectedList.list_id, token);
         // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
 
     }

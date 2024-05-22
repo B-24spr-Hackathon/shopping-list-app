@@ -3,7 +3,7 @@ import Select, { components } from 'react-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 
-const options = [
+export const options = [
     { value: '0', label: <FontAwesomeIcon icon={faCircle} style={{color: "#ee2f2f", fontSize: "1.5rem"}} /> },
     { value: '1', label: <FontAwesomeIcon icon={faCircle} style={{color: "#ff00dd", fontSize: "1.5rem"}} /> },
     { value: '2', label: <FontAwesomeIcon icon={faCircle} style={{color: "#fa7000", fontSize: "1.5rem"}} /> },
@@ -23,7 +23,7 @@ const customStyles = {
         minHeight: '30px', // Smaller box height
         height: '30px',
         fontSize: '1rem', // Adjust font size
-        width: '50px', // Adjust width
+        width: '40px', // Adjust width
         backgroundColor: 'transparent', // Make background transparent
         border: 'none', // Optionally remove border
         boxShadow: 'none', // Optionally remove box shadow
@@ -46,7 +46,7 @@ const customStyles = {
     }),
     option: (provided) => ({
         ...provided,
-        fontSize: '1.5rem', // Larger font size for options
+        fontSize: '1.0rem', // Larger font size for options
         height: '40px',
         backgroundColor: 'transparent', // Make background transparent
     }),

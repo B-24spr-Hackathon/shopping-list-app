@@ -11,8 +11,8 @@ const AddNewList = () => {
     return async() => {
         await addNewListRequest(token);
         const response = await fetchUserInfoRequest(token);
-        // dispatch(setUser(response.data.user));
-        // dispatch(setUser({lists:response.data.lists}));
+        dispatch(setUser(response.data.user));
+        dispatch(setUser({lists:response.data.lists}));
         dispatch(setSelectedList(response.data.lists[response.data.lists.length -1]));
     };
 };
