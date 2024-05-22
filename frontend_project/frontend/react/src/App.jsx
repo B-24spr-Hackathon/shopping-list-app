@@ -32,7 +32,7 @@ function App() {
             <Route exact path="/" element={<LoginNew />} />
             <Route path="/itemspre" element={<Items />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/shoppinglist" element={<ShoppingList />} />
+            <Route path="/oldshopping" element={<ShoppingList />} />
             <Route path="/setting" element={<Setting />} />
             <Route path="/home" element={<Home />} />
             <Route path="/lineloginerror" element={<LineLoginError />} />
@@ -40,7 +40,7 @@ function App() {
             <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
             <Route path="/linelinkform" element={<LineLinkForm/>} />
-            <Route path="/items" element={<CombinedScreen/>} />
+            <Route path="/shoppinglist" element={<CombinedScreen/>} />
             <Route path="/old" element={<Login/>} />
 
             

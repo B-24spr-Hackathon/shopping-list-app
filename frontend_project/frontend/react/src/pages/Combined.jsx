@@ -19,8 +19,8 @@ function CombinedScreen() {
     const [lists, setLists] = useState([]);
     const token = useSelector(state => state.token.token);
     const navigate = useNavigate();
-    const [selectedTab, setSelectedTab] = useState('items'); // タブの状態を管理
     const userInfo = useSelector(state => state.user);
+    const [selectedTab, setSelectedTab] = useState(userInfo.default_list); // タブの状態を管理
 
     useEffect(() => {
         const fetchListAndItemsInfo = async () => {
@@ -33,6 +33,7 @@ function CombinedScreen() {
     const handleToHome = () => {
         navigate('/home');
     }
+
 
     return (
         <>
@@ -52,54 +53,68 @@ function CombinedScreen() {
                 </div>
             <div className="flex justify-center mt-20">
                 <button
-                    className={`px-4 py-2 text-sm font-semibold ${selectedTab === 'items' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
-                    onClick={() => setSelectedTab('items')}
+                    className={`px-4 py-2 text-sm font-semibold ${selectedTab===true ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
+                    onClick={() => setSelectedTab(true)}
                     >
                     管理商品
                 </button>
                 <button
-                    className={`px-4 py-2 text-sm font-semibold ml-4 ${selectedTab === 'shopping' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
-                    onClick={() => setSelectedTab('shopping')}
+                    className={`px-4 py-2 text-sm font-semibold ml-4 ${!selectedTab ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
+                    onClick={() => setSelectedTab(false)}
                     >
                     お買い物リスト
                 </button>
                 <button
-                    className={`px-4 py-2 text-sm font-semibold ml-4 ${selectedTab === 'settings' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
+                    className={`px-4 py-2 text-sm font-semibold ml-4 ${selectedTab == 'settings' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-600'}`}
                     onClick={() => setSelectedTab('settings')}
                     >
                     設定
                 </button>
             </div>
-            <div className="flex justify-center w-full items-center mt-8">
+            {/* <div className="flex justify-center w-full items-center mt-8">
                 <div className="">
                     <SelectList lists={lists} />
                 </div>
-            </div>
+            </div> */}
             <div className="mt-4">
-                {selectedTab === 'items' && (
-                    <div className="flex justify-center">
-                        <div className='w-11/12'>
-                            <ItemsListPanel />
+                {selectedTab && (
+                    <div>
+                        <div className="flex justify-center w-full items-center my-4">
+                            <div className="">
+                                <SelectList lists={lists} />
+                            </div>
+                        </div>
+                        <div className="flex justify-center">
+                            <div className='w-11/12'>
+                                <ItemsListPanel />
+                            </div>
                         </div>
                     </div>
                 )}
-                {selectedTab === 'shopping' && (
-                    <div className="flex justify-center">
-                        <div className='w-11/12'>
-                            <ShoppingListPanel />
+                {!selectedTab && (
+                    <div>
+                        <div className="flex justify-center w-full items-center my-4">
+                            <div className="">
+                                <SelectList lists={lists} />
+                            </div>
+                        </div>
+                        <div className="flex justify-center">
+                            <div className='w-11/12'>
+                                <ShoppingListPanel />
+                            </div>
                         </div>
                     </div>
                 )}
-                {selectedTab === 'settings' && (
-                    <div className="flex justify-center">
-                        <div className='w-11/12'>
-                            <SettingUserInfo />
-                        </div>
+                {selectedTab == 'settings' && (
+                    <div className="flex flex-col items-center text-center min-h-screen">
+                    <div className='w-full mt-12'>
+                        <SettingUserInfo />
                     </div>
+                </div>
                 )}
             </div>
 
-                </div>
+        </div>
         </>
     );
 }

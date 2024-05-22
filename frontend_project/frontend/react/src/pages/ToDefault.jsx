@@ -38,9 +38,9 @@ const ToDefault = () => {
                 }
                 //デフォルトリストの値でitemsに遷移した後の表示を変える
                 if (userInfo.default_list){
-                    navigate('/items');
+                    navigate('/shoppinglist');
                 }else{
-                    navigate('/items');
+                    navigate('/shoppinglist');
                 }
             }
         }

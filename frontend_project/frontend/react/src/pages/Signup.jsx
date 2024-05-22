@@ -53,7 +53,7 @@ function Signup({ toggleForm }) {
             setCookie('jwt_token', token, { path: '/', maxAge: 100000, sameSite: "none", secure: true });
             dispatch(setUser(response.data.user));
             dispatch(setToken(token));
-            navigate('/home');
+            navigate('/todefault');
         } catch (err) {
             setError("他のユーザーが使用中のユーザーIDです");
             console.error('error;', err);
