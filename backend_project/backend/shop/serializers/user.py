@@ -47,8 +47,15 @@ class GetUpdateUserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         request = self.context.get("request")
-        if request and request.method == "PATCH":
-            fields = request.data.keys()
-            ret = {field: value for field, value in ret.items() if field in fields
-            }
+        if request:
+            # PATCHメソッドの時はリクエストにある属性のみをdataに含める
+            if request.method == "PATCH":
+                fields = request.data.keys()
+                ret = {field: value for field, value in ret.items() if field in fields
+                }
+            # GETメソッドの時はremind_timeを00:00の形式でdataに含める
+            elif request.method == "GET":
+                remind_time = ret.get("remind_time")
+                if remind_time:
+                    ret["remind_time"] = remind_time[:5]
         return ret
