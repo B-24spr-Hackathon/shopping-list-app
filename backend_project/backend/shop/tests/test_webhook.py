@@ -445,6 +445,95 @@ class LineWebhookViewTestCase(APITestCase):
         print("[Expect]: ", expected_json)
         self.assertEqual(kwargs["json"], expected_json)
 
+    # アイテム追加済みのリクエスト（LINEメッセージ送信リクエストはモック）
+    @patch("shop.views.webhook.requests.post")
+    def test_postback_already_event(self, mock_post):
+        print("\n[[ LineWebhookViewTestCase/test_postback_already_event(4) ]]")
+        # モック化したLINEメッセージ送信リクエストのレスポンスを定義
+        mock_post.return_value = MagicMock(ok=True)
+
+        # itemのto_listをTrueに変更
+        self.item.to_list = True
+        self.item.save()
+
+        # リクエストデータを定義
+        data = {
+            "destination": "xxxxxxxxxx",
+            "events": [
+                {
+                    "type": "postback",
+                    "timestamp": int(time.time() * 1000),
+                    "source": {
+                        "type": "user",
+                        "userId": "123456789abc123456789"
+                    },
+                    "replyToken": "757913772c4646b784d4b7ce46d12671",
+                    "mode": "active",
+                    "webhookEventId": "01FZ74A0TDDPYRVKNK77XKC3ZR",
+                    "deliveryContext": {"isRedelivery": False},
+                    "postback": {
+                        "data": self.item.item_id,
+                        "params": {}
+                    },
+                }
+            ],
+        }
+        
+        # リクエスト送信後のuser1のデータを定義
+        expected_db = {
+            "item_name": self.item.item_name,
+            "list_id": self.item.list_id.list_id,
+            "consume_cycle": 120,
+            "last_purchase_at": datetime.strptime("2024-02-20", "%Y-%m-%d").date(),
+            "last_open_at": datetime.strptime("2024-03-01", "%Y-%m-%d").date(),
+            "to_list": True,
+        }
+
+        # LINE通知リクエストに渡されるべきデータを定義
+        expected_json = {
+            "replyToken": data["events"][0]["replyToken"],
+            "messages": {
+                "type": "text",
+                "text": f"{self.item.item_name}は既に追加済みです",
+            },
+        }
+
+        # ヘッダーに付与する署名を生成
+        signature = self.make_signature(data)
+
+        # リクエストのヘッダーを定義
+        headers = {"x-line-signature": signature}
+
+        response = self.client.post(url, data=data, headers=headers, format="json")
+
+        # DBからitemのデータを取得
+        item = Item.objects.filter(item_id=self.item.item_id).values(
+            "item_name",
+            "list_id",
+            "consume_cycle",
+            "last_purchase_at",
+            "last_open_at",
+            "to_list",
+        )
+
+        # LINE通知リクエストに渡されたkwargs（json）を取得
+        _, kwargs = mock_post.call_args
+
+        # HTTPステータスコードの確認
+        print("[Result]: ", response.status_code, "==", status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # DBデータの確認
+        print("[Result]: ", item[0])
+        print("[Expect]: ", expected_db)
+        self.assertEqual(item[0], expected_db)
+        # LINE通知リクエストが呼出された回数
+        print("[Result]: ", mock_post.call_count, "==", 1)
+        self.assertEqual(mock_post.call_count, 1)
+        # LINE通知リクエストに渡されたkwargs（json）を確認
+        print("[Result]: ", kwargs["json"])
+        print("[Expect]: ", expected_json)
+        self.assertEqual(kwargs["json"], expected_json)
+
     # アイテム追加しないリクエスト（LINEメッセージ送信リクエストはモック）
     @patch("shop.views.webhook.requests.post")
     def test_postback_no_event(self, mock_post):
