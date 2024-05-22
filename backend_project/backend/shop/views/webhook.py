@@ -48,7 +48,7 @@ class LineWebhookView(APIView):
         body = request.body
         hash = hmac.new(client_secret.encode("utf-8"),
                         body, hashlib.sha256).digest()
-        signature = base64.b64decode(hash).decode("utf-8")
+        signature = base64.b64encode(hash).decode("utf-8")
         if not hmac.compare_digest(signature, line_signature):
             logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
@@ -155,7 +155,7 @@ class LineWebhookView(APIView):
                     logger.error("remind, line_status更新失敗")
 
                 # itemsテーブルの関係するitemのremind_by_itemをfalseに設定
-                lists = List.objects.filter(owner_id=user_id)
+                lists = List.objects.filter(owner_id=user.user_id)
                 items = Item.objects.filter(list_id__in=lists)
                 for item in items:
                     serializer = ItemSerializer(item, data={"remind_by_item": False}, partial=True)
@@ -211,46 +211,65 @@ class LineWebhookView(APIView):
                 # アイテムを買い物リストに追加する時の処理
                 if type(data) == int:
                     item = Item.objects.get(item_id=data)
-                    today = timezone.now().date()
+                    # to_listがすでにTrueの場合はその旨をLINE通知
+                    if item.to_list:
+                        # メッセージの送信
+                        data = {
+                            "replyToken": reply_token,
+                            "messages": {
+                                "type": "text",
+                                "text": f"{item.item_name}は既に追加済みです",
+                            },
+                        }
 
-                    new_cycle = CheckCycle(item.consume_cycle, item.last_open_at)
-
-                    # 消費頻度の更新が必要な場合
-                    if new_cycle:
-                        serializer = ItemSerializer(
-                            item,
-                            data={"to_list": True, "last_open_at": today,
-                                  "consume_cycle": new_cycle},
-                            partial=True,
-                        )
-                    # 消費頻度の更新が不要な場合
+                        response = requests.post(reply_url, headers=headers, json=data)
+                        if response.ok:
+                            logger.info("買い物リスト追加済み通知の送信成功")
+                        else:
+                            logger.error(f"買い物リスト追加済み通知の送信失敗: {response.text}")
+                    
+                    # to_listがFalseの場合
                     else:
-                        serializer = ItemSerializer(
-                            item,
-                            data={"to_list": True, "last_open_at": today},
-                            partial=True,
-                        )
+                        today = timezone.now().date()
 
-                    if serializer.is_valid():
-                        logger.info(f"{item.item_id}の更新成功")
-                        serializer.save()
-                    else:
-                        logger.error(f"{item.item_id}の更新失敗")
+                        new_cycle = CheckCycle(item.consume_cycle, item.last_open_at)
 
-                    # メッセージの送信
-                    data = {
-                        "replyToken": reply_token,
-                        "messages": {
-                            "type": "text",
-                            "text": f"{item.item_name}を追加しました",
-                        },
-                    }
+                        # 消費頻度の更新が必要な場合
+                        if new_cycle:
+                            serializer = ItemSerializer(
+                                item,
+                                data={"to_list": True, "last_open_at": today,
+                                    "consume_cycle": new_cycle},
+                                partial=True,
+                            )
+                        # 消費頻度の更新が不要な場合
+                        else:
+                            serializer = ItemSerializer(
+                                item,
+                                data={"to_list": True, "last_open_at": today},
+                                partial=True,
+                            )
 
-                    response = requests.post(reply_url, headers=headers, json=data)
-                    if response.ok:
-                        logger.info("買い物リスト追加通知の送信成功")
-                    else:
-                        logger.error(f"買い物リスト追加通知の送信失敗: {response.text}")
+                        if serializer.is_valid():
+                            logger.info(f"{item.item_id}の更新成功")
+                            serializer.save()
+                        else:
+                            logger.error(f"{item.item_id}の更新失敗")
+
+                        # メッセージの送信
+                        data = {
+                            "replyToken": reply_token,
+                            "messages": {
+                                "type": "text",
+                                "text": f"{item.item_name}を追加しました",
+                            },
+                        }
+
+                        response = requests.post(reply_url, headers=headers, json=data)
+                        if response.ok:
+                            logger.info("買い物リスト追加通知の送信成功")
+                        else:
+                            logger.error(f"買い物リスト追加通知の送信失敗: {response.text}")
 
                 # アイテムを買い物リストに追加しない時の処理
                 else:
