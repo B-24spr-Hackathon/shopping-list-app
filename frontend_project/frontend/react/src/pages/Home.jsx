@@ -42,7 +42,6 @@ function Home() {
 
     useEffect(() => {
         const fetchUserInfo = async () => {
-
             if (lists.length == 0) {
                 setMessage('まだリストがありません');
             } else {
@@ -191,7 +190,7 @@ function Home() {
                     <button className="text-sm mb-1" onClick={handleAddNewList}>＋新しいリストを作成する</button>
                 <div className="flex justify-center ">
                     <div className="my-4">
-                        <OrangeBtn onClick={() => navigate('/items')} children="選んだリストを見る" />
+                        <OrangeBtn disabled={lists.length == 0} onClick={() => navigate('/shoppinglist')} children="選んだリストを見る" />
                     </div>
                     {/* <div className="mx-1">
                         <OrangeBtn onClick={() => navigate('/comb')} children="お買い物リストを見る" />
