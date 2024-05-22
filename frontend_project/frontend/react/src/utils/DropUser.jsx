@@ -17,17 +17,21 @@ const DropUserBtn = () => {
 
     const handleDropUser = async() => {
         console.log(token);
+        const confirmDrop = window.confirm('ユーザー情報を削除して退会します。本当によろしいですか？');
+    
+    if (confirmDrop) {
         const response = await dropUserRequest(token);
         removeCookie('jwt_token', { path: '/' });
 
-        console.log('dropUser',response);
+        console.log('dropUser', response);
         dispatch(resetAppState());
-
-
-
     }
+}
     return (
-        <TestBtn onClick={handleDropUser} children="退会する" />
+        <button onClick={handleDropUser} className="text-red-500">
+            ユーザー情報を削除して退会する
+        </button>
+
     )
 }
 

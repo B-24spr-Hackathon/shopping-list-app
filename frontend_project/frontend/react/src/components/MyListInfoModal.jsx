@@ -53,7 +53,7 @@ function MyListInfoModal() {
                     {/* オーバーレイ背景 */}
                     <div className="fixed inset-0 bg-black opacity-50 z-40" onClick={handleClose}></div>
                     {/* モーダルコンテンツ */}
-                    <div className="relative z-50 sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+                    <div className="relative z-50 sm:max-w-sm sm:w-full m-3 sm:mx-auto">
                         <div className="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
                             <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
                                 <h3 className="font-bold text-gray-800 dark:text-white">
@@ -106,10 +106,10 @@ function MyListInfoModal() {
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="ml-4 text-gray-800 dark:text-neutral-400">No guests available</p>
+                                        <p className="ml-4 text-gray-800 dark:text-neutral-400">共有しているユーザーはいません。</p>
                                     )
                                 ) : (
-                                    <p className="ml-4 text-gray-800 dark:text-neutral-400">No data available</p>
+                                    <p className="ml-4 text-gray-800 dark:text-neutral-400">　</p>
                                 )}
                             </div>
                             <div className="flex justify-center items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
