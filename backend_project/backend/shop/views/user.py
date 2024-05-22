@@ -38,7 +38,9 @@ class UserView(APIView):
             logger.error(f"{request.data}")
 
         user = request.user
-        response_serializer = GetUpdateUserSerializer(user)
+        response_serializer = GetUpdateUserSerializer(
+            user, context={"request": request}
+        )
 
         # user_idより所有するリストのlist_id, list_nameを取得
         lists = List.objects.filter(owner_id=user.user_id).values("list_id", "list_name")
