@@ -269,14 +269,10 @@ def remind_request(line_id, items):
 
     # 通知を送信
     try:
-        response = requests.post(url, headers=headers, json=data)
+        requests.post(url, headers=headers, json=data)
+        logger.info(f"{line_id}への通知成功")
     except Exception as e:
         logger.error(f"{line_id}への通知失敗: {repr(e)}")
-
-    if response.ok:
-        logger.info(f"{line_id}への通知成功")
-    else:
-        logger.error(f"{line_id}への通知失敗: {response.text}")
 
     logger.info("開封通知送信処理の終了")
 
@@ -312,13 +308,9 @@ def shopping_request(line_id):
 
     # 通知を送信
     try:
-        response = requests.post(url, headers=headers, json=data)
+        requests.post(url, headers=headers, json=data)
+        logger.info(f"{line_id}への通知成功")
     except Exception as e:
         logger.error(f"{line_id}への通知失敗: {repr(e)}")
-
-    if response.ok:
-        logger.info(f"{line_id}への通知成功")
-    else:
-        logger.error(f"{line_id}への通知失敗: {response.text}")
 
     logger.info("買い物日通知送信処理の終了")
