@@ -26,6 +26,7 @@ function CombinedScreen() {
         const fetchListAndItemsInfo = async () => {
             const listsOfUser = await fetchUserInfoRequest(token);
             setLists(listsOfUser.data.lists);
+
         };
         fetchListAndItemsInfo();
     }, []);
@@ -77,7 +78,7 @@ function CombinedScreen() {
                 </div>
             </div> */}
             <div className="mt-4">
-                {selectedTab && (
+                {selectedTab === true && (
                     <div>
                         <div className="flex justify-center w-full items-center my-4">
                             <div className="">
