@@ -37,6 +37,10 @@ class LineWebhookView(APIView):
 
     # POSTリクエストで届くWebhookイベントの処理
     def post(self, request):
+        # リクエストボディが空の場合は、何もせずにOKレスポンス
+        if not request.data or not request.data["events"]:
+            return Response(status=status.HTTP_200_OK)
+
         request_body = request.body
         request_data = json.loads(request_body.decode("utf-8"))
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
@@ -52,7 +56,7 @@ class LineWebhookView(APIView):
         if not hmac.compare_digest(signature, line_signature):
             logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_200_OK)
 
         # リクエストボディからeventsを取得
         events = request_data.get("events")
@@ -227,7 +231,7 @@ class LineWebhookView(APIView):
                             logger.info("買い物リスト追加済み通知の送信成功")
                         else:
                             logger.error(f"買い物リスト追加済み通知の送信失敗: {response.text}")
-                    
+
                     # to_listがFalseの場合
                     else:
                         today = timezone.now().date()
