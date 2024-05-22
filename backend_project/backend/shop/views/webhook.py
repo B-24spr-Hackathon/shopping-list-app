@@ -48,7 +48,7 @@ class LineWebhookView(APIView):
         body = request.body
         hash = hmac.new(client_secret.encode("utf-8"),
                         body, hashlib.sha256).digest()
-        signature = base64.b64decode(hash).decode("utf-8")
+        signature = base64.b64encode(hash).decode("utf-8")
         if not hmac.compare_digest(signature, line_signature):
             logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
@@ -155,7 +155,7 @@ class LineWebhookView(APIView):
                     logger.error("remind, line_status更新失敗")
 
                 # itemsテーブルの関係するitemのremind_by_itemをfalseに設定
-                lists = List.objects.filter(owner_id=user_id)
+                lists = List.objects.filter(owner_id=user.user_id)
                 items = Item.objects.filter(list_id__in=lists)
                 for item in items:
                     serializer = ItemSerializer(item, data={"remind_by_item": False}, partial=True)
