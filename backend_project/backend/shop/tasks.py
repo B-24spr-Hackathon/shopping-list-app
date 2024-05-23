@@ -269,7 +269,8 @@ def remind_request(line_id, items):
 
     # 通知を送信
     try:
-        requests.post(url, headers=headers, json=data)
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
         logger.info(f"{line_id}への通知成功")
     except Exception as e:
         logger.error(f"{line_id}への通知失敗: {repr(e)}")
@@ -308,7 +309,8 @@ def shopping_request(line_id):
 
     # 通知を送信
     try:
-        requests.post(url, headers=headers, json=data)
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
         logger.info(f"{line_id}への通知成功")
     except Exception as e:
         logger.error(f"{line_id}への通知失敗: {repr(e)}")
