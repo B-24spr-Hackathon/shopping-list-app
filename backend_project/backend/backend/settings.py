@@ -39,8 +39,12 @@ DATABASES = {
 """
 
 # 許可するリクエストURL（バックエンドのURL）
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "tech-talk-chat.net",
-                 "tech-talk-cloud.net"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "alb.tech-talk-cloud.net",
+    "front.tech-talk-cloud.net",
+]
 
 # CORS設定
 # 他オリジンのhttpリクエストにCookieを含めることを許可
