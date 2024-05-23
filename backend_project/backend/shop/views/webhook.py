@@ -37,7 +37,7 @@ class LineWebhookView(APIView):
 
     # POSTリクエストで届くWebhookイベントの処理
     def post(self, request):
-        request_body = request.body
+        # request_body = request.body
         request_data = request.data
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request_data}")
@@ -56,8 +56,8 @@ class LineWebhookView(APIView):
         # 署名の検証
         line_signature = request.headers.get("x-line-signature")
         hash = hmac.new(client_secret.encode("utf-8"),
-                        request_body, hashlib.sha256).digest()
-        signature = base64.b64encode(hash).decode("utf-8")
+                        request_data.encode("utf-8"), hashlib.sha256).digest()
+        signature = base64.b64encode(hash)
         if not hmac.compare_digest(signature, line_signature):
             logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
