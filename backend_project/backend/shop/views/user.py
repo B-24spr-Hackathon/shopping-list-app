@@ -38,7 +38,9 @@ class UserView(APIView):
             logger.error(f"{request.data}")
 
         user = request.user
-        response_serializer = GetUpdateUserSerializer(user)
+        response_serializer = GetUpdateUserSerializer(
+            user, context={"request": request}
+        )
 
         # user_idより所有するリストのlist_id, list_nameを取得
         lists = List.objects.filter(owner_id=user.user_id).values("list_id", "list_name")
@@ -89,12 +91,12 @@ class UserView(APIView):
         logger.info(f"{request.data}")
 
         # line_idの更新リクエストの場合はエラーを返す
-        if request.data.get("line_id") is not None:
+        if request.data.get("line_id"):
             logger.error("line_idの更新リクエスト")
             return Response({"error": "line_idの更新はできません"},
                             status=status.HTTP_400_BAD_REQUEST)
         # user_idの更新リクエストの場合はエラーを返す
-        elif request.data.get("user_id") is not None:
+        elif request.data.get("user_id"):
             logger.error("user_idの更新リクエスト")
             return Response({"error": "user_idの更新はできません"},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -103,8 +105,13 @@ class UserView(APIView):
             logger.error("user_idの更新リクエスト")
             return Response({"error": "line_statusの更新はできません"},
                             status=status.HTTP_400_BAD_REQUEST)
+        # have_listの更新リクエストの場合はエラーを返す
+        elif request.data.get("have_list") is not None:
+            logger.error("have_listの更新リクエスト")
+            return Response({"error": "have_listの更新はできません"},
+                            status=status.HTTP_400_BAD_REQUEST)
         # remindをTrueにするリクエストでline_statusがFalseの場合はエラーを返す
-        elif request.data.get("remind") == "True" and request.user.line_status == False:
+        elif request.data.get("remind") and not request.user.line_status:
             logger.error("友達追加していないユーザーの通知ONリクエスト")
             return Response({"error": "友達追加が必要です"},
                             status=status.HTTP_400_BAD_REQUEST)

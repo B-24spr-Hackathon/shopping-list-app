@@ -684,6 +684,168 @@ class EntryDeclineViewTestCase(APITestCase):
         print('[Expect]: ', expected_response)
         self.assertEqual(response.data, expected_response)
 
+# 招待・申請一覧を表示 GET
+class EntryMemberStatusViewTestCase(APITestCase):
+    
+    def setUp(self):
+        
+        # リストオーナー
+        list_owner = User.objects.create(
+        user_id='owner',
+        user_name='owner',
+        email='owner@sample,com',
+        password='owner'
+        )
+        list_owner.save()
+        self.list_owner = list_owner        
+        self.list_owner_token = AccessToken.for_user(list_owner)
+        
+        guest_member = User.objects.create_user(
+            user_id='guest', 
+            user_name='guest', 
+            email='guest@example.com', 
+            password='password'
+            )
+        guest_member.save()
+        self.guest_member = guest_member
+        self.guest_user_token = AccessToken.for_user(guest_member)
+        
+        another_user = User.objects.create_user(
+            user_id='another', 
+            user_name='another', 
+            email='another@example.com', 
+            password='password'
+            )
+        another_user.save()
+        self.another_user = another_user
+        self.another_user_token = AccessToken.for_user(another_user)
+
+        # リストを作成
+        list_instance = List.objects.create(
+            owner_id=list_owner, 
+            list_name='test-list'
+            )
+        list_instance.save()
+        self.list_instance = list_instance
+
+        # メンバーを作成
+        member = Member.objects.create(
+            list_id=list_instance, 
+            guest_id=guest_member, 
+            member_status=1
+            )
+        member.save()
+        self.member = member
+
+    # オーナーとしてリクエスト 200が期待される
+    def test_get_entry_status_as_owner(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_as_owner ]]")
+
+        url = '/api/member_status/'
+        token = self.list_owner_token
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }    
+        expected_response = [{            
+            'member_id': self.member.member_id,
+            'guest_name': self.guest_member.user_name,
+            'member_status': self.member.member_status,
+            'list_id': self.list_instance.list_id,
+            'list_name': self.list_instance.list_name,
+            'owner_name': self.list_owner.user_name,
+            'is_owner': True,
+        }]
+
+        response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストとしてリクエスト 200が期待される
+    def test_get_entry_status_as_guest(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_as_guest ]]")
+
+        url = f'/api/member_status/'
+        token = self.guest_user_token
+        response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
+
+        expected_response = [
+            {
+                'member_id': self.member.member_id,
+                'guest_name': self.guest_member.user_name,
+                'member_status': self.member.member_status,
+                'list_id': self.list_instance.list_id,
+                'list_name': self.list_instance.list_name,
+                'owner_name': self.list_owner.user_name,
+                'is_owner': False,
+            }
+        ]
+        response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # ゲストでもオーナーでもないユーザーがリクエスト、空のレスポンスを期待
+    def test_get_entry_status_as_another_user(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_as_another_user ]]")
+
+        url = f'/api/member_status/'
+        token = self.another_user_token
+        response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(token)}"
+        }
+
+        expected_response = []
+
+        response = response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+
+    # 認証されていないユーザーがアクセス　401エラーが期待される
+    def test_get_entry_status_unauthenticated(self):
+        print("\n[[ EntryMemberStatusViewTestCase/test_get_entry_status_unauthenticated ]]")
+
+        url = f'/api/member_status/'   
+        invalid_token = "invalid_token_value"
+        response = self.client.get(url, format='json', HTTP_COOKIE=f"jwt_token={str(invalid_token)}")
+        headers = {
+            "Cookie": f"jwt_token={str(invalid_token)}"
+        }
+    
+        expected_response =  {'detail': 'トークンが無効です'}
+
+        response = response = self.client.get(url, headers=headers, format='json')
+
+        # HTTPステータスコードの確認
+        print('[Result]: ', response.status_code, '==', status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # レスポンスデータの確認
+        print('[Result]: ', response.data)
+        print('[Expect]: ', expected_response)
+        self.assertEqual(response.data, expected_response)
+        
+
+
 
 
     

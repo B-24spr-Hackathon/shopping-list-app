@@ -20,6 +20,9 @@ from datetime import timedelta
 BACKEND_URL = "https://127.0.0.1:8000"
 FRONTEND_URL = "http://127.0.0.1:5173"
 
+# LINE callback用URL
+LINE_URL = "https://127.0.0.1:8000"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -36,9 +39,8 @@ DATABASES = {
 """
 
 # 許可するリクエストURL（バックエンドのURL）
-ALLOWED_HOSTS = ["localhost",
-                 "127.0.0.1",
-                 "tech-talk-chat.net"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "tech-talk-chat.net",
+                 "tech-talk-cloud.net"]
 
 # CORS設定
 # 他オリジンのhttpリクエストにCookieを含めることを許可
@@ -185,7 +187,7 @@ SIMPLE_JWT = {
 # LINEログインの設定
 LINE_CHANNEL_ID = '2004751038'
 LINE_CHANNEL_SECRET = 'b2b453579e5786b991a979e0c555f1a0'
-REDIRECT_URL = f'{BACKEND_URL}/api/callback/'
+REDIRECT_URL = f'{LINE_URL}/api/callback/'
 STATE = 'shopping-list12345'
 
 # LINEログインでのフロントエンドリダイレクトURL

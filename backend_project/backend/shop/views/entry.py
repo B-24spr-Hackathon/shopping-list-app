@@ -144,10 +144,13 @@ class EntryAcceptView(APIView):
         guest.member_status = 0
         guest.save()
         logger.info(f'承認完了member_statusを更新: {guest.member_status}')
-        # ゲストのhave_listをTrueに更新
-        guest.guest_id.have_list = True
-        guest.guest_id.save()
-        logger.info(f'ゲストのhave_listを更新: {guest.guest_id.have_list}')
+
+        # ゲストのhave_listがFalseだった場合Trueに更新
+        if not guest.guest_id.have_list:
+            guest.guest_id.have_list = True
+            guest.guest_id.save()
+            logger.info(f'ゲストのhave_listを更新: {guest.guest_id.have_list}')
+
         # アクセスユーザーがゲストの場合
         if current_user == guest.guest_id:
             # 他に招待中のステータスがなければ招待フラグをFalseに
@@ -207,14 +210,10 @@ class EntryDeclineView(APIView):
             logger.error('参加済みのゲストは拒否・中止できない')
             return Response({'error': '参加済みのゲストの削除はここからはできません'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # 招待・申請を拒否・中止
-        guest.delete()
-        logger.info(f'拒否・中止完了: {guest}')
-
         # member_status=1の場合,ゲストがアクセス時は招待拒否、オーナーがアクセス時は招待中止
         if member_status == 1:              
             # ゲストについて他に招待中のステータスがなければinvitationをFalseに
-            other_invites = Member.objects.filter(guest_id=guest.guest_id, member_status=1).exists()
+            other_invites = Member.objects.filter(guest_id=guest_user, member_status=1).exclude(pk=member_id).exists()
             if not other_invites:
                 guest_user.invitation = False
                 guest_user.save()
@@ -223,12 +222,16 @@ class EntryDeclineView(APIView):
         elif member_status == 2:
             # オーナーについて他に申請中のステータスがなければrequestをFalseに
             owner_lists = List.objects.filter(owner_id=current_user)
-            other_requests = Member.objects.filter(list_id__in=owner_lists, member_status=2).exists()
+            other_requests = Member.objects.filter(list_id__in=owner_lists, member_status=2).exclude(pk=member_id).exists()
             if not other_requests:
                 owner_user.request = False
                 owner_user.save()
                 logger.info(f'オーナーのリクエストフラグ更新: {owner_user.request}')
-                    
+
+                # 招待・申請を拒否・中止
+        guest.delete()
+        logger.info(f'拒否・中止完了: {guest}')
+
         # レスポンス用データ
         data = {
             'user_name': user_name,

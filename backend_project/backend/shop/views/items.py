@@ -2,12 +2,13 @@ from django.http import Http404
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from ..models import Item, List
-from ..serializers.items import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, ItemUpdateSerializer
+from shop.models import Item, List
+from shop.serializers.items import ItemSerializer, ItemCreateSerializer, ItemResponseSerializer, ItemUpdateSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from shop.permissions import IsOwnerOrGuestWithAuthority
+from datetime import date
 import logging
 
 logger = logging.getLogger("backend")
@@ -101,16 +102,23 @@ class ItemDetailView(APIView):
         serializer = ItemUpdateSerializer(item_instance, data=request.data, context={"request": request}, partial=True)
 
         if serializer.is_valid():
+            # 更新前の直近開封日とto_listを保存
+            previous_last_open_at = item_instance.last_open_at
+            previous_to_list = item_instance.to_list
             # データを更新して保存
             to_list = request.data.get('to_list', item_instance.to_list)
             serializer.save(to_list=to_list)
 
-            # to_listが更新されたら消費頻度をチェックする
-            if to_list:
-                cycle = item_instance.consume_cycle
-                last_open_at = item_instance.last_open_at
-                new_cycle = CheckCycle(cycle, last_open_at)
+            # to_listがfalseからtrueに更新されたらlast_open_atを更新する
+            if to_list == True and previous_to_list == False:
+                item_instance.last_open_at = date.today()
+                item_instance.save()
+
                 # 頻度が短くなっていれば、消費サイクルを更新
+                cycle = item_instance.consume_cycle
+                last_open_at = previous_last_open_at
+                new_cycle = CheckCycle(cycle, last_open_at)
+                
                 if new_cycle is not False:
                     item_instance.consume_cycle = new_cycle
                     item_instance.save()

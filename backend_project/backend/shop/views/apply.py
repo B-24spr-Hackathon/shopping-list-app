@@ -74,9 +74,10 @@ class ApplyView(APIView):
         new_guest.save()
         logger.info(f'新しいレコードを登録: {guest.user_id}')
         # オーナーのrequestをTrueにする処理
-        owner.request = True
-        owner.save()
-        logger.info(f'オーナーの申請フラグを更新: {owner.request}')
+        if not owner.request:
+            owner.request = True
+            owner.save()
+            logger.info(f'オーナーの申請フラグを更新: {owner.request}')
         
         member_status = 2
 
