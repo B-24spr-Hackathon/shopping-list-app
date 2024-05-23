@@ -14,7 +14,7 @@ logger = logging.getLogger("backend")
 
 
 # デフォルトの値を定義
-client_secret = settings.LINE_CHANNEL_SECRET
+client_secret = settings.LINE_MESSAGE_SECRET
 secret = settings.SECRET_KEY
 access_token = settings.CHANNEL_ACCESS_TOKEN
 reply_url = settings.REPLY_URL
@@ -37,15 +37,10 @@ class LineWebhookView(APIView):
 
     # POSTリクエストで届くWebhookイベントの処理
     def post(self, request):
-        # request_body = request.body
+        request_body = request.body
         request_data = request.data
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request_data}")
-        
-        # リクエストボディが空の場合は、何もせずにOKレスポンス
-        if not request_data or not request_data["events"]:
-            logger.info("webhook疎通確認")
-            return Response(status=status.HTTP_200_OK)
 
         # リクエストボディが空の場合は、何もせずにOKレスポンス
         if not request_data or not request_data["events"]:
@@ -56,12 +51,11 @@ class LineWebhookView(APIView):
         # 署名の検証
         line_signature = request.headers.get("x-line-signature")
         hash = hmac.new(client_secret.encode("utf-8"),
-                        request_data.encode("utf-8"), hashlib.sha256).digest()
-        signature = base64.b64encode(hash)
+                        request_body, hashlib.sha256).digest()
+        signature = base64.b64encode(hash).decode("utf-8")
         if not hmac.compare_digest(signature, line_signature):
             logger.error("署名検証の失敗")
-            return Response({"error": "Invalid signature"},
-                            status=status.HTTP_200_OK)
+            return Response({"error": "Invalid signature"}, status=status.HTTP_200_OK)
 
         # リクエストボディからeventsを取得
         events = request_data.get("events")

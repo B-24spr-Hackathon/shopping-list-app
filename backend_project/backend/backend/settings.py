@@ -192,6 +192,9 @@ LINE_CHANNEL_SECRET = 'b2b453579e5786b991a979e0c555f1a0'
 REDIRECT_URL = f'{LINE_URL}/api/callback/'
 STATE = 'shopping-list12345'
 
+# LINE Messaging APIの設定
+LINE_MESSAGE_SECRET = "fc125aa8f37a352ab74077c606414679"
+
 # LINEログインでのフロントエンドリダイレクトURL
 FRONT_SIGNUP_URL = f'{FRONTEND_URL}/lineloginform'
 FRONT_LOGIN_URL = f"{FRONTEND_URL}/lineloginmethod"
