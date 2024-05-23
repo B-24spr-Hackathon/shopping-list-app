@@ -22,7 +22,7 @@ function EditableDateInput({ initialValue, onSave }) {
             selected={selectedDate}
             onChange={handleDateChange}
             dateFormat="M/d"
-            className="form-control w-full text-center bg-opacity-0 bg-white"
+            className="form-control w-16 text-center bg-opacity-0 bg-white"
         />
     );
 }

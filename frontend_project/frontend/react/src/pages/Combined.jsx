@@ -12,6 +12,7 @@ import UserNameAndIcon from "../components/UserNameIcon.jsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import ToHomeButton from "../components/ToHome.jsx";
+import ScrollTable from "../components/Table.jsx";
 
 function CombinedScreen() {
     const dispatch = useDispatch();
@@ -95,7 +96,7 @@ function CombinedScreen() {
                 {!selectedTab && (
                     <div>
                         <div className="flex justify-center w-full items-center my-4">
-                            <div className="">
+                            <div>
                                 <SelectList lists={lists} />
                             </div>
                         </div>
@@ -110,6 +111,8 @@ function CombinedScreen() {
                     <div className="flex flex-col items-center text-center min-h-screen">
                     <div className='w-full mt-12'>
                         <SettingUserInfo />
+                        <ScrollTable />
+                        <ItemsListPanel/>
                     </div>
                 </div>
                 )}

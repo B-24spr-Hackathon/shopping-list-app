@@ -297,87 +297,91 @@ function ItemsListPanel() {
 
     const itemsData = itemListItems.map((item) => (
         <>
-        <tbody class="divide-y divide-gray-200 dark:divide-neutral-70">
-
-            <tr key={item.item_id}>
-                {/*管理対象*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <input
-                        type="checkbox"
-                        checked={item.manage_target}
-                        onChange={() => changeManageTarget(item)}  />
-                </td>
-                {/*カテゴリカラー*/}
-                <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    {/* <CategoryColorSelector
-                        color={item.color}
-                        onChange={(e) => updateItem(item, 'color', e.target.value)}
-                    /> */}
-                    <SimpleSelectBox
-                        color={item.color}
-                        onChange={(selectedOption) => updateItem(item, 'color', selectedOption.value)}
-                    />
-                </td>
-                {/*商品名*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
-                    <EditableInput
-                        className='w-full '
-                        initialValue={item.item_name}
-                        onSave={newValue => updateItem(item, 'item_name', newValue)}
+            
+            <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+                <tr key={item.item_id}>
+                    {/*管理対象*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <input
+                            type="checkbox"
+                            checked={item.manage_target}
+                            onChange={() => changeManageTarget(item)}
+                            className='w-8'
+                              />
+                    </td>
+                    {/*カテゴリカラー*/}
+                    <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        {/* <CategoryColorSelector
+                            color={item.color}
+                            onChange={(e) => updateItem(item, 'color', e.target.value)}
+                        /> */}
+                        <SimpleSelectBox
+                            color={item.color}
+                            onChange={(selectedOption) => updateItem(item, 'color', selectedOption.value)}
                         />
-                </td>
-                {/*消費サイクル*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <EditableInput
-                        className='w-full text-center'
-                        initialValue={item.consume_cycle}
-                        onSave={newValue => updateItem(item, 'consume_cycle', newValue)}
+                    </td>
+                    {/*商品名*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
+                        <EditableInput
+                            className=' '
+                            initialValue={item.item_name}
+                            onSave={newValue => updateItem(item, 'item_name', newValue)}
+                            />
+                    </td>
+                    {/*消費サイクル*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
+                        <EditableInput
+                            className='text-center w-14'
+                            initialValue={item.consume_cycle}
+                            onSave={newValue => updateItem(item, 'consume_cycle', newValue)}
+                            />日
+                    </td>
+                    {/*直近の開封日*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <EditableDateInput
+                        initialValue={item.last_open_at}
+                        onSave={newValue => updateItem(item, 'last_open_at', newValue)}
                         />
-                </td>
-                {/*直近の開封日*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <EditableDateInput
-                    initialValue={item.last_open_at}
-                    onSave={newValue => updateItem(item, 'last_open_at', newValue)}
+                    </td>
+                    {/*リンク*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-start font-medium text-gray-800 dark:text-neutral-200">
+                        <EditableInput
+                            className='w-16 text-center'
+                            initialValue={item.item_url}
+                            onSave={newValue => updateItem(item, 'item_url', newValue)}
+                            />
+                    </td>
+                    {/*最終購入日*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <EditableDateInput
+                            initialValue={item.last_purchase_at}
+                            onSave={newValue => updateItem(item, 'last_purchase_at', newValue)}
+                            />
+                    </td>
+                    {/*リスト追加ボタン*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                        <ToShoppingListBtn
+                            onClick={ () => toShoppingLists(item) }
+                            children="追加"
+                            disabled={item.to_list}
                         />
-                </td>
-                {/*リンク*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <EditableInput
-                        className='w-full text-center'
-                        initialValue={item.item_url}
-                        onSave={newValue => updateItem(item, 'item_url', newValue)}
-                        />
-                </td>
-                {/*最終購入日*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <EditableDateInput
-                        initialValue={item.last_purchase_at}
-                        onSave={newValue => updateItem(item, 'last_purchase_at', newValue)}
-                        />
-                </td>
-                {/*リスト追加ボタン*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
-                    <ToShoppingListBtn
-                        onClick={ () => toShoppingLists(item) }
-                        children="追加"
-                        disabled={item.to_list}
-                    />
-                </td>
-                {/*通知対象*/}
-                <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                    <input
-                        type='checkbox'
-                        checked={item.remind_by_item}
-                        onChange={ () => changeRemindByItem(item) }
-                        disabled={!userSetRemind}/>
-                </td >
-                {/* 削除 */}
-                <td class='px-2 py-2'>
-                    <TrashBtn onClick={ () => deleteItemtest(item)} />
-                </td>
-            </tr>
-        </tbody>
+                    </td>
+                    {/*通知対象*/}
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <input
+                            type='checkbox'
+                            checked={item.remind_by_item}
+                            onChange={ () => changeRemindByItem(item) }
+                            disabled={!userSetRemind}
+                            className='w-8'
+                            />
+                    </td >
+                    {/* 削除 */}
+                    <td class='px-2 py-2'>
+                        <TrashBtn onClick={ () => deleteItemtest(item)} />
+                    </td>
+                </tr>
+            </tbody>
 
         </>
         )
@@ -386,14 +390,24 @@ function ItemsListPanel() {
 
 
     const itemsListFieldPanel = (
-        // <div className='list-field'>
-        //     <table className="table-fixed w-full">
-        <div class="flex flex-col w-full">
-            <div class="-m-1.5 overflow-x-auto overflow-y-auto  mx-auto max-w-128">
-                <div class="p-1.5 min-w-full inline-block align-middle">
-                    <div class="overflow-hidden border rounded-lg">
-                        <table class="text-center min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                            { itemsHeader }
+        <div class="flex flex-col">
+                <div class="-m-1.5 overflow-x-auto border">
+                    <div class="p-1.5 min-w-full inline-block align-middle">
+                    <div class="overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                        <thead>
+                            <tr>
+                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">管理する</th>
+                            <th colspan="2" scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">商品名</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">消費サイクル</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">直近開封日</th>
+                            <th scope="col" class="px-2 py-2 text-center w-16 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">リンク</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">最終購入日</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">  </th>
+                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">通知する</th>
+                            </tr>
+                        </thead>
+                            {/* { itemsHeader } */}
                             { itemsData }
                         </table>
                     </div>
@@ -412,7 +426,6 @@ function ItemsListPanel() {
             { itemsListFieldPanel }
             <div className='flex justify-center mt-2 '>
                 <button type='button' className='' onClick={handleAddNewItem}>
-                    {/* <AddBtn children="+" onClick={handleAddNewItem} /> */}
                     +商品を追加する
                 </button>
 
