@@ -17,7 +17,7 @@ function Login({ toggleForm }) {
     const [cookies, setCookie] = useCookies(['jwt_token']);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState([]);
     const navigate = useNavigate();
     const token = useSelector(state => state.token.token);
 
@@ -44,8 +44,18 @@ function Login({ toggleForm }) {
             navigate('/todefault');
 
         } catch (err) {
-            console.log(err.response.data);
-            setError("入力した情報で登録されていません。");
+            if (err.response) {
+                const errData = err.response.data;
+                const errs = [];
+                for (const key in errData) {
+                  if (errData.hasOwnProperty(key)) {
+                    errs.push(`${errData[key]}`);
+                  }
+                }
+                setError(errs);
+              } else {
+                setError(['Network error']);
+              }
         };
     };
 
@@ -58,7 +68,7 @@ function Login({ toggleForm }) {
                 <Bar children="またはメールアドレスでログイン" />
                 <TextInput type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                 <TextInput type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
-                <CertifyBtn onClick={handleLogin} children="ログインする" />
+                <CertifyBtn onClick={handleLogin} children="ログインする" disabled={!email || !password} />
                 <RegisterOrLogin children="新規登録はこちらから" onClick={toggleForm} />
                 {error && <p className="text-red-500">{error}</p>}
             </div>

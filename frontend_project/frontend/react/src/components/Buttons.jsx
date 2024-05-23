@@ -1,7 +1,7 @@
 import React from "react";
 
-function CertifyBtn({ onClick, children }) {
-    return <button className="bg-base-orange text-white px-24 py-2.5 rounded-full text-l my-2 font-medium" onClick={onClick}>{children}</button>;
+function CertifyBtn({ onClick, children, disabled }) {
+    return <button className="bg-base-orange text-white px-24 py-2.5 rounded-full text-l my-2 font-medium disabled:opacity-50" onClick={onClick} disabled={disabled}>{children}</button>;
 }
 
 function LineBtn({ onClick, children, disabled }) {
