@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { Header } from "../components/HeaderImg";
+import { LineBtn } from "../components/Buttons";
 
 function LineLinkForm () {
     const [copySuccess, setCopySuccess] = useState('');
@@ -17,15 +19,23 @@ function LineLinkForm () {
     return(
         <>
         <div>
-            <div>
-                <a href={lineLinkInfo.url}>LINE連携はこちら</a>
+
+            <Header/>
+            <div className="flex justify-center mt-24">
+                <img className="w-52 h-40 object-cover rounded-full" src="/kaimotto.jpeg"/>
             </div>
+
+            <div className="flex justify-center items-center flex-col my-16">
+                <a href={lineLinkInfo.url}>
+                    <LineBtn children="LINE連携はこちら" />
+                </a>
             <div>
-                <div>
+                <div className="flex justify-center">
                     {displayText}...
                 </div>
 
-                <button onClick={copyToClipboard}>コピー</button>
+                <button onClick={copyToClipboard}>ここを押してコピー</button>
+            </div>
             </div>
         {copySuccess && <p>{copySuccess}</p>}
         </div>

@@ -134,15 +134,15 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center ">
                     <div className="fixed inset-0 bg-black opacity-50 z-40" onClick={handleModalClose}></div>
-                    <div className="relative z-50 w-full max-w-lg sm:max-w-[80%] m-3 sm:mx-auto p-4">
-                        <div className="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
-                            <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
-                                <h3 className="font-bold text-gray-800 dark:text-white">招待・申請の状況</h3>
+                    <div className="relative z-50 w-full max-w-lg sm:max-w-[45%] m-3 sm:mx-auto p-4">
+                        <div className="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+                            <div className="flex justify-between items-center py-3 px-4 border-b ">
+                                <h3 className="font-bold text-gray-800">招待・申請の状況</h3>
                                 <button
                                     type="button"
-                                    className="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-neutral-700"
+                                    className="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
                                     onClick={handleModalClose}
                                 >
                                     <span className="sr-only">Close</span>
@@ -168,14 +168,14 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                 <div className="-m-1.5 overflow-x-auto">
                                     <div className="p-1.5 min-w-full inline-block align-middle">
                                         <div className="overflow-hidden">
-                                            <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                                                <caption className="py-2 text-center text-lg font-semibold text-gray-800 dark:text-neutral-200">友達からの招待</caption>
-                                                <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+                                            <table className="min-w-full  divide-gray-200 ">
+                                                <caption className="py-2 text-center text-lg font-semibold text-gray-800">友達からの招待</caption>
+                                                <tbody className="divide-y border-b divide-gray-200">
                                                     {friendInvites.length > 0 ? (
                                                         friendInvites.map((m, index) => (
                                                             <tr key={index}>
-                                                                <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 w-1/4"><OtherUserNameAndIcon userInfo={m.owner_name}/></td>
-                                                                <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 w-1/4">{m.list_name}</td>
+                                                                <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 w-1/4"><OtherUserNameAndIcon userInfo={m.owner_name}/></td>
+                                                                <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 w-1/4">{m.list_name}</td>
                                                                 <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                     <TestBtn children="参加" onClick={() => onApprove(m.member_id)} />
                                                                 </td>
@@ -183,7 +183,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                                     <button
                                                                         type="button"
                                                                         onClick={() => onDecline(m.member_id)}
-                                                                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none"
                                                                     >
                                                                         拒否
                                                                     </button>
@@ -192,7 +192,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                         ))
                                                     ) : (
                                                         <tr>
-                                                            <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">現在、友達からの招待はありません</td>
+                                                            <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、友達からの招待はありません</td>
                                                         </tr>
                                                     )}
                                                 </tbody>
@@ -205,25 +205,25 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                     <div className="-m-1.5 overflow-x-auto">
                                         <div className="p-1.5 min-w-full inline-block align-middle">
                                             <div className="overflow-hidden">
-                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800 dark:text-neutral-200">友達のリストへの共有申請</caption>
-                                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+                                                <table className="min-w-full divide-gray-200">
+                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">友達のリストへの共有申請</caption>
+                                                    <tbody className="divide-y border-b divide-gray-200">
                                                         {sharedRequests.length > 0 ? (
                                                             sharedRequests.map((m, index) => (
                                                                 <tr key={index}>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 w-1/4"><OtherUserNameAndIcon userInfo={m.owner_name}/></td>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 w-1/4">{m.list_name}</td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 w-1/4"><OtherUserNameAndIcon userInfo={m.owner_name}/></td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 w-1/4">{m.list_name}</td>
                                                                     <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                                                         ></button>
                                                                     </td>
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => onDecline(m.member_id)}
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-200 hover:text-red-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-200 hover:text-red-800 disabled:opacity-50 disabled:pointer-events-none"
                                                                         >
                                                                             中止
                                                                         </button>
@@ -232,7 +232,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                             ))
                                                         ) : (
                                                             <tr>
-                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">現在、友達のリストへの共有申請をしていません</td>
+                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、友達のリストへの共有申請をしていません</td>
                                                             </tr>
                                                         )}
                                                     </tbody>
@@ -246,25 +246,25 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                     <div className="-m-1.5 overflow-x-auto">
                                         <div className="p-1.5 min-w-full inline-block align-middle">
                                             <div className="overflow-hidden">
-                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800 dark:text-neutral-200">自分のリストに招待</caption>
-                                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+                                                <table className="min-w-full  divide-gray-200">
+                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">自分のリストに招待</caption>
+                                                    <tbody className="divide-y border-b divide-gray-200">
                                                         {myListInvites.length > 0 ? (
                                                             myListInvites.map((m, index) => (
                                                                 <tr key={index}>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 w-1/4"><OtherUserNameAndIcon userInfo={m.guest_name}/></td>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 w-1/4">{m.list_name}</td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 w-1/4"><OtherUserNameAndIcon userInfo={m.guest_name}/></td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 w-1/4">{m.list_name}</td>
                                                                     <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                                                         ></button>
                                                                     </td>
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => onDecline(m.member_id)}
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none"
                                                                         >
                                                                             中止
                                                                         </button>
@@ -273,7 +273,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                             ))
                                                         ) : (
                                                             <tr>
-                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">現在、自分のリストに招待していません</td>
+                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、自分のリストに招待していません</td>
                                                             </tr>
                                                         )}
                                                     </tbody>
@@ -287,25 +287,25 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                     <div className="-m-1.5 overflow-x-auto">
                                         <div className="p-1.5 min-w-full inline-block align-middle">
                                             <div className="overflow-hidden">
-                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800 dark:text-neutral-200">自分のリストの共有申請</caption>
-                                                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+                                                <table className="min-w-full  divide-gray-200">
+                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">自分のリストの共有申請</caption>
+                                                    <tbody className="divide-y border-b divide-gray-200">
                                                         {myListShares.length > 0 ? (
                                                             myListShares.map((m, index) => (
                                                                 <tr key={index}>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 w-1/4"><OtherUserNameAndIcon userInfo={m.guest_name}/></td>
-                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200 w-1/4">{m.list_name}</td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 w-1/4"><OtherUserNameAndIcon userInfo={m.guest_name}/></td>
+                                                                    <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 w-1/4">{m.list_name}</td>
                                                                     <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                                                         ></button>
                                                                     </td>
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => onDecline(m.member_id)}
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none"
                                                                         >
                                                                             中止
                                                                         </button>
@@ -314,7 +314,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                             ))
                                                         ) : (
                                                             <tr>
-                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">現在、自分のリストの共有申請をしていません</td>
+                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、自分のリストの共有申請をしていません</td>
                                                             </tr>
                                                         )}
                                                     </tbody>
@@ -327,7 +327,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                             <div className="py-3 px-4 text-center">
                                 <button
                                     type="button"
-                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
+                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                                     onClick={handleModalClose}
                                 >
                                     閉じる

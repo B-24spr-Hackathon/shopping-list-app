@@ -16,12 +16,9 @@ import { PermissionDropdown } from "../components/cmbSelectAuthority";
 import LineLinkBtn from "../utils/LineLink";
 import DropUserBtn from "../utils/DropUser";
 import { setMember } from "../reducers/memberSlice";
-import MemberStatusModal from "../components/MemberStatusModal";
-import SelectMyList from "../components/SelectMyList";
 import MyListInfoModal from "../components/MyListInfoModal";
 import { UserNameAndIcon, OtherUserNameAndIcon } from "../components/UserNameIcon";
 import SimpleSelectBox from "../components/SimpleReactSelect";
-import HamburgerMenu from "../components/HumbergerMenu";
 import NewHamburgerMenu from "../components/dropdown";
 
 
@@ -37,7 +34,7 @@ function Home() {
 
 
     const [message, setMessage] = useState("");
-    const [selectedTab, setSelectedTab] = useState('invite'); // タブの状態を管理
+    const [selectedTab, setSelectedTab] = useState('none'); // タブの状態を管理
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -170,7 +167,6 @@ function Home() {
                 </div>
                 <div className="fixed flex right-2 mt-4 mr-4 z-40">
                     <div className="">
-                        {/* <HamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/> */}
                         <NewHamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/>
                     </div>
                 </div>
@@ -264,6 +260,11 @@ function Home() {
                                 <TestBtn onClick={handleApplyFriendToList} children="申請" />
                             </div>
                         </div>
+                    </div>
+                )}
+                {selectedTab === 'none' && (
+                    <div className="flex justify-center">
+                        
                     </div>
                 )}
             </div>

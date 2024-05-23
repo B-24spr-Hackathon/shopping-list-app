@@ -24,7 +24,7 @@ function LogoutButton(  ) {
 
     return (
         <>
-        <button onClick={handleLogout} type="button" className='flex items-center gap-x-3.5 py-2  rounded-lg text-m text-gray-800  focus:outline-none focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700"'>
+        <button onClick={handleLogout} type="button" className='flex items-center gap-x-3.5 py-2  rounded-lg text-m text-gray-800  focus:outline-none focus:bg-gray-100'>
             ログアウト
         </button>
         </>

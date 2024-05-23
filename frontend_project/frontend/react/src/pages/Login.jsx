@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from "../components/HeaderImg";
 import { TextInput } from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from "../reducers/userSlice";
 import { fetchUserInfoRequest, lineUrl, loginRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
+
+
 
 function Login({ toggleForm }) {
     const dispatch = useDispatch();
@@ -17,6 +19,19 @@ function Login({ toggleForm }) {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const token = useSelector(state => state.token.token);
+
+    useEffect(()=> {
+        const haveJwt = async()=>{
+            try{
+                const response = await fetchUserInfoRequest(token);
+                navigate('/todefault');
+            }catch(err){
+                console.error(err);
+            }
+        }
+        haveJwt();
+    }, []);
 
     const handleLogin = async () => {
         try {
