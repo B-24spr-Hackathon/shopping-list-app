@@ -17,19 +17,19 @@ from datetime import timedelta
 """
 デプロイ時に変更する項目（始点）
 """
-BACKEND_URL = "https://127.0.0.1:8000"
-FRONTEND_URL = "http://127.0.0.1:5173"
+BACKEND_URL = "https://alb.tech-talk-cloud.net"
+FRONTEND_URL = "https://front.tech-talk-cloud.net"
 
 # LINE callback用URL
-LINE_URL = "https://127.0.0.1:8000"
+LINE_URL = "https://alb.tech-talk-cloud.net"
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "django-db",
-        "USER": "django",
-        "PASSWORD": "django",
-        "HOST": "db",
+        "NAME": "mydatabase",
+        "USER": "myuser",
+        "PASSWORD": "mypassword123",
+        "HOST": "s3cdkstack-myrdsinstance48fd439c-uoous3zidx2j.ctai8y82wfu1.ap-northeast-1.rds.amazonaws.com",
         "PORT": "3306",
     }
 }
@@ -42,8 +42,9 @@ DATABASES = {
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "alb.tech-talk-cloud.net",
     "front.tech-talk-cloud.net",
+    "alb.tech-talk-cloud.net",
+    "10.1.2.181",
 ]
 
 # CORS設定
@@ -83,9 +84,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'shop',
     'corsheaders',
-    
-    # デプロイ時に削除
-    "sslserver"
 ]
 
 # AbstractUserを使うため追記
