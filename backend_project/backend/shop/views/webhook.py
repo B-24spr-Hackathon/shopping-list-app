@@ -47,6 +47,11 @@ class LineWebhookView(APIView):
             logger.info("webhook疎通確認")
             return Response(status=status.HTTP_200_OK)
 
+        # リクエストボディが空の場合は、何もせずにOKレスポンス
+        if not request_data or not request_data["events"]:
+            logger.info("webhook疎通確認")
+            return Response(status=status.HTTP_200_OK)
+
         logger.info("Webhook処理開始")
         # 署名の検証
         line_signature = request.headers.get("x-line-signature")
