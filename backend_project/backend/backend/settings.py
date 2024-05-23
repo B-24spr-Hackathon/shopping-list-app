@@ -194,7 +194,7 @@ FRONT_LOGIN_URL = f"{FRONTEND_URL}/lineloginmethod"
 FRONT_ERROR_URL = f"{FRONTEND_URL}/lineloginerror"
 
 # LINE連携後のフロントエンドリダイレクトURL
-LINK_REDIRECT_URL = f"{FRONTEND_URL}/home"
+LINK_REDIRECT_URL = f"{FRONTEND_URL}/todefault"
 
 # 買い物リストのURL
 SHOPPING_LIST_URL = f"{FRONTEND_URL}/shoppinglist"
