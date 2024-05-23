@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faPencil } from '@fortawesome/free-solid-svg-icons';
 import { PermissionDropdownForMyListModal } from "./cmbSelectAuthority";
 import { changeEditAuthJoinedListRequest, deleteListRequest, editListInfoRequest, fetchListInfoRequest, fetchUserInfoRequest } from "../utils/Requests";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,7 +49,7 @@ function MyListInfoModal() {
     return (
         <>
             <button type="button" disabled={!list.is_owner} className="disabled:opacity-50 disabled:pointer-events-none" onClick={handleOpen}>
-                <FontAwesomeIcon icon={faCircleInfo} style={{ color: 'rgba(30, 144, 255,1)' }} size="2x" />
+                <FontAwesomeIcon icon={faPencil} style={{color: "#0091ff",}} className="hover:opacity-50" />
             </button>
 
             {isOpen && (

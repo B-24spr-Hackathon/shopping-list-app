@@ -94,7 +94,18 @@ function ShoppingListPanel() {
                     {getColorIcon(item.color)}
                 </td>
                 <td class="px-2 py-2 whitespace-nowrap text-start text-sm w-32 font-medium text-gray-800">
-                    {item.item_name}
+                    {item.item_url ? (
+                        <a
+                            href={item.item_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                        >
+                            {item.item_name}
+                        </a>
+                    ) : (
+                        item.item_name
+                    )}
                 </td>
                 <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800">
                     <BoughtOrPassBtn
