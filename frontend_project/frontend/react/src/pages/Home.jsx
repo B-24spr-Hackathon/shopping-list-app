@@ -8,7 +8,7 @@ import { setUser, clearUser } from "../reducers/userSlice";
 import { Footer, Header } from "../components/HeaderImg";
 import { Bar, Title } from "../components/Title";
 import { ForApplySelectList, ForInviteSelectList, SelectList } from "../components/SelectBox";
-import AddNewList from "../utils/AddNewList";
+import AddNewList from "../components/AddNewList";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import LogoutButton from "../components/Logout";
 import { TextInput, TextInput2 } from "../components/TextInput";
@@ -28,17 +28,14 @@ import HamburgerMenu from "../components/HumbergerMenu";
 function Home() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const user_id = useSelector((state) => state.user.user_id);
-    const userLineRemind = useSelector(state => state.user.remind);
-    const selectedList = useSelector(state => state.selectedList);
-    const selectedListId = useSelector(state => state.selectedList.list_id);
-    const handleAddNewList = AddNewList();
     const token = useSelector(state => state.token.token);
-    const lists = useSelector(state => state.user.lists);
-    const [guest_info, setGuest_info] = useState([]);
-    const [message, setMessage] = useState("");
+    const user_id = useSelector((state) => state.user.user_id);
+    const selectedList = useSelector(state => state.selectedList);
     const member = useSelector(state => state.member.member);
-    const [memberInfo, setMemberInfo] = useState([]);
+    const lists = useSelector(state => state.user.lists);
+
+
+    const [message, setMessage] = useState("");
     const [selectedTab, setSelectedTab] = useState('invite'); // タブの状態を管理
 
     useEffect(() => {
@@ -56,26 +53,30 @@ function Home() {
         fetchUserInfo();
     }, []);
 
-    const handleFetchShoppingList = async () => {
-        const response = await fetchShoppingListRequest(selectedListId, token);
-        console.log('fetchshopping:', response);
-    }
+    // const handleFetchShoppingList = async () => {
+    //     const response = await fetchShoppingListRequest(selectedListId, token);
+    //     console.log('fetchshopping:', response);
+    // }
 
-    const handleDeleteList = async () => {
-        const response = await deleteListRequest(selectedListId, token);
-        const newUserInfo = await fetchUserInfoRequest(token);
-        dispatch(setUser(newUserInfo.data.user));
-        const lastIndex = newUserInfo.data.lists.length - 1;
-        const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
-        dispatch(setSelectedList(listInfo.data));
-    }
-
+    // const handleDeleteList = async () => {
+    //     const response = await deleteListRequest(selectedListId, token);
+    //     const newUserInfo = await fetchUserInfoRequest(token);
+    //     dispatch(setUser(newUserInfo.data.user));
+    //     const lastIndex = newUserInfo.data.lists.length - 1;
+    //     const listInfo = await fetchListInfoRequest(newUserInfo.data.lists[lastIndex].list_id, token);
+    //     dispatch(setSelectedList(listInfo.data));
+    // }
+    
+    //招待と申請
     const [friendInviteUserId, setFriendInviteUserId] = useState();
     const [friendApplyUserId, setFriendApplyUserId] = useState();
     const [friendInviteUserInfo, setFriendInviteUserInfo] = useState({});
     const [friendApplyUserInfo, setFriendApplyUserInfo] = useState({});
     const [friendApplyUserLists, setFriendApplyUserLists] = useState([]);
+    const [inviteAuthority, setInviteAuthority] = useState("False");
+    const [applyAuthority, setApplyAuthority] = useState("False");
 
+    //招待する友達を検索
     const handleSearchInviteFriend = async () => {
         try {
             const response = await searchFriendRequest(friendInviteUserId, token);
@@ -84,7 +85,7 @@ function Home() {
             console.log(err.response.data);
         }
     }
-
+    //申請する友達を検索
     const handleSearchApplyFriend = async () => {
         try {
             const response = await searchApplyFriendRequest(friendApplyUserId, token);
@@ -94,66 +95,68 @@ function Home() {
             console.log(err.response.data);
         }
     }
-
-    const [inviteAuthority, setInviteAuthority] = useState("False");
-    const [applyAuthority, setApplyAuthority] = useState("False");
-
+    //招待する
     const handleInviteFriendToList = async () => {
         try {
-            const response = await inviteToListRequest(selectedInviteListId, friendInviteUserInfo.user_id, inviteAuthority, token);
-            const response1 = await fetchUserInfoRequest(token);
-            dispatch(setUser(response1));
+            const inviteResponse = await inviteToListRequest(selectedInviteListId, friendInviteUserInfo.user_id, inviteAuthority, token);
+            const userInfoResponse = await fetchUserInfoRequest(token);
+            dispatch(setUser(userInfoResponse.data.user));
+            const memberStatusInfoResponse = await fetchMemberStatusInfoRequest(token);
+            dispatch(setMember(memberStatusInfoResponse.data));
+            console.log("招待",inviteResponse);
         } catch {
-            console.log(err.response.data);
+            console.log(err.inviteResponse.data);
         }
     }
-
+    //申請する
     const handleApplyFriendToList = async () => {
         try {
             const response = await applyToListRequest(selectedApplyListId, user_id, applyAuthority, token);
+            const userInfoResponse = await fetchUserInfoRequest(token);
+            dispatch(setUser(userInfoResponse.data.user));
+            const memberStatusInfoResponse = await fetchMemberStatusInfoRequest(token);
+            dispatch(setMember(memberStatusInfoResponse.data));
+            console.log("申請",response);
         } catch {
             console.log(err.response.data);
         }
     }
-
+    //招待する自分のリストを選ぶ
     const [selectedInviteListId, setSelectedInviteListId] = useState();
     const handleSelectChange = (inviteListId) => {
         setSelectedInviteListId(inviteListId);
         console.log("Selected List ID:", inviteListId);
     }
-
+    //申請する友達のリストを選ぶ
     const [selectedApplyListId, setSelectedApplyListId] = useState([]);
     const handleApplyListSelectChange = (applyListId) => {
         setSelectedApplyListId(applyListId);
         console.log("Selected List ID:", applyListId);
     }
-
-    const handleLineRemindChange = async () => {
-        const newLineRemind = !userLineRemind;
-        try {
-            const response = await updateUserInfoRequest('remind', newLineRemind, token);
-            dispatch(setUser({ remind: response.data.user.remind }));
-            setRemind(response.data.user.remind);
-        } catch (err) {
-            console.error('Failed to update manage target:', err);
-        }
-    }
-
+    //申請する友達の権限を設定する
     const handleInviteAuthorityChange = (e) => {
         setInviteAuthority(e.target.value);
     };
-
+    //招待する友達の権限を選ぶ
     const handleApplyAuthorityChange = (e) => {
         setApplyAuthority(e.target.value);
     };
-
+    //承認する
     const handleApproveToList = async (member_id) => {
         const response = await approveToListRequest(member_id, token);
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser(userInfoResponse.data.user));
+        const memberStatusInfoResponse = await fetchMemberStatusInfoRequest(token);
+        dispatch(setMember(memberStatusInfoResponse.data));
         console.log('承認', response);
     }
-
+    //拒否・中止する
     const handleDeclineToList = async (member_id) => {
         const response = await declineToListRequest(member_id, token);
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser(userInfoResponse.data.user));
+        const memberStatusInfoResponse = await fetchMemberStatusInfoRequest(token);
+        dispatch(setMember(memberStatusInfoResponse.data));
         console.log('拒否OR中止', response);
     }
 
@@ -182,13 +185,13 @@ function Home() {
                     </div>
                     {/* リスト情報モーダル */}
                     <div className="ml-4">
-                        <MyListInfoModal list={selectedList} guest_info={guest_info} />
+                        <MyListInfoModal />
                     </div>
                 </div>
                     <div className="flex justify-center">
                         {message}
                     </div>
-                    <button className="text-sm mb-1" onClick={handleAddNewList}>＋新しいリストを作成する</button>
+                    <AddNewList />
                 <div className="flex justify-center ">
                     <div className="my-4">
                         <OrangeBtn disabled={lists.length == 0} onClick={() => navigate('/shoppinglist')} children="選んだリストを見る" />
@@ -241,8 +244,13 @@ function Home() {
                             <div className="flex justify-center w-full mb-2">
                                 <TestBtn onClick={handleSearchApplyFriend} children='友達検索' />
                             </div>
-                            <div className="flex justify-center w-full mb-2">
-                                <p>検索結果：{friendApplyUserInfo.user_name}</p>
+                            <div className="flex flex-row justify-center w-auto mb-2">
+                                <div className="flex items-center">
+                                    検索結果：
+                                </div>
+                                <div className="flex justify-center">
+                                    <OtherUserNameAndIcon userInfo={friendApplyUserInfo.user_name} />
+                                </div>
                             </div>
                             <div className="flex justify-center w-full mb-2">
                                 <ForApplySelectList lists={friendApplyUserLists} onSelectChange={handleApplyListSelectChange} />

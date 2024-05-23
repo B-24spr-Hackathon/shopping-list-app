@@ -25,27 +25,30 @@ function MyListInfoModal() {
 
     const handleChangeAuthority = async (memberId, newAuthority) => {
         const formattedAuthority = newAuthority === 'true' ? 'True' : 'False';
-        const response = await changeEditAuthJoinedListRequest(memberId, formattedAuthority, token);
-        const response1 = await fetchListInfoRequest(list.list_id,token,);
-        dispatch(setSelectedList(response1.data));
-        console.log(`Response: ${response}`); // デバッグ用に追加
+        const changeAuthResult = await changeEditAuthJoinedListRequest(memberId, formattedAuthority, token);
+        const listInfoResponse = await fetchListInfoRequest(list.list_id,token,);
+        dispatch(setSelectedList(listInfoResponse.data));
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser({lists: userInfoResponse.data.lists}));
     };
 
     const handleUpdateListInfo = async(list_id, key, newValue) => {
-        const response = await editListInfoRequest(list_id, key, newValue, token);
-        const response1 = await fetchListInfoRequest(list.list_id, token);
-        dispatch(setSelectedList(response1.data));
+        const editResult = await editListInfoRequest(list_id, key, newValue, token);
+        const listInfoResponse = await fetchListInfoRequest(list.list_id, token);
+        dispatch(setSelectedList(listInfoResponse.data));
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser({lists: userInfoResponse.data.lists}));
     }
     const handleDeleteList = async(list_id) => {
         await deleteListRequest(list_id, token);
-        const response = await fetchUserInfoRequest(token);
-        dispatch(setUser(response.data));
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser({lists: userInfoResponse.data.lists}));
         handleClose();
     }
 
     return (
         <>
-            <button type="button" className="disabled:opacity-50 disabled:pointer-events-none" onClick={handleOpen}>
+            <button type="button" disabled={!list.is_owner} className="disabled:opacity-50 disabled:pointer-events-none" onClick={handleOpen}>
                 <FontAwesomeIcon icon={faCircleInfo} style={{ color: 'rgba(30, 144, 255,1)' }} size="2x" />
             </button>
 

@@ -39,7 +39,7 @@ function LineLoginMethod() {
             // レスポンスからトークンを取得;
             setCookie('jwt_token', token, { path: '/', maxAge:100000, sameSite: "none", secure: true});
             //レスポンスでユーザー情報を受け取ってstoreに保存
-            dispatch(setUser(response.data.user));
+            // dispatch(setUser(response.data.user));
             dispatch(setToken(token));
             //リダイレクト
             navigate('/todefault');

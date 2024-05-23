@@ -15,10 +15,14 @@ function UserNameAndIcon() {
     );
 }
 function OtherUserNameAndIcon({userInfo}) {
-    const initial = userInfo ? userInfo[0].toUpperCase() : '';
+    if (!userInfo) {
+        return null; // userInfoがない場合は何も表示しない
+    }
+
+    const initial = userInfo[0].toUpperCase();
 
     return (
-        <div className="flex items-center ">
+        <div className="flex items-center">
             <div className="bg-pink-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                 {initial}
             </div>

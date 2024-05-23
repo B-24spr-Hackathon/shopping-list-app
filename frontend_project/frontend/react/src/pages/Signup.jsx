@@ -51,7 +51,7 @@ function Signup({ toggleForm }) {
             const response = await signUpRequest(user_id, user_name, email, password1);
             const token = response.data.access;
             setCookie('jwt_token', token, { path: '/', maxAge: 100000, sameSite: "none", secure: true });
-            dispatch(setUser(response.data.user));
+            // dispatch(setUser(response.data.user));
             dispatch(setToken(token));
             navigate('/todefault');
         } catch (err) {

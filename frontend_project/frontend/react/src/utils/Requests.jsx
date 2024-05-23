@@ -51,6 +51,7 @@ export const fetchUserInfoRequest = async(token) => {
         withCredentials: true,
         token: token,
     });
+    console.log("fetchUserInfo.Response:", response);
     return response;
 };
 //共有の招待・申請状況を取得するリクエスト
@@ -61,6 +62,7 @@ export const fetchMemberStatusInfoRequest = async(token) => {
         withCredentials: true,
         token: token,
     });
+    console.log("fetchMemberStatusInfo.Response:", response);
     return response;
 };
 
@@ -76,6 +78,7 @@ export const updateUserInfoRequest = async( key, newValue, token  ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("updateUserInfo.Response:", response);
     return response;
 }
 //退会のリクエスト
@@ -86,6 +89,7 @@ export const dropUserRequest = async(token) => {
         withCredentials: true,
         token: token,
     });
+    console.log("dropUser.Response:", response);
     return response;
 };
 
@@ -101,6 +105,7 @@ export const loginRequest = async(email, password) => {
             },
         withCredentials: false,
     });
+    console.log("login.Response:", response);
     return response;
 }
 //新規登録のリクエスト
@@ -116,6 +121,7 @@ export const signUpRequest = async(user_id, user_name, email, password) => {
             },
         withCredentials: false,
     });
+    console.log("signUp.Response:", response);
     return response;
 }
 //LINEログイン初回
@@ -131,6 +137,7 @@ export const firstLineLoginRequest = async(user_id, user_name, line_id, line_sta
             },
         withCredentials: false,
     });
+    console.log("firstLineLogin.Response:", response);
     return response;
 }
 //LINEログイン2回目以降
@@ -143,6 +150,7 @@ export const lineLoginRequest = async(line_id) => {
             },
         withCredentials: false,
     });
+    console.log("lineLogin.Response:", response);
     return response;
 }
 //LINE連携
@@ -153,6 +161,7 @@ export const lineLinkRequest = async(token) => {
         withCredentials: true,
         toke: token,
     });
+    console.log("lineLink.Response:", response);
     return response;
 }
 
@@ -168,6 +177,7 @@ export const addNewListRequest = async(token) => {
         withCredentials: true,
         token: token,
     });
+    console.log("addNewList.Response:", response);
     return response;
 }
 //リスト名を編集するリクエスト
@@ -181,6 +191,7 @@ export const editListInfoRequest = async( list_id, key, newValue, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("editListInfo.Response:", response);
     return response;
 }
 //リストを削除するリクエスト
@@ -191,6 +202,7 @@ export const deleteListRequest = async( list_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("deleteList.Response:", response);
     return response;
 }
 //管理商品リストを取得するリクエスト
@@ -201,6 +213,7 @@ export const fetchListInfoRequest = async( list_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("fetchListInfo.Response:", response);
     return response;
 }
 
@@ -216,6 +229,7 @@ export const addNewItemRequest = async( list_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("addNewItem.Response:", response);
     return response;
 }
 //リスト内のアイテムを取得するリクエスト
@@ -226,6 +240,7 @@ export const fetchItemsOfListRequest = async( list_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("fetchItemsOfList.Response:", response);
     return response;
 }
 //アイテムの情報を更新するリクエスト
@@ -239,6 +254,7 @@ export const updateItemInfoRequest = async( list_id, item_id, key, newItemName, 
         withCredentials: true,
         token: token,
     });
+    console.log("updateItemInfo.Response:", response);
     return response;
 }
 //アイテムを削除するリクエスト
@@ -249,6 +265,7 @@ export const deleteItemRequest = async( list_id, item_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("deleteItem.Response:", response);
     return response;
 }
 //お買い物リストを取得するリクエスト
@@ -259,6 +276,7 @@ export const fetchShoppingListRequest = async( list_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("fetchShoppingList.Response:", response);
     return response;
 }
 //招待時にユーザー検索するリクエスト
@@ -269,6 +287,7 @@ export const searchFriendRequest = async( user_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("searchFriend.Response:", response);
     return response;
 }
 //リストに招待するリクエスト
@@ -284,6 +303,7 @@ export const inviteToListRequest = async( list_id, user_id, authority, token ) =
         withCredentials: true,
         token: token,
     });
+    console.log("inviteToList.Response:", response);
     return response;
 }
 
@@ -295,7 +315,7 @@ export const searchApplyFriendRequest = async( user_id, token ) => {
         withCredentials: true,
         token: token,
     });
-    console.log("");
+    console.log("searchApplyFriend.Response:", response);
     return response;
 }
 
@@ -312,6 +332,7 @@ export const applyToListRequest = async( list_id, user_id, authority, token ) =>
         withCredentials: true,
         token: token,
     });
+    console.log("applyToList.Response:", response);
     return response;
 }
 //リストの共有を許可するリクエスト(招待も申請も共通)
@@ -325,6 +346,7 @@ export const approveToListRequest = async( member_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("approveToList.Response:", response);
     return response;
 }
 //自分からのリストの招待、申請、友達からの申請を拒否するリクエスト
@@ -335,6 +357,7 @@ export const declineToListRequest = async( member_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("declineToList.Response:", response);
     return response;
 }
 //共有リストの権限変更（招待・申請共通）
@@ -348,6 +371,7 @@ export const changeEditAuthJoinedListRequest = async( member_id, authority, toke
         withCredentials: true,
         token: token,
     });
+    console.log("changeEditAuth.Response:", response);
     return response;
 }
 //共有リストの共有解除（招待・申請共通）
@@ -358,6 +382,7 @@ export const removeJoinedListRequest = async( member_id, token ) => {
         withCredentials: true,
         token: token,
     });
+    console.log("removeJoinedList.Response:", response);
     return response;
 }
 
