@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TabMainMenu from "../components/TabMainMenu";
 import { Header, Footer } from "../components/HeaderImg";
-import UserNameAndIcon from '../components/UserNameIcon';
+import { UserNameAndIcon } from "../components/UserNameIcon";
 import { ShoppingListPanel } from '../components/ListPanels';
 import LogoutButton from '../components/Logout';
 import { SelectList } from '../components/SelectBox';

@@ -22,33 +22,29 @@ const ToDefault = () => {
             dispatch(setUser({lists: userInfoResponse.data.lists}));
 
             //招待・申請情報を取得して保存
-            const memberStatusInfo = await fetchMemberStatusInfoRequest(token);
-            dispatch(setMember(memberStatusInfo.data));
+            const memberStatusInfoResponse = await fetchMemberStatusInfoRequest(token);
+            dispatch(setMember(memberStatusInfoResponse.data));
             // setMemberInfo(memberStatusInfo.data);
-            console.log(selectedList)
 
-            //リストが一つもないときhomeへ
-            if(userInfoResponse.data.lists.length == 0){
-                navigate("/home");
-            //それ以外
-            }else{
-                //selectedListがあれば
+            //リストがあれば、/shoppinglistへ
+            if(userInfoResponse.data.lists.length != 0){
+                //selectedListがなければ、リストの最初を設定する
                 if(selectedList.list_id == null){
                     dispatch(setSelectedList(userInfo.lists[0]))
                 }
-                //デフォルトリストの値でitemsに遷移した後の表示を変える
-                if (userInfo.default_list){
-                    navigate('/shoppinglist');
-                }else{
-                    navigate('/shoppinglist');
-                }
+                navigate('/shoppinglist');
+            //リストがなければ/homeへ
+            }else{
+                navigate("/home");
             }
         }
 
         fetchUserInfo();
     }, []);
 
-    return null;
+    return (
+        'データ読み込み中...'
+    );
 };
 
 export default ToDefault;
