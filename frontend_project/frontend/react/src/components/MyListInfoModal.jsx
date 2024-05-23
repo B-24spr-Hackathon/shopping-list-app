@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedList } from "../reducers/selectedListSlice";
 import { EditableInput } from "./EditableDateInput";
 import { setUser } from "../reducers/userSlice";
+import { OtherUserNameAndIcon } from "./UserNameIcon";
 
 function MyListInfoModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -98,11 +99,15 @@ function MyListInfoModal() {
                                 {list && list.guests_info ? (
                                     list.guests_info.length > 0 ? (
                                         list.guests_info.map((guest, index) => (
-                                            <div key={guest.member_id} className="ml-4 text-gray-800 dark:text-neutral-400">
-                                                {guest.authority.toString()} {guest.user_name} {guest.member_id}
-                                                <PermissionDropdownForMyListModal
+                                            <div key={guest.member_id} className="flex-row ml-4 text-gray-800 flex dark:text-neutral-400">
+                                                <div className="justify-center flex ml-16">
+                                                    <OtherUserNameAndIcon userInfo={guest.user_name} />
+                                                </div>
+                                                <div className="justify-center flex">
+                                                    <PermissionDropdownForMyListModal
                                                     value={guest.authority}
                                                     onChange={(event) => handleChangeAuthority(guest.member_id, event.target.value)}/>
+                                                </div>
                                             </div>
                                         ))
                                     ) : (

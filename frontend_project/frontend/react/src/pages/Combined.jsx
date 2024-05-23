@@ -8,7 +8,8 @@ import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
 import { useNavigate } from "react-router-dom";
 import SettingUserInfo from "../components/SettigUserInfo.jsx";
-import UserNameAndIcon from "../components/UserNameIcon.jsx";
+import { UserNameAndIcon } from "../components/UserNameIcon";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import ToHomeButton from "../components/ToHome.jsx";

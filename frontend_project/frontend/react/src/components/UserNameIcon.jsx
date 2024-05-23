@@ -7,12 +7,24 @@ function UserNameAndIcon() {
 
     return (
         <div className="flex items-center mx-8 w-full h-[20px]">
-            <div className="fixed bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+            <div className="fixed bg-green-700 text-white rounded-full w-8 h-8 flex items-center justify-center">
                 {initial}
             </div>
             <div className="fixed mx-10 text-xl">{user_name}</div>
         </div>
     );
 }
+function OtherUserNameAndIcon({userInfo}) {
+    const initial = userInfo ? userInfo[0].toUpperCase() : '';
 
-export default UserNameAndIcon;
+    return (
+        <div className="flex items-center ">
+            <div className="bg-pink-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                {initial}
+            </div>
+            <div className="mx-3 text-xl">{userInfo}</div>
+        </div>
+    );
+}
+
+export {UserNameAndIcon, OtherUserNameAndIcon};

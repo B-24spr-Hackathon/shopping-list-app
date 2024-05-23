@@ -10,7 +10,7 @@ function PermissionDropdown({ value, onChange }) {
 }
 function PermissionDropdownForMyListModal({ value, onChange }) {
     return (
-        <select value={value} onChange={onChange}>
+        <select value={value} onChange={onChange} className='border rounded-lg'>
             <option value="true">編集可</option>
             <option value="false">閲覧のみ</option>
         </select>

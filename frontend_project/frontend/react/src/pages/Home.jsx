@@ -19,9 +19,10 @@ import { setMember } from "../reducers/memberSlice";
 import MemberStatusModal from "../components/MemberStatusModal";
 import SelectMyList from "../components/SelectMyList";
 import MyListInfoModal from "../components/MyListInfoModal";
-import UserNameAndIcon from "../components/UserNameIcon";
+import { UserNameAndIcon, OtherUserNameAndIcon } from "../components/UserNameIcon";
 import SimpleSelectBox from "../components/SimpleReactSelect";
 import HamburgerMenu from "../components/HumbergerMenu";
+
 
 
 function Home() {
@@ -211,8 +212,13 @@ function Home() {
                             <div className="flex justify-center w-full mb-2">
                                 <TestBtn onClick={handleSearchInviteFriend} children='友達検索' />
                             </div>
-                            <div className="flex justify-center w-full mb-2">
-                                検索結果：{friendInviteUserInfo.user_name}
+                            <div className="flex flex-row justify-center w-auto mb-2">
+                                <div className="flex items-center">
+                                    検索結果：
+                                </div>
+                                <div className="flex justify-center">
+                                    <OtherUserNameAndIcon userInfo={friendInviteUserInfo.user_name} />
+                                </div>
                             </div>
                             <div className="flex justify-center w-full mb-2">
                                 <ForInviteSelectList lists={lists} onSelectChange={handleSelectChange} />

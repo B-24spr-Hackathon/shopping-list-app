@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { EditableInput } from "./EditableDateInput";
 import LineLinkBtn from "../utils/LineLink";
@@ -10,11 +10,32 @@ function SettingUserInfo() {
     const userInfo = useSelector(state => state.user);
     const token = useSelector(state => state.token.token);
     const dispatch = useDispatch();
+    const fileInputRef = useRef(null)
 
     const handleUpdateUserInfo = async (key, newValue) => {
         await updateUserInfoRequest(key, newValue, token);
         const response = await fetchUserInfoRequest(token);
         dispatch(setUser(response.data.user));
+    };
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('icon', file);
+
+            try {
+                // const response = await axios.post('/api/upload-icon', formData, {
+                //     headers: {
+                //         'Content-Type': 'multipart/form-data',
+                //         'Authorization': `Bearer ${token}`
+                //     }
+                // });
+                handleUpdateUserInfo('icon', response.data.filePath);
+            } catch (error) {
+                console.error("Error uploading the file", error);
+            }
+        }
     };
 
     const timeOptions = [];
@@ -54,10 +75,23 @@ function SettingUserInfo() {
 
     return (
         <div className="flex flex-col items-center text-center">
-            <div className="relative mb-6 border-b w-full max-w-xs">
+            {/* <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">アイコン</label>
-                <EditableInput initialValue={userInfo.icon} onSave={''} className="text-xl mt-2 text-center" />
-            </div>
+                <div className="mt-2 text-xl text-center">
+                    <img
+                        src={userInfo.icon}
+                        alt="User Icon"
+                        className="w-16 h-16 rounded-full mx-auto cursor-pointer"
+                        onClick={() => fileInputRef.current.click()}
+                    />
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                    />
+                </div>
+            </div> */}
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">ユーザー名</label>
                 <EditableInput initialValue={userInfo.user_name} onSave={(newValue => handleUpdateUserInfo('user_name',newValue))} className="text-xl mt-2 text-center" />
