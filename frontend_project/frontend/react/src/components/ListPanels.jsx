@@ -180,7 +180,7 @@ function ItemsListPanel() {
     useEffect(() => {
         setErrorMessage("");
         const fetchListAndItemsInfo = async() => {
-            if(selectedList.is_owner){
+            if(selectedList.is_owner == true){
                 const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
                 setItemsState(itemsInfo.data.items);
                 // const listsInfo = await fetchListInfoRequest(selectedList.list_id, token);
@@ -194,6 +194,7 @@ function ItemsListPanel() {
                     //clear
                     setItemsState([]);
                     setErrorMessage("※お買い物リストの閲覧のみ可能です。")
+                    const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
                 }
             }
         };

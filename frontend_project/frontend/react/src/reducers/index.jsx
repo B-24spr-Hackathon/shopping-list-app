@@ -25,7 +25,7 @@ const rootReducer = (state, action) => {
         const { selectedList } = state; // 現在のselectedListの状態を取得
         state = undefined;
         state = appReducer(state, action); // 他の部分を初期化
-        state.selectedList = selectedList; // selectedListの状態を復元
+        // state.selectedList = selectedList; // selectedListの状態を復元
     }
     return appReducer(state, action);
 };
