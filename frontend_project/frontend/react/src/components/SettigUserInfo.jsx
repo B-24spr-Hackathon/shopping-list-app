@@ -14,8 +14,8 @@ function SettingUserInfo() {
 
     const handleUpdateUserInfo = async (key, newValue) => {
         await updateUserInfoRequest(key, newValue, token);
-        const response = await fetchUserInfoRequest(token);
-        dispatch(setUser(response.data.user));
+        const userInfoResponse = await fetchUserInfoRequest(token);
+        dispatch(setUser(userInfoResponse.data.user));
     };
 
     const handleFileChange = async (event) => {
@@ -95,6 +95,10 @@ function SettingUserInfo() {
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">ユーザー名</label>
                 <EditableInput initialValue={userInfo.user_name} onSave={(newValue => handleUpdateUserInfo('user_name',newValue))} className="text-xl mt-2 text-center" />
+            </div>
+            <div className="relative mb-6 border-b w-full max-w-xs">
+                <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">ユーザーID</label>
+                <EditableInput disabled='false' initialValue={userInfo.user_id} onSave={(newValue => handleUpdateUserInfo('user_id',newValue))} className="text-xl mt-2 text-center" />
             </div>
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">メールアドレス</label>

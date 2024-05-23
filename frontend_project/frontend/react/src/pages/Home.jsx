@@ -22,6 +22,7 @@ import MyListInfoModal from "../components/MyListInfoModal";
 import { UserNameAndIcon, OtherUserNameAndIcon } from "../components/UserNameIcon";
 import SimpleSelectBox from "../components/SimpleReactSelect";
 import HamburgerMenu from "../components/HumbergerMenu";
+import NewHamburgerMenu from "../components/dropdown";
 
 
 
@@ -167,9 +168,10 @@ function Home() {
                 <div className="mt-3">
                     <UserNameAndIcon />
                 </div>
-                <div className="fixed flex right-2 mt-1 mr-4 z-40">
+                <div className="fixed flex right-2 mt-4 mr-4 z-40">
                     <div className="">
-                        <HamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/>
+                        {/* <HamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/> */}
+                        <NewHamburgerMenu member={member} onApprove={handleApproveToList} onDecline={handleDeclineToList}/>
                     </div>
                 </div>
                 <div className="flex justify-center my-2">

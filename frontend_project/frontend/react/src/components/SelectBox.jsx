@@ -50,19 +50,19 @@ function ForShoppingListSelectList({lists}) {
         const selected = lists.find(list => list.list_id == event.target.value);
         dispatch(setSelectedList(selected));
         //リストのオーナーならば
-        if(selectedList.is_owner){
-            //選んだリストの情報を取得
-            const listInfo = await fetchListInfoRequest(event.target.value, token);
-            dispatch(setSelectedList(listInfo.data));
+        // if(selectedList.is_owner){
+        //     //選んだリストの情報を取得
+        //     const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
+        //     // dispatch(setSelectedList(listInfo.data));
         
-        }else if (selectedList.authority){
-            //選んだリストの中のアイテムを取得
-            const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
-            // dispatch(setItemAllInfo(itemsInfo.data.items))
-        }
-        //選んだリストの買い物リストを取得
-        const shoppingListInfo = await fetchShoppingListRequest(selectedList.list_id, token);
-        // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
+        // }else if (selectedList.authority){
+        //     //選んだリストの中のアイテムを取得
+        //     const itemsInfo = await fetchItemsOfListRequest(event.target.value, token);
+        //     // dispatch(setItemAllInfo(itemsInfo.data.items))
+        // }
+        // //選んだリストの買い物リストを取得
+        // const shoppingListInfo = await fetchShoppingListRequest(selectedList.list_id, token);
+        // // dispatch(setShoppingItemsAllInfo(shoppingListInfo.data));
     }
     return (
         <>
@@ -109,7 +109,7 @@ function ForInviteSelectList({ onSelectChange, lists }) {
                 <option value="" disabled>招待するリストを選択</option>
                 {lists.map((list, index) => (
                     <option key={index} value={list.list_id}>
-                        {list.list_id} {list.list_name}
+                        {list.list_name}
                     </option>
                 ))}
             </select>
@@ -141,7 +141,7 @@ function ForApplySelectList({ onSelectChange, lists }) {
                 <option value="" disabled>申請するリストを選択</option>
                 {lists.map((list, index) => (
                     <option key={index} value={list.list_id}>
-                        {list.list_id} {list.list_name}
+                        {list.list_name}
                     </option>
                 ))}
             </select>
@@ -149,6 +149,6 @@ function ForApplySelectList({ onSelectChange, lists }) {
     );
 }
 
-export { SelectList, ForInviteSelectList, ForApplySelectList };
+export { SelectList, ForShoppingListSelectList, ForInviteSelectList, ForApplySelectList };
 
 

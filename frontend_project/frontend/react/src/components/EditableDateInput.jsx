@@ -28,7 +28,7 @@ function EditableDateInput({ initialValue, onSave }) {
 }
 
 //inputフォームの共通化
-function EditableInput({ initialValue, onSave, className='' }) {
+function EditableInput({ initialValue, onSave, className='', disabled }) {
     const [value, setValue] = useState(initialValue);
     const inputRef = useRef(null);
     const [isComposing, setIsComposing] = useState(false);
@@ -50,6 +50,7 @@ function EditableInput({ initialValue, onSave, className='' }) {
         <input
             className={`focus:outline-none focus:ring-0 bg-white bg-opacity-0 ${className}`}
             ref={inputRef}
+            disabled={disabled}
             type="text"
             value={value}
             onChange={e => setValue(e.target.value)}

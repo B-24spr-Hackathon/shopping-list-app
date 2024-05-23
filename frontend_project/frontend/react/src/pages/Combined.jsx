@@ -4,7 +4,7 @@ import { AddBtn, TestBtn, OrangeBtn } from "../components/Buttons";
 import { fetchUserInfoRequest } from "../utils/Requests.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { ItemsListPanel, ShoppingListPanel } from "../components/ListPanels.jsx";
-import { SelectList } from "../components/SelectBox.jsx";
+import { ForShoppingListSelectList, SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
 import { useNavigate } from "react-router-dom";
 import SettingUserInfo from "../components/SettigUserInfo.jsx";
@@ -84,7 +84,7 @@ function CombinedScreen() {
                     <div>
                         <div className="flex justify-center w-full items-center my-4">
                             <div className="">
-                                <SelectList lists={lists} />
+                                <ForShoppingListSelectList lists={lists} />
                             </div>
                         </div>
                         <div className="flex justify-center">
