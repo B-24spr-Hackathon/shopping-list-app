@@ -111,8 +111,6 @@ function CombinedScreen() {
                     <div className="flex flex-col items-center text-center min-h-screen">
                     <div className='w-full mt-12'>
                         <SettingUserInfo />
-                        <ScrollTable />
-                        <ItemsListPanel/>
                     </div>
                 </div>
                 )}
