@@ -11,7 +11,4 @@ python /backend/manage.py migrate
 celery -A backend worker -l info &
 celery -A backend beat &
 # 本番環境用コマンド
-# python /backend/manage.py runserver 0.0.0.0:8000
-
-# 開発環境用コマンド
-python /backend/manage.py runsslserver 0.0.0.0:8000 --certificate /backend/server.crt --key /backend/server.key
+python /backend/manage.py runserver 0.0.0.0:8000

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const apiBaseUrl = "https://127.0.0.1:8000/";
+const apiBaseUrl = "https://alb.tech-talk-cloud.net/";
 export const apiEndpoint = {
     user : "api/user/",
     login: "api/login/",
@@ -19,7 +19,7 @@ export const apiEndpoint = {
     decline: "api/entry/decline/",
 };
 
-export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
+export const lineUrl = "https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=2004751038&redirect_uri=https%3A%2F%2Falb.tech-talk-cloud.net%2Fapi%2Fcallback%2F&state=shopping-list12345&bot_prompt=aggressive&scope=profile%20openid";
 
 
 const apiRequest = async({ method, apiEndpoint, data={}, headers={}, withCredentials, token }) => {
