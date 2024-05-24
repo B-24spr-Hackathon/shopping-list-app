@@ -178,10 +178,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": f"{self.user1.user_name}さん\n友達追加ありがとうございます！\nアプリへ戻って設定の続きをお願いします\n\n{redirect_url}",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": f"{self.user1.user_name}さん\n友達追加ありがとうございます！\nアプリへ戻って設定の続きをお願いします\n\n{redirect_url}",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -273,10 +275,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m _ _ m",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m _ _ m",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -443,10 +447,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": f"{self.item.item_name}を追加しました",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": f"{self.item.item_name}を追加しました",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -532,10 +538,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": f"{self.item.item_name}は既に追加済みです",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": f"{self.item.item_name}は既に追加済みです",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -617,10 +625,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": f"{self.item.item_name}を追加しませんでした",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": f"{self.item.item_name}を追加しませんでした",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -710,10 +720,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
@@ -812,10 +824,12 @@ class LineWebhookViewTestCase(APITestCase):
         # LINE通知リクエストに渡されるべきデータを定義
         expected_json = {
             "replyToken": data["events"][0]["replyToken"],
-            "messages": {
-                "type": "text",
-                "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
-            },
+            "messages": [
+                {
+                    "type": "text",
+                    "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                },
+            ],
         }
 
         # ヘッダーに付与する署名を生成
