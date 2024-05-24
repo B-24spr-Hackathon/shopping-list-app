@@ -14,7 +14,7 @@ from shop.models import User, List, Member, Item
 # 全テスト同じ項目を定義
 url = reverse("line-webhook")
 redirect_url = settings.LINK_REDIRECT_URL
-secret = settings.LINE_CHANNEL_SECRET
+secret = settings.LINE_MESSAGE_SECRET
 
 """
 LineWebhookViewTestCase
@@ -86,6 +86,46 @@ class LineWebhookViewTestCase(APITestCase):
         hash = hmac.new(secret.encode("utf-8"), encode, hashlib.sha256).digest()
         signature = base64.b64encode(hash).decode("utf-8")
         return signature
+
+    # 疎通確認のリクエスト（空のボディ）
+    @patch("shop.views.webhook.logger")
+    def test_empty_request(self, mock_logger):
+        print("\n[[ LineWebhookViewTestCase/test_empty_request(2) ]]")
+
+        # リクエストデータを定義
+        data = {}
+
+        # 期待されるログ出力を定義
+        expected_log = "webhook疎通確認"
+
+        response = self.client.post(url, data=data, format="json")
+
+        # HTTPステータスコードの確認
+        print("[Result]: ", response.status_code, "==", status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # ログ出力の確認
+        print("[Result]: ", expected_log)
+        mock_logger.info.assert_called_with(expected_log)
+
+    # 疎通確認のリクエスト（空のevents）
+    @patch("shop.views.webhook.logger")
+    def test_empty_events(self, mock_logger):
+        print("\n[[ LineWebhookViewTestCase/test_empty_events(2) ]]")
+
+        # リクエストデータを定義
+        data = {"destination": "xxxxxxxxxx", "events": []}
+
+        # 期待されるログ出力を定義
+        expected_log = "webhook疎通確認"
+
+        response = self.client.post(url, data=data, format="json")
+
+        # HTTPステータスコードの確認
+        print("[Result]: ", response.status_code, "==", status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # ログ出力の確認
+        print("[Result]: ", expected_log)
+        mock_logger.info.assert_called_with(expected_log)
 
     # LINE連携のリクエスト（LINEメッセージ送信リクエストはモック）
     @patch("shop.views.webhook.requests.post")
@@ -478,7 +518,7 @@ class LineWebhookViewTestCase(APITestCase):
                 }
             ],
         }
-        
+
         # リクエスト送信後のuser1のデータを定義
         expected_db = {
             "item_name": self.item.item_name,
