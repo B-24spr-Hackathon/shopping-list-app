@@ -41,7 +41,7 @@ class LineWebhookView(APIView):
         request_data = request.data
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request_data}")
-        
+
         # リクエストボディが空の場合は、何もせずにOKレスポンス
         if not request_data or not request_data["events"]:
             logger.info("webhook疎通確認")
@@ -92,10 +92,12 @@ class LineWebhookView(APIView):
                             user_name = serializer.data["user_name"]
                             data = {
                                 "replyToken": reply_token,
-                                "messages": {
-                                    "type": "text",
-                                    "text": f"{user_name}さん\n友達追加ありがとうございます！\nアプリへ戻って設定の続きをお願いします\n\n{redirect_url}"
-                                }
+                                "messages": [
+                                    {
+                                        "type": "text",
+                                        "text": f"{user_name}さん\n友達追加ありがとうございます！\nアプリへ戻って設定の続きをお願いします\n\n{redirect_url}",
+                                    }
+                                ],
                             }
 
                             # リダイレクトURLの送信
@@ -114,10 +116,12 @@ class LineWebhookView(APIView):
                         logger.info(f"JWT以外のtext受信(user_id: {user_id})")
                         data = {
                             "replyToken": reply_token,
-                            "messages": {
-                                "type": "text",
-                                "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m"
-                            }
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                                }
+                            ],
                         }
 
                         # 対応していない旨のメッセージ送信
@@ -132,10 +136,12 @@ class LineWebhookView(APIView):
                     logger.info("text以外の受信")
                     data = {
                         "replyToken": reply_token,
-                        "messages": {
-                            "type": "text",
-                            "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
-                        },
+                        "messages": [
+                            {
+                                "type": "text",
+                                "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                            },
+                        ],
                     }
 
                     # 対応していない旨のメッセージ送信
@@ -193,10 +199,12 @@ class LineWebhookView(APIView):
                 # メッセージの送信
                 data = {
                     "replyToken": reply_token,
-                    "messages": {
-                        "type": "text",
-                        "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m _ _ m",
-                    },
+                    "messages": [
+                        {
+                            "type": "text",
+                            "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m _ _ m",
+                        },
+                    ],
                 }
 
                 response = requests.post(reply_url, headers=headers, json=data)
@@ -223,10 +231,12 @@ class LineWebhookView(APIView):
                         # メッセージの送信
                         data = {
                             "replyToken": reply_token,
-                            "messages": {
-                                "type": "text",
-                                "text": f"{item.item_name}は既に追加済みです",
-                            },
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": f"{item.item_name}は既に追加済みです",
+                                },
+                            ],
                         }
 
                         response = requests.post(reply_url, headers=headers, json=data)
@@ -266,10 +276,12 @@ class LineWebhookView(APIView):
                         # メッセージの送信
                         data = {
                             "replyToken": reply_token,
-                            "messages": {
-                                "type": "text",
-                                "text": f"{item.item_name}を追加しました",
-                            },
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": f"{item.item_name}を追加しました",
+                                },
+                            ],
                         }
 
                         response = requests.post(reply_url, headers=headers, json=data)
@@ -283,10 +295,12 @@ class LineWebhookView(APIView):
                     # メッセージの送信
                     data = {
                         "replyToken": reply_token,
-                        "messages": {
-                            "type": "text",
-                            "text": f"{data}を追加しませんでした",
-                        },
+                        "messages": [
+                            {
+                                "type": "text",
+                                "text": f"{data}を追加しませんでした",
+                            },
+                        ],
                     }
 
                     response = requests.post(reply_url, headers=headers, json=data)
