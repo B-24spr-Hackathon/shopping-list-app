@@ -38,9 +38,15 @@ function Home() {
 
     useEffect(() => {
         const fetchUserInfo = async () => {
+            const memberStatusResponse = await fetchMemberStatusInfoRequest(token);
+            dispatch(setMember(memberStatusResponse.data));
+            const userInfoResponse = await fetchUserInfoRequest(token);
+            dispatch(setUser(userInfoResponse.data.user));
+
             if (lists.length == 0) {
                 setMessage('まだリストがありません');
             } else {
+                setMessage("");
 
                 //dispatch(setSelectedList(userInfo.data.lists[0]))
                 // const response = await fetchListInfoRequest(selectedListId, token);
@@ -73,24 +79,33 @@ function Home() {
     const [friendApplyUserLists, setFriendApplyUserLists] = useState([]);
     const [inviteAuthority, setInviteAuthority] = useState("False");
     const [applyAuthority, setApplyAuthority] = useState("False");
+    const [inviteFriendSearchError, setInviteFriendSearchError] = useState("");
+    const [applyFriendSearchError, setApplyFriendSearchError] = useState("");
 
     //招待する友達を検索
     const handleSearchInviteFriend = async () => {
         try {
+            setInviteFriendSearchError("");
             const response = await searchFriendRequest(friendInviteUserId, token);
             setFriendInviteUserInfo(response.data);
         } catch {
+            setFriendInviteUserInfo({})
+            setInviteFriendSearchError("見つかりませんでした")
             console.log(err.response.data);
         }
     }
     //申請する友達を検索
     const handleSearchApplyFriend = async () => {
         try {
+            setApplyFriendSearchError("");
             const response = await searchApplyFriendRequest(friendApplyUserId, token);
             setFriendApplyUserInfo(response.data);
             setFriendApplyUserLists(response.data.lists);
         } catch {
+            setFriendApplyUserInfo({});
+            setApplyFriendSearchError("見つかりませんでした")
             console.log(err.response.data);
+            
         }
     }
     //招待する
@@ -189,7 +204,9 @@ function Home() {
                     <div className="flex justify-center">
                         {message}
                     </div>
-                    <AddNewList />
+                    <div className="flex justify-center">
+                        <AddNewList />
+                    </div>
                 <div className="flex justify-center ">
                     <div className="my-4">
                         <OrangeBtn disabled={lists.length == 0} onClick={() => navigate('/shoppinglist')} children="選んだリストを見る" />
@@ -200,8 +217,8 @@ function Home() {
                 </div>
                 <div className="flex justify-center">
                     <div className="flex flex-col w-auto p-4">
-                        <button onClick={() => setSelectedTab('invite')} className={`py-2 px-4 rounded-t-lg border ${selectedTab === 'invite' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>友達を招待</button>
-                        <button onClick={() => setSelectedTab('apply')} className={`py-2 px-4 rounded-b-lg ${selectedTab === 'apply' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>共有を申請</button>
+                        <button onClick={() => setSelectedTab('invite')} className={`py-2 px-4 rounded-t-lg border ${selectedTab === 'invite' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>自分のリストに友達を招待</button>
+                        <button onClick={() => setSelectedTab('apply')} className={`py-2 px-4 rounded-b-lg ${selectedTab === 'apply' ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}>友達のリストに共有を申請</button>
                     </div>
                 </div>
                 {selectedTab === 'invite' && (
@@ -218,7 +235,9 @@ function Home() {
                                     検索結果：
                                 </div>
                                 <div className="flex justify-center">
+                                    
                                     <OtherUserNameAndIcon userInfo={friendInviteUserInfo.user_name} />
+                                    {inviteFriendSearchError && <p className="text-red-500">{inviteFriendSearchError}</p>}
                                 </div>
                             </div>
                             <div className="flex justify-center w-full mb-2">
@@ -248,6 +267,8 @@ function Home() {
                                 </div>
                                 <div className="flex justify-center">
                                     <OtherUserNameAndIcon userInfo={friendApplyUserInfo.user_name} />
+                                    {applyFriendSearchError && <p className="text-red-500">{applyFriendSearchError}</p>}
+
                                 </div>
                             </div>
                             <div className="flex justify-center w-full mb-2">

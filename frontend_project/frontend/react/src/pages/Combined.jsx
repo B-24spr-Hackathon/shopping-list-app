@@ -13,6 +13,7 @@ import { UserNameAndIcon } from "../components/UserNameIcon";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import ToHomeButton from "../components/ToHome.jsx";
+import { setUser } from "../reducers/userSlice.jsx";
 
 
 function CombinedScreen() {
@@ -26,8 +27,10 @@ function CombinedScreen() {
 
     useEffect(() => {
         const fetchListAndItemsInfo = async () => {
-            const listsOfUser = await fetchUserInfoRequest(token);
-            setLists(listsOfUser.data.lists);
+            const userInfoResponse = await fetchUserInfoRequest(token);
+            console.log('itemsEffectUser');
+            dispatch(setUser(userInfoResponse.data.user));
+            setLists(userInfoResponse.data.lists);
 
         };
         fetchListAndItemsInfo();

@@ -49,7 +49,7 @@ function SettingUserInfo() {
     }
 
     const dayOptions = [];
-    for (let d = 1; d <= 10; d++) {
+    for (let d = 0; d <= 10; d++) {
         dayOptions.push(d);
     }
 
@@ -100,10 +100,21 @@ function SettingUserInfo() {
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">ユーザーID</label>
                 <EditableInput disabled='false' initialValue={userInfo.user_id} onSave={(newValue => handleUpdateUserInfo('user_id',newValue))} className="text-xl mt-2 text-center" />
             </div>
-            <div className="relative mb-6 border-b w-full max-w-xs">
+
+            {!userInfo.line_status && (
+                <div className="relative mb-6 border-b w-full max-w-xs">
+                    <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">メールアドレス</label>
+                    <EditableInput
+                        initialValue={userInfo.email}
+                        onSave={(newValue) => handleUpdateUserInfo('email', newValue)}
+                        className="w-full text-lg mt-2 text-center"
+                    />
+                </div>
+            )}
+            {/* <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">メールアドレス</label>
                 <EditableInput initialValue={userInfo.email} onSave={(newValue => handleUpdateUserInfo('email',newValue))} className="w-full text-lg mt-2 text-center" />
-            </div>
+            </div> */}
             <div className="relative mb-6 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">最初に開く画面</label>
                 <div className="flex justify-center mt-2">
@@ -180,7 +191,7 @@ function SettingUserInfo() {
                     ))}
                 </select>
             </div>
-            <div className="relative mb-6 border-b w-full max-w-xs">
+            <div className="relative mb-2 border-b w-full max-w-xs">
                 <label className="absolute -top-2.5 left-2 px-1 text-xs text-gray-600">通知するタイミング</label>
                 <select
                     value={userInfo.remind_timing}
@@ -190,11 +201,13 @@ function SettingUserInfo() {
                 >
                     {dayOptions.map((day, index) => (
                         <option key={index} value={day} className="text-sm">
-                            {day} 日前
+                            {day} 日後
                         </option>
                     ))}
                 </select>
             </div>
+                    <div className="left-2 px-1 text-xs w-full max-w-xs text-start text-gray-600">　※お買い物リストに追加されていない場合、</div>
+                    <div className="left-2 px-1 text-xs w-full max-w-xs text-start text-gray-600 mb-8">　　設定した日が経過すると通知がきます。</div>
             <DropUserBtn />
         </div>
     );

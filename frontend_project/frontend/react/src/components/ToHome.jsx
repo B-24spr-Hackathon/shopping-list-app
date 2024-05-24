@@ -5,7 +5,7 @@ import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-i
 function ToHomeButton({ userInfo, handleToHome }) {
     return (
         <>
-            {userInfo.invitation ? (
+            {userInfo.invitation || userInfo.request ? (
                 <button onClick={handleToHome}>
                     <FontAwesomeIcon icon={faHouseCircleExclamation} style={{ color: "#ff6524", fontSize: '32px' }} />
                 </button>

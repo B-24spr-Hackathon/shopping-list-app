@@ -36,8 +36,11 @@ function LineLinkForm () {
 
                 <button onClick={copyToClipboard}>ここを押してコピー</button>
             </div>
+            <div className="flex justify-center mt-8">
+                {copySuccess && <p>{copySuccess}</p>}
+
             </div>
-        {copySuccess && <p>{copySuccess}</p>}
+            </div>
         </div>
         </>
     )
