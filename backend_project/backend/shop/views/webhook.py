@@ -49,11 +49,14 @@ class LineWebhookView(APIView):
 
         logger.info("Webhook処理開始")
         # 署名の検証
+        # headersからx-line-signatureを取得（文字列）
         line_signature = request.headers.get("x-line-signature")
+        # request.body（バイト文字列）を使用してダイジェストを計算
         hash = hmac.new(client_secret.encode("utf-8"),
                         request_body, hashlib.sha256).digest()
+        # hashをBase64エンコードし、文字列にデコード
         signature = base64.b64encode(hash).decode("utf-8")
-        if not hmac.compare_digest(signature, line_signature):
+        if signature != line_signature:
             logger.error("署名検証の失敗")
             return Response({"error": "Invalid signature"},
                             status=status.HTTP_200_OK)
