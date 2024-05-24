@@ -1,11 +1,10 @@
-import jwt, requests
-from datetime import datetime, timedelta
+import requests
+from datetime import datetime
 from django.test import TestCase
-from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from unittest.mock import patch, call
 from django.conf import settings
-from shop.tasks import remind_request, shopping_request, remind_batch
+from shop.tasks import remind_request, shopping_request, remind_batch, shopping_batch
 from shop.models import User, List, Item
 from celery import current_app
 
@@ -771,3 +770,100 @@ class RemindBatchTestCase(TestCase):
         print("[Result]: user2 items: ", result_args[0][0][1])
         print("[Expect]: user2 items: ", expected_args2[1])
         self.assertEqual(result_args[0][0][1], expected_args2[1])
+
+
+"""
+ShoppingBatchTestCase
+shopping_batchのテストケース
+"""
+class ShoppingBatchTestCase(TestCase):
+    def setUp(self):
+        # 初期値を設定
+        self.user1 = User.objects.create(
+            user_id="test",
+            user_name="test",
+            email="test@sample.com",
+            password=make_password("test"),
+            line_id="abcdefghijklmnopqrstuvwxyz",
+            line_status=True,
+            have_list=True,
+            remind=True,
+            remind_timing=3,
+            remind_time=datetime.strptime("18:00", "%H:%M").time(),
+        )
+
+        list1_data = [
+            {
+                "list_id": 1,
+                "list_name": "user1リスト1",
+                "owner_id": self.user1,
+                "shopping_day": 25,
+            },
+            {
+                "list_id": 2,
+                "list_name": "user1リスト2",
+                "owner_id": self.user1,
+                "shopping_day": 25,
+            },
+        ]
+
+        List.objects.bulk_create([List(**data) for data in list1_data])
+
+        self.user2 = User.objects.create(
+            user_id="hoge",
+            user_name="hoge",
+            email="hoge@sample.com",
+            password=make_password("hoge"),
+            line_id="12345abc67890",
+            line_status=True,
+            have_list=True,
+            remind=True,
+            remind_timing=0,
+            remind_time=datetime.strptime("19:00", "%H:%M").time(),
+        )
+
+        List.objects.create(list_id=3, list_name="user2リスト", owner_id=self.user2, shopping_day=25)
+
+    # user1: 2アイテム、user2: 1アイテムの通知
+    @patch("shop.tasks.logger")
+    @patch("shop.tasks.shopping_request.apply_async")
+    def test_ok(self, mock_shopping_request, mock_logger):
+        print("\n[[ ShoppingBatchTestCase/test_ok(6) ]]")
+
+        # shopping_requestに渡される予想される引数を定義
+        expected_args1 = self.user1.line_id
+
+        expected_args2 = self.user2.line_id
+
+        # タスクの実行
+        shopping_batch()
+
+        # shopping_requestに渡された引数を取得
+        result_args = []
+        for i in mock_shopping_request.call_args_list:
+            args, _ = i
+            result_args.append(args)
+
+        # ログの呼出し内容と順番を定義
+        expected_log = [
+            call.info("買い物日通知バッチ処理の開始"),
+            call.info("買い物日通知ユーザー数: 2"),
+            call.info("買い物日通知バッチ処理の終了"),
+        ]
+
+        # ログが指定した順で呼出されたか確認
+        mock_logger.info.assert_has_calls(expected_log)
+        # ログ出力の確認
+        print("[Result]: 買い物日通知バッチ処理の開始")
+        print("[Result]: 買い物日通知ユーザー数: 2")
+        print("[Result]: 買い物日通知バッチ処理の終了")
+        # shopping_requestが呼出された回数
+        print("[Result]: ", mock_shopping_request.call_count, "==", 2)
+        self.assertEqual(mock_shopping_request.call_count, 2)
+        # shopping_requestに渡されたargsを確認
+        print("[Result]: user1 line_id: ", result_args[0][0][0])
+        print("[Expect]: user1 line_id: ", expected_args1)
+        self.assertEqual(result_args[0][0][0], expected_args1)
+        print("[Result]: user2 line_id: ", result_args[1][0][0])
+        print("[Expect]: user2 line_id: ", expected_args2)
+        self.assertEqual(result_args[1][0][0], expected_args2)
