@@ -14,7 +14,7 @@ logger = logging.getLogger("backend")
 
 
 # デフォルトの値を定義
-client_secret = settings.LINE_CHANNEL_SECRET
+client_secret = settings.LINE_MESSAGE_SECRET
 secret = settings.SECRET_KEY
 access_token = settings.CHANNEL_ACCESS_TOKEN
 reply_url = settings.REPLY_URL
