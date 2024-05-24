@@ -41,7 +41,7 @@ class LineWebhookView(APIView):
         request_data = request.data
         logger.info(f"{request.method}:{request.build_absolute_uri()}")
         logger.info(f"{request_data}")
-        
+
         # リクエストボディが空の場合は、何もせずにOKレスポンス
         if not request_data or not request_data["events"]:
             logger.info("webhook疎通確認")
@@ -58,8 +58,7 @@ class LineWebhookView(APIView):
         signature = base64.b64encode(hash).decode("utf-8")
         if signature != line_signature:
             logger.error("署名検証の失敗")
-            return Response({"error": "Invalid signature"},
-                            status=status.HTTP_200_OK)
+            return Response({"error": "Invalid signature"}, status=status.HTTP_200_OK)
 
         # リクエストボディからeventsを取得
         events = request_data.get("events")
