@@ -48,7 +48,7 @@ function MyLists({ lists, token }) {
                         <input
                             type="radio"
                             name="hs-list-radio"
-                            className="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                            className="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none "
                             id={`hs-list-radio-${list.list_id}`}
                             value={list.list_id}
                             checked={selectedListId === list.list_id}
@@ -56,7 +56,7 @@ function MyLists({ lists, token }) {
                         />
                         <label
                             htmlFor={`hs-list-radio-${list.list_id}`}
-                            className="text-sm text-gray-500 ms-2 dark:text-neutral-400 flex-grow"
+                            className="text-sm text-gray-500 ms-2 flex-grow"
                         >
                             <EditableInputWithButton
                                 initialValue={list.list_name}

@@ -30,7 +30,7 @@ const ToDefault = () => {
             if(userInfoResponse.data.lists.length != 0){
                 //selectedListがなければ、リストの最初を設定する
                 if(selectedList.list_id == null){
-                    dispatch(setSelectedList(userInfo.lists[0]))
+                    dispatch(setSelectedList(userInfoResponse.data.lists[0]))
                 }
                 navigate('/shoppinglist');
             //リストがなければ/homeへ

@@ -30,18 +30,19 @@ function App() {
         <div>
           <Routes>
             <Route exact path="/" element={<LoginNew />} />
-            <Route path="/itemspre" element={<Items />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/oldshopping" element={<ShoppingList />} />
-            <Route path="/setting" element={<Setting />} />
+            <Route path="/shoppinglist" element={<CombinedScreen/>} />
             <Route path="/home" element={<Home />} />
             <Route path="/lineloginerror" element={<LineLoginError />} />
             <Route path="/lineloginform" element={<LineLoginForm />} />
             <Route path="/lineloginmethod" element={<LineLoginMethod />} />
             <Route path="/todefault" element={<ToDefault />} />
             <Route path="/linelinkform" element={<LineLinkForm/>} />
-            <Route path="/shoppinglist" element={<CombinedScreen/>} />
-            <Route path="/old" element={<Login/>} />
+
+            <Route path="/itemsold" element={<Items />} />
+            <Route path="/settingold" element={<Setting />} />
+            <Route path="/signupold" element={<Signup />} />
+            <Route path="/oldshopping" element={<ShoppingList />} />
+            <Route path="/oldlogin" element={<Login/>} />
 
             
 

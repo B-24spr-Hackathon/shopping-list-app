@@ -13,7 +13,7 @@ import { UserNameAndIcon } from "../components/UserNameIcon";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faHouseCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import ToHomeButton from "../components/ToHome.jsx";
-import ScrollTable from "../components/Table.jsx";
+
 
 function CombinedScreen() {
     const dispatch = useDispatch();

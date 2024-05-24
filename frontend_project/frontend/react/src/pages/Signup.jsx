@@ -45,8 +45,6 @@ function Signup({ toggleForm }) {
     };
 
     const handleSignup = async () => {
-        if (passwordError || emailError) return;
-        if (!user_id || !user_name || !email || !password1 || !password2) return;
         try {
             const response = await signUpRequest(user_id, user_name, email, password1);
             const token = response.data.access;
@@ -55,8 +53,18 @@ function Signup({ toggleForm }) {
             dispatch(setToken(token));
             navigate('/todefault');
         } catch (err) {
-            setError("他のユーザーが使用中のユーザーIDです");
-            console.error('error;', err);
+            if (err.response) {
+                const errData = err.response.data;
+                const errs = [];
+                for (const key in errData) {
+                  if (errData.hasOwnProperty(key)) {
+                    errs.push(`${errData[key]}`);
+                  }
+                }
+                setError(errs);
+              } else {
+                setError(['Network error']);
+              }
         }
     };
 
@@ -72,7 +80,7 @@ function Signup({ toggleForm }) {
                 <TextInput type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                 <TextInput type="password" placeholder="パスワード" value={password1} onChange={e => setPassword1(e.target.value)} />
                 <TextInput type="password" placeholder="パスワード(確認)" value={password2} onChange={e => setPassword2(e.target.value)} />
-                <CertifyBtn onClick={handleSignup} children="登録する" />
+                <CertifyBtn onClick={handleSignup} children="登録する" disabled={!user_id || !user_name || !email || !password1 || !password2 || passwordError || emailError} />
                 <RegisterOrLogin children="すでにお持ちのアカウントでログインする" onClick={toggleForm} />
                 {emailError && <p className="text-red-500">{emailError}</p>}
                 {passwordError && <p className="text-red-500">{passwordError}</p>}

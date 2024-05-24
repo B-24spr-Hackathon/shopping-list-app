@@ -1,7 +1,7 @@
 import React from "react";
 
-function CertifyBtn({ onClick, children }) {
-    return <button className="bg-base-orange text-white px-24 py-2.5 rounded-full text-l my-2 font-medium" onClick={onClick}>{children}</button>;
+function CertifyBtn({ onClick, children, disabled }) {
+    return <button className="bg-base-orange text-white px-24 py-2.5 rounded-full text-l my-2 font-medium disabled:opacity-50" onClick={onClick} disabled={disabled}>{children}</button>;
 }
 
 function LineBtn({ onClick, children, disabled }) {
@@ -29,7 +29,7 @@ function DeleteListBtn({ onClick, children }) {
     return <button className="h-8 w-1/2 rounded-full text-white bg-base-orange border" onClick={onClick} >{children}</button>
 }
 function OrangeBtn({ onClick, children, disabled }){
-    return <button type="button" onClick={onClick} disabled={disabled} class="py-3 px-4 w-60 justify-center inline-flex items-center gap-x-2 text-lg font-medium rounded-lg border border-gray-200 bg-base-orange text-white shadow-sm hover:bg-base-orange-hover disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:hover:bg-neutral-800">
+    return <button type="button" onClick={onClick} disabled={disabled} class="py-3 px-4 w-60 justify-center inline-flex items-center gap-x-2 text-lg font-medium rounded-lg border border-gray-200 bg-base-orange text-white shadow-sm hover:bg-base-orange-hover disabled:opacity-50 disabled:pointer-events-none ">
             {children}
             </button>
 }

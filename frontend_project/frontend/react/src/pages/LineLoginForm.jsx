@@ -62,11 +62,14 @@ function LineLoginForm() {
             <div className="flex flex-col">
                 <Header />
                 <div className="flex flex-col justify-center flex-grow items-center overflow-auto">
+                <div className="flex justify-center my-4">
+                    <img className="w-52 h-40 object-cover rounded-full" src="/kaimotto.jpeg"/>
+                </div>
                     <Title children="LINEログイン" />
-                    <Bar children="必要な情報を入力する"/>
+                    <Bar children="登録するユーザーIDを入力してください"/>
                     <TextInput  type="text" placeholder="user_id" value={userId} onChange={e => setUserId(e.target.value)} />
                     {/* <TextInput  type="text" placeholder="user_name未実装" value={password} onChange={e => setPassword(e.target.value)} /> */}
-                    <CertifyBtn onClick={handleLineLogin} children="ログインする"/>
+                    <LineBtn children="ログインする" onClick={handleLineLogin} disabled={!userId} />
                     <RegisterOrLogin children="メールアドレスでログインに戻る" onClick={ () => navigate('/')} />
                     {error && <p>{error}</p>} { }
                 </div>

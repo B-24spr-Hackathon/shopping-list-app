@@ -1,22 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { Header, Footer } from "../components/HeaderImg";
 import { TextInput } from "../components/TextInput";
 import { CertifyBtn, LineBtn } from "../components/Buttons";
 import { Title, Bar, RegisterOrLogin } from "../components/Title";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from "../reducers/userSlice";
 import { fetchUserInfoRequest, lineUrl, loginRequest } from "../utils/Requests";
 import { setToken } from "../reducers/tokenSlice";
+
+
 
 function Login({ toggleForm }) {
     const dispatch = useDispatch();
     const [cookies, setCookie] = useCookies(['jwt_token']);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState([]);
     const navigate = useNavigate();
+    const token = useSelector(state => state.token.token);
+
+    useEffect(()=> {
+        const haveJwt = async()=>{
+            try{
+                const response = await fetchUserInfoRequest(token);
+                navigate('/todefault');
+            }catch(err){
+                console.error(err);
+            }
+        }
+        haveJwt();
+    }, []);
 
     const handleLogin = async () => {
         try {
@@ -29,8 +44,18 @@ function Login({ toggleForm }) {
             navigate('/todefault');
 
         } catch (err) {
-            console.log(err.response.data);
-            setError("入力した情報で登録されていません。");
+            if (err.response) {
+                const errData = err.response.data;
+                const errs = [];
+                for (const key in errData) {
+                  if (errData.hasOwnProperty(key)) {
+                    errs.push(`${errData[key]}`);
+                  }
+                }
+                setError(errs);
+              } else {
+                setError(['Network error']);
+              }
         };
     };
 
@@ -43,7 +68,7 @@ function Login({ toggleForm }) {
                 <Bar children="またはメールアドレスでログイン" />
                 <TextInput type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                 <TextInput type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} />
-                <CertifyBtn onClick={handleLogin} children="ログインする" />
+                <CertifyBtn onClick={handleLogin} children="ログインする" disabled={!email || !password} />
                 <RegisterOrLogin children="新規登録はこちらから" onClick={toggleForm} />
                 {error && <p className="text-red-500">{error}</p>}
             </div>

@@ -79,7 +79,7 @@ function ShoppingListPanel() {
     const shoppingItemsHeader = (
         <thead>
             <tr>
-                <th colspan="4" scope="col" class="px-2 py-2 text-center text-lg font-medium text-gray-500 uppercase dark:text-neutral-500">
+                <th colspan="4" scope="col" class="px-2 py-2 text-center text-lg font-medium text-gray-500 uppercase">
                     買い物予定日：{formatDate(ShoppingListInfo.next_shopping_day)}</th>
             </tr>
         </thead>
@@ -87,23 +87,34 @@ function ShoppingListPanel() {
 
     const shoppingItemsData = shoppingItems.map((item, index) => (
         <>
-        <tbody class="divide-y divide-gray-200 dark:divide-neutral-70">
+        <tbody class="divide-y divide-gray-200">
 
             <tr key={index}>
-                <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800">
                     {getColorIcon(item.color)}
                 </td>
-                <td class="px-2 py-2 whitespace-nowrap text-start text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
-                    {item.item_name}
+                <td class="px-2 py-2 whitespace-nowrap text-start text-sm w-32 font-medium text-gray-800">
+                    {item.item_url ? (
+                        <a
+                            href={item.item_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                        >
+                            {item.item_name}
+                        </a>
+                    ) : (
+                        item.item_name
+                    )}
                 </td>
-                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800">
                     <BoughtOrPassBtn
                         onClick={ () => handleBought(item) }
                         children="買った"
                         disabled={!item.to_list}
                         />
                 </td>
-                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800">
                     <BoughtOrPassBtn
                         onClick={ () => handlePass(item) }
                         children="見送る"
@@ -122,7 +133,7 @@ function ShoppingListPanel() {
             <div class="-m-1.5 overflow-x-auto overflow-y-auto  mx-auto max-w-128">
                 <div class="p-1.5 min-w-full inline-block align-middle">
                     <div class="overflow-hidden border rounded-lg">
-                        <table class="text-center min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                        <table class="text-center min-w-full divide-y divide-gray-200">
                             { shoppingItemsHeader }
 
                             {shoppingItemsData}
@@ -169,7 +180,7 @@ function ItemsListPanel() {
     useEffect(() => {
         setErrorMessage("");
         const fetchListAndItemsInfo = async() => {
-            if(selectedList.is_owner){
+            if(selectedList.is_owner == true){
                 const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
                 setItemsState(itemsInfo.data.items);
                 // const listsInfo = await fetchListInfoRequest(selectedList.list_id, token);
@@ -183,6 +194,7 @@ function ItemsListPanel() {
                     //clear
                     setItemsState([]);
                     setErrorMessage("※お買い物リストの閲覧のみ可能です。")
+                    const itemsInfo = await fetchItemsOfListRequest(selectedList.list_id, token);
                 }
             }
         };
@@ -249,10 +261,10 @@ function ItemsListPanel() {
     const itemsData = itemsState.map((item) => (
         <>
             
-            <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+            <tbody class="divide-y divide-gray-200">
                 <tr key={item.item_id}>
                     {/*管理対象*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800">
                         <input
                             type="checkbox"
                             checked={item.manage_target}
@@ -261,14 +273,14 @@ function ItemsListPanel() {
                               />
                     </td>
                     {/*カテゴリカラー*/}
-                    <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-1 py-1 whitespace-nowrap text-sm font-medium text-gray-800">
                         <SimpleSelectBox
                             color={item.color}
                             onChange={(selectedOption) => updateItem(item, 'color', selectedOption.value)}
                         />
                     </td>
                     {/*商品名*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-sm w-32 font-medium text-gray-800">
                         <EditableInput
                             className=' '
                             initialValue={item.item_name}
@@ -276,7 +288,7 @@ function ItemsListPanel() {
                             />
                     </td>
                     {/*消費サイクル*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm w-32 font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm w-32 font-medium text-gray-800">
                         <EditableInput
                             className='text-center w-14'
                             initialValue={item.consume_cycle}
@@ -284,14 +296,14 @@ function ItemsListPanel() {
                             />日
                     </td>
                     {/*直近の開封日*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800">
                         <EditableDateInput
                         initialValue={item.last_open_at}
                         onSave={newValue => updateItem(item, 'last_open_at', newValue)}
                         />
                     </td>
                     {/*リンク*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-sm text-start font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-sm text-start font-medium text-gray-800">
                         <EditableInput
                             className='w-16 text-center'
                             initialValue={item.item_url}
@@ -299,14 +311,14 @@ function ItemsListPanel() {
                             />
                     </td>
                     {/*最終購入日*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-sm font-medium text-gray-800">
                         <EditableDateInput
                             initialValue={item.last_purchase_at}
                             onSave={newValue => updateItem(item, 'last_purchase_at', newValue)}
                             />
                     </td>
                     {/*リスト追加ボタン*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-sm w-20 font-medium text-gray-800">
                         <ToShoppingListBtn
                             onClick={ () => toShoppingLists(item) }
                             children="追加"
@@ -314,7 +326,7 @@ function ItemsListPanel() {
                         />
                     </td>
                     {/*通知対象*/}
-                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                    <td class="px-2 py-2 whitespace-nowrap text-center text-sm font-medium text-gray-800">
                         <input
                             type='checkbox'
                             checked={item.remind_by_item}
@@ -341,17 +353,17 @@ function ItemsListPanel() {
                 <div class="-m-1.5 overflow-x-auto border">
                     <div class="p-1.5 min-w-full inline-block align-middle">
                     <div class="overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                        <table class="min-w-full divide-y divide-gray-200">
                         <thead>
                             <tr>
-                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">管理する</th>
-                            <th colspan="2" scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">商品名</th>
-                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">消費サイクル</th>
-                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">直近開封日</th>
-                            <th scope="col" class="px-2 py-2 text-center w-16 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">リンク</th>
-                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">最終購入日</th>
-                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">  </th>
-                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">通知する</th>
+                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">管理する</th>
+                            <th colspan="2" scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">商品名</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase">消費サイクル</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase">直近開封日</th>
+                            <th scope="col" class="px-2 py-2 text-center w-16 text-xs font-medium text-gray-500 uppercase">リンク</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase">最終購入日</th>
+                            <th scope="col" class="px-2 py-2 text-center w-20 text-xs font-medium text-gray-500 uppercase">  </th>
+                            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">通知する</th>
                             </tr>
                         </thead>
                             {/* { itemsHeader } */}
