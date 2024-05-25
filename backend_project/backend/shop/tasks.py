@@ -24,8 +24,7 @@ remind_batch
 def remind_batch():
     logger.info("開封確認バッチ処理の開始")
     # 現在の日にちを取得
-    today_datetime = timezone.now()
-    today = today_datetime.date()
+    today = timezone.now().date()
 
     # 通知対象のユーザーとそのユーザーの持つ通知対象となるアイテムを抽出
     # アイテムの取得条件のクエリセット
@@ -224,12 +223,12 @@ def remind_request(line_id, items):
                         {
                             "type": "postback",
                             "label": "追加する",
-                            "data": item["item_id"],
+                            "data": str(item["item_id"]) + "!",
                         },
                         {
                             "type": "postback",
                             "label": "追加しない",
-                            "data": item["item_name"],
+                            "data": str(item["item_id"]),
                         },
                     ],
                 }
@@ -254,12 +253,12 @@ def remind_request(line_id, items):
                             {
                                 "type": "postback",
                                 "label": "追加する",
-                                "data": item["item_id"],
+                                "data": str(item["item_id"]) + "!",
                             },
                             {
                                 "type": "postback",
                                 "label": "追加しない",
-                                "data": item["item_name"],
+                                "data": str(item["item_id"]),
                             },
                         ],
                     },

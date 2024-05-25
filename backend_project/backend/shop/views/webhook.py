@@ -90,7 +90,7 @@ class LineWebhookView(APIView):
                             logger.info("line_id, line_statusの保存成功")
                             serializer.save()
                             user_name = serializer.data["user_name"]
-                            data = {
+                            message_data = {
                                 "replyToken": reply_token,
                                 "messages": [
                                     {
@@ -101,7 +101,7 @@ class LineWebhookView(APIView):
                             }
 
                             # リダイレクトURLの送信
-                            response = requests.post(reply_url, headers=headers, json=data)
+                            response = requests.post(reply_url, headers=headers, json=message_data)
                             if response.ok:
                                 logger.info("LINE連携通知成功")
                             else:
@@ -114,7 +114,7 @@ class LineWebhookView(APIView):
                     # メッセージがjwt以外の時の処理
                     else:
                         logger.info(f"JWT以外のtext受信(user_id: {user_id})")
-                        data = {
+                        message_data = {
                             "replyToken": reply_token,
                             "messages": [
                                 {
@@ -125,7 +125,7 @@ class LineWebhookView(APIView):
                         }
 
                         # 対応していない旨のメッセージ送信
-                        response = requests.post(reply_url, headers=headers, json=data)
+                        response = requests.post(reply_url, headers=headers, json=message_data)
                         if response.ok:
                             logger.info("定型文送信成功")
                         else:
@@ -134,7 +134,7 @@ class LineWebhookView(APIView):
                 # text以外のメッセージに対する処理
                 else:
                     logger.info("text以外の受信")
-                    data = {
+                    message_data = {
                         "replyToken": reply_token,
                         "messages": [
                             {
@@ -145,7 +145,7 @@ class LineWebhookView(APIView):
                     }
 
                     # 対応していない旨のメッセージ送信
-                    response = requests.post(reply_url, headers=headers, json=data)
+                    response = requests.post(reply_url, headers=headers, json=message_data)
                     if response.ok:
                         logger.info("定型文送信成功")
                     else:
@@ -197,7 +197,7 @@ class LineWebhookView(APIView):
                     logger.error("line_statusの更新失敗")
 
                 # メッセージの送信
-                data = {
+                message_data = {
                     "replyToken": reply_token,
                     "messages": [
                         {
@@ -207,7 +207,7 @@ class LineWebhookView(APIView):
                     ],
                 }
 
-                response = requests.post(reply_url, headers=headers, json=data)
+                response = requests.post(reply_url, headers=headers, json=message_data)
                 if response.ok:
                     logger.info("友達登録の返信成功")
                 else:
@@ -222,14 +222,15 @@ class LineWebhookView(APIView):
                 logger.info(f"postbackの受信(user_id: {user.user_id})")
 
                 data = event["postback"]["data"]
-
+                
                 # アイテムを買い物リストに追加する時の処理
-                if type(data) == int:
-                    item = Item.objects.get(item_id=data)
+                if data[-1] == "!":
+                    item_id = int(data[:-1])
+                    item = Item.objects.get(item_id=item_id)
                     # to_listがすでにTrueの場合はその旨をLINE通知
                     if item.to_list:
                         # メッセージの送信
-                        data = {
+                        message_data = {
                             "replyToken": reply_token,
                             "messages": [
                                 {
@@ -239,7 +240,7 @@ class LineWebhookView(APIView):
                             ],
                         }
 
-                        response = requests.post(reply_url, headers=headers, json=data)
+                        response = requests.post(reply_url, headers=headers, json=message_data)
                         if response.ok:
                             logger.info("買い物リスト追加済み通知の送信成功")
                         else:
@@ -274,7 +275,7 @@ class LineWebhookView(APIView):
                             logger.error(f"{item.item_id}の更新失敗")
 
                         # メッセージの送信
-                        data = {
+                        message_data = {
                             "replyToken": reply_token,
                             "messages": [
                                 {
@@ -284,7 +285,7 @@ class LineWebhookView(APIView):
                             ],
                         }
 
-                        response = requests.post(reply_url, headers=headers, json=data)
+                        response = requests.post(reply_url, headers=headers, json=message_data)
                         if response.ok:
                             logger.info("買い物リスト追加通知の送信成功")
                         else:
@@ -292,18 +293,20 @@ class LineWebhookView(APIView):
 
                 # アイテムを買い物リストに追加しない時の処理
                 else:
+                    item_id = int(data)
+                    item = Item.objects.get(item_id=item_id)
                     # メッセージの送信
-                    data = {
+                    message_data = {
                         "replyToken": reply_token,
                         "messages": [
                             {
                                 "type": "text",
-                                "text": f"{data}を追加しませんでした",
+                                "text": f"{item.item_name}を追加しませんでした",
                             },
                         ],
                     }
 
-                    response = requests.post(reply_url, headers=headers, json=data)
+                    response = requests.post(reply_url, headers=headers, json=message_data)
                     if response.ok:
                         logger.info("追加しない通知の送信成功")
                     else:
