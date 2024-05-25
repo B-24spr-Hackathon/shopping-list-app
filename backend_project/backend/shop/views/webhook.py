@@ -58,8 +58,7 @@ class LineWebhookView(APIView):
         signature = base64.b64encode(hash).decode("utf-8")
         if signature != line_signature:
             logger.error("署名検証の失敗")
-            return Response({"error": "Invalid signature"},
-                            status=status.HTTP_200_OK)
+            return Response({"error": "Invalid signature"}, status=status.HTTP_200_OK)
 
         # リクエストボディからeventsを取得
         events = request_data.get("events")
