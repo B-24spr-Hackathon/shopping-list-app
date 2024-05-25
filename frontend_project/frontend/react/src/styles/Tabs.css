@@ -1,0 +1,110 @@
+
+.mainMenu-tabs__tab-list {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #969696;
+}
+
+.mainMenu-tabs__tab {
+    text-align: center;
+    margin: 0 40px;
+    width: 180px;
+    padding: 3px 10px;
+    font-size: 20px;
+    color: #333; /* タブの文字色 */
+    border: none; /* 枠線を消す */
+    background-color: transparent; /* 背景色を透明にする */
+    outline: none; /* アウトラインを消す */
+    cursor: pointer;
+}
+
+.mainMenu-tabs__tab--selected {
+    border-bottom: solid 5px #FFA800;
+}
+
+.items-tabs__tab-list {
+    display: flex;
+    /* border-bottom: 2px solid #ccc; */
+    border-radius: 0;
+    margin-top: 10px;
+    padding: 0;
+    /* background-color: aqua; */
+    /* margin-left: 100px; */
+    border: none;
+}
+
+.items-tabs-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.items-tabs__tab {
+    list-style: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background-color: #f0f0f0;
+    margin-right: 5px;
+    /* clip-path: polygon(5% 0 , 95% 0, 100% 100%, 0% 100%); */
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
+}
+
+.items-tabs__tab--selected {
+    border-bottom: solid 5px #FFA800;
+    background-color: #fff;
+    color: black;
+}
+
+.items-tabs__tab-panel {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    display: none;
+    width: 90%;
+    flex: 1;
+    overflow: auto;
+
+}
+
+.items-tabs__tab-panel--selected {
+    display: block;
+
+}
+
+.item-field-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    height: 80vh;
+
+}
+.item-field-title {
+
+    padding: 10px 20px;
+    border-color: aqua;
+    border: 1px solid rgb(206, 206, 206);
+    border-bottom: none;
+    /* box-shadow: 0px 0px 8px  rgba(0, 0, 0, 0.2); 影を追加 */
+    border-radius: 10px 10px 0 0; /* 角を丸くする */
+    position: relative; /* 相対位置 */
+    background-color: #fff;
+    align-self: flex-start;
+    margin-bottom: -1px;
+}
+
+.item-field {
+    padding: 20px;
+    border: 1px solid rgb(206, 206, 206);
+    width: 100%; /* 幅を調整 */
+    background-color: #fff; /* 背景色を白に */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 影をつける */
+    flex: 1;
+    overflow: auto;
+    /* text-align: center; */
+    /* align-self: flex-start; */
+}

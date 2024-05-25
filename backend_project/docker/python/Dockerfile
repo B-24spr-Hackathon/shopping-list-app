@@ -4,6 +4,9 @@ FROM python:3.11-bullseye
 # Pythonの出力がDockerのログとして扱われる
 ENV PYTHONUNBUFFERED 1
 
+# pycacheの生成を行わない
+ENV PYTHONDONTWRITEBYTECODE 1
+
 # 作業ディレクトリ
 WORKDIR /backend
 

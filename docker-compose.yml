@@ -1,6 +1,12 @@
 version: '3.9'
 
 services:
+  #redisコンテナを定義
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
   backend:
     build:
       # ビルドコンテキストを指定
@@ -11,14 +17,19 @@ services:
       # ホストディレクトリ：コンテナディレクトリにマウント
       - ./backend_project/backend:/backend
     # コンテナ起動時に実行するコマンド
-    command: python3 /backend/manage.py runserver 0.0.0.0:8000
+    command: /backend/command.sh
     # ポートを指定、ホスト：コンテナ
     ports:
       - "8000:8000"
+    environment:
+      TZ: 'Asia/Tokyo'
     # コンテナがフォアグラウンドで実行される
     tty: true
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   frontend:
     build: 
@@ -40,8 +51,9 @@ services:
   db:
     image: mysql:8.0
     platform: linux/amd64
+    # マウント方式、volume名変更 ./mysql/data => mysql_data
     volumes:
-      - ./mysql/data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     ports:
       - 3306:3306
     environment:
@@ -50,4 +62,16 @@ services:
       MYSQL_USER: django
       MYSQL_PASSWORD: django
       TZ: 'Asia/Tokyo'
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    # コマンドlower_case, 追記
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --lower_case_table_names=1
+    # ヘルスチェックを追加
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+#追記
+volumes:
+  mysql_data:
