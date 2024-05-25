@@ -12,6 +12,7 @@ import { ItemsListPanel } from "../components/ListPanels.jsx";
 import { SelectList } from "../components/SelectBox.jsx";
 import LogoutButton from "../components/Logout.jsx";
 import { useNavigate } from "react-router-dom";
+import { setUser } from "../reducers/userSlice.jsx";
 
 
 
@@ -28,9 +29,10 @@ function Items() {
 
    useEffect(() => {
     const fetchListAndItemsInfo = async() =>{
-        const listsOfUser = await fetchUserInfoRequest(token);
+        const userInfoResponse = await fetchUserInfoRequest(token);
         console.log('itemsEffectUser');
-        setLists(listsOfUser.data.lists);
+        dispatch(setUser(userInfoResponse.data.user));
+        setLists(userInfoResponse.data.lists);
         // const itemsOfList = await fetchListInfoRequest(selectedList.list_id);
         // console.log('itemsEffectItemOfList',response);
         // setItems(itemsOfList.data.items);

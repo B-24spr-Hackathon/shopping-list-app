@@ -5,9 +5,23 @@ import Select, { components } from 'react-select';
 import LogoutButton from "./Logout";
 import { TestBtn } from './Buttons';
 import { OtherUserNameAndIcon } from "./UserNameIcon";
+import { useSelector } from "react-redux";
+
+function OptionWithNotification({label}) {
+    const invitationOrRequest = useSelector(state => state.user);
+    return (
+        <div className="relative inline-block">
+            {label}
+            {(invitationOrRequest.invitation || invitationOrRequest.request) && (
+                <span className="absolute top-0 right--1 inline-flex items-center justify-center w-3 h-3 bg-red-600 rounded-full"></span>
+            )}
+        </div>
+    );
+}
+
 
 export const options = [
-    { value: 'invite_status', label: "招待・申請の状況" },
+    { value: 'invite_status', label: <OptionWithNotification label= "招待・申請の状況" /> },
     { value: 'logout', label: <LogoutButton /> },
 ];
 
@@ -73,10 +87,21 @@ const customStyles = {
 const NoInput = (props) => <components.Input {...props} readOnly />;
 
 const DropdownIndicator = (props) => {
+    const invitationOrRequest = useSelector(state => state.user);
     return (
+        // <components.DropdownIndicator {...props}>
+        //     <FontAwesomeIcon icon={faBars} style={{ color: 'gray' }} size="2x" />
+        // </components.DropdownIndicator>
         <components.DropdownIndicator {...props}>
-            <FontAwesomeIcon icon={faBars} style={{ color: 'gray' }} size="2x" />
+            <div className="relative inline-block">
+                <FontAwesomeIcon icon={faBars} style={{ color: 'gray' }} size="2x" />
+                {(invitationOrRequest.invitation || invitationOrRequest.request) &&  (
+                    <span className="absolute bottom-6 left-6 inline-flex items-center justify-center w-3 h-3 bg-red-600 rounded-full"></span>
+                )}
+            </div>
         </components.DropdownIndicator>
+
+
     );
 };
 
@@ -94,21 +119,22 @@ const Menu = props => {
 };
 
 const HamburgerSelect = ({ onChange }) => {
+    
     return (
         <Select
-            options={options}
-            styles={customStyles}
-            components={{ DropdownIndicator, IndicatorSeparator: () => null, Input: NoInput, Menu }} // Use custom DropdownIndicator and disable input cursor
-            menuPortalTarget={document.body} // Render the menu in the body
-            onChange={onChange}
-            isClearable={false} // Prevent clearing selected option
+        options={options}
+        styles={customStyles}
+        components={{ DropdownIndicator, IndicatorSeparator: () => null, Input: NoInput, Menu }} // Use custom DropdownIndicator and disable input cursor
+        menuPortalTarget={document.body} // Render the menu in the body
+        onChange={onChange}
+        isClearable={false} // Prevent clearing selected option
         />
     );
 };
 
 function NewHamburgerMenu({ member, onApprove, onDecline }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    
     const handleMenuSelect = (selectedOption) => {
         if (selectedOption.value === 'invite_status') {
             setIsModalOpen(true);
@@ -117,7 +143,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
             console.log("Logging out...");
         }
     };
-
+    
     const handleModalClose = () => {
         setIsModalOpen(false);
     };
@@ -192,7 +218,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                         ))
                                                     ) : (
                                                         <tr>
-                                                            <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、友達からの招待はありません</td>
+                                                            <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、友達からの招待は届いていません</td>
                                                         </tr>
                                                     )}
                                                 </tbody>
@@ -223,7 +249,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => onDecline(m.member_id)}
-                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-200 hover:text-red-800 disabled:opacity-50 disabled:pointer-events-none"
+                                                                            className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none"
                                                                         >
                                                                             中止
                                                                         </button>
@@ -247,7 +273,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                         <div className="p-1.5 min-w-full inline-block align-middle">
                                             <div className="overflow-hidden">
                                                 <table className="min-w-full  divide-gray-200">
-                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">自分のリストに招待</caption>
+                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">あなたのリストに招待</caption>
                                                     <tbody className="divide-y border-b divide-gray-200">
                                                         {myListInvites.length > 0 ? (
                                                             myListInvites.map((m, index) => (
@@ -273,7 +299,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                             ))
                                                         ) : (
                                                             <tr>
-                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、自分のリストに招待していません</td>
+                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、招待をしていません</td>
                                                             </tr>
                                                         )}
                                                     </tbody>
@@ -288,7 +314,7 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                         <div className="p-1.5 min-w-full inline-block align-middle">
                                             <div className="overflow-hidden">
                                                 <table className="min-w-full  divide-gray-200">
-                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">自分のリストの共有申請</caption>
+                                                    <caption className="py-2 text-center text-lg font-semibold text-gray-800">あなたのリストへの共有申請</caption>
                                                     <tbody className="divide-y border-b divide-gray-200">
                                                         {myListShares.length > 0 ? (
                                                             myListShares.map((m, index) => (
@@ -296,10 +322,14 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium text-gray-800 w-1/4"><OtherUserNameAndIcon userInfo={m.guest_name}/></td>
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-800 w-1/4">{m.list_name}</td>
                                                                     <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
-                                                                        <button
+                                                                    <td className="px-4 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
+                                                                        <TestBtn children="参加" onClick={() => onApprove(m.member_id)} />
+                                                                    </td>
+                                                                        {/* <button
                                                                             type="button"
                                                                             className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                                                                        ></button>
+                                                                        ></button> */}
+
                                                                     </td>
                                                                     <td className="px-2 py-2 text-center whitespace-nowrap text-sm font-medium w-1/4">
                                                                         <button
@@ -307,14 +337,14 @@ function NewHamburgerMenu({ member, onApprove, onDecline }) {
                                                                             onClick={() => onDecline(m.member_id)}
                                                                             className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-red-600 hover:text-red-400 disabled:opacity-50 disabled:pointer-events-none"
                                                                         >
-                                                                            中止
+                                                                            拒否
                                                                         </button>
                                                                     </td>
                                                                 </tr>
                                                             ))
                                                         ) : (
                                                             <tr>
-                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、自分のリストの共有申請をしていません</td>
+                                                                <td colSpan="4" className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800">現在、あなたのリストへの共有申請は届いていません</td>
                                                             </tr>
                                                         )}
                                                     </tbody>
