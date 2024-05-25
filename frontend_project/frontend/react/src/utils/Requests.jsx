@@ -159,7 +159,7 @@ export const lineLinkRequest = async(token) => {
         method: 'GET',
         apiEndpoint: apiEndpoint.lineLink,
         withCredentials: true,
-        toke: token,
+        token: token,
     });
     console.log("lineLink.Response:", response);
     return response;
