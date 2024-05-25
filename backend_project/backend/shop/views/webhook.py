@@ -119,7 +119,7 @@ class LineWebhookView(APIView):
                             "messages": [
                                 {
                                     "type": "text",
-                                    "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                                    "text": "メッセージありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m(_ _)m",
                                 }
                             ],
                         }
@@ -139,7 +139,7 @@ class LineWebhookView(APIView):
                         "messages": [
                             {
                                 "type": "text",
-                                "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m _ _ m",
+                                "text": "ありがとうございます！\n買いもっとでは通知のみを行っており、メッセージは受付けておりません m(_ _)m",
                             },
                         ],
                     }
@@ -202,7 +202,7 @@ class LineWebhookView(APIView):
                     "messages": [
                         {
                             "type": "text",
-                            "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m _ _ m",
+                            "text": "友だち追加ありがとうございます！\n買いもっとからの通知をお待ちください m(_ _)m",
                         },
                     ],
                 }
@@ -222,7 +222,7 @@ class LineWebhookView(APIView):
                 logger.info(f"postbackの受信(user_id: {user.user_id})")
 
                 data = event["postback"]["data"]
-                
+
                 # アイテムを買い物リストに追加する時の処理
                 if data[-1] == "!":
                     item_id = int(data[:-1])
@@ -295,22 +295,43 @@ class LineWebhookView(APIView):
                 else:
                     item_id = int(data)
                     item = Item.objects.get(item_id=item_id)
-                    # メッセージの送信
-                    message_data = {
-                        "replyToken": reply_token,
-                        "messages": [
-                            {
-                                "type": "text",
-                                "text": f"{item.item_name}を追加しませんでした",
-                            },
-                        ],
-                    }
 
-                    response = requests.post(reply_url, headers=headers, json=message_data)
-                    if response.ok:
-                        logger.info("追加しない通知の送信成功")
+                    # to_listがTrue場合
+                    if item.to_list:
+                        message_data = {
+                            "replyToken": reply_token,
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": f"{item.item_name}は買い物リストに追加済みです。\n変更が必要な場合は 買いもっと を開いて変更してください",
+                                },
+                            ],
+                        }
+
+                        response = requests.post(
+                            reply_url, headers=headers, json=message_data
+                        )
+                        if response.ok:
+                            logger.info("変更できない通知の送信成功")
+                        else:
+                            logger.error(f"変更できない通知の送信失敗: {response.text}")
+                    # to_listがFalseの場合
                     else:
-                        logger.error(f"追加しない通知の送信失敗: {response.text}")
+                        message_data = {
+                            "replyToken": reply_token,
+                            "messages": [
+                                {
+                                    "type": "text",
+                                    "text": f"{item.item_name}を追加しませんでした",
+                                },
+                            ],
+                        }
+
+                        response = requests.post(reply_url, headers=headers, json=message_data)
+                        if response.ok:
+                            logger.info("追加しない通知の送信成功")
+                        else:
+                            logger.error(f"追加しない通知の送信失敗: {response.text}")
 
         logger.info("Webhook処理終了")
 
