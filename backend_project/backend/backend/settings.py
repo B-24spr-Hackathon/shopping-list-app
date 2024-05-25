@@ -219,7 +219,7 @@ CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_TIMEZONE = 'Asia/Tokyo'
 
 # Celery Beatの呼出し時間
-BATCH_HOUR = 13
+BATCH_HOUR = 21
 BATCH_MINUTE = 0
 
 
